@@ -28,7 +28,7 @@ configure_file("configure.h.in" "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_con
 # Test target #
 #=============#
 
-set(Header_Files "test_lib.h" "test_string.h")
+set(Header_Files "test_lib.h")
 source_group("${EXEC_NAME} Header Files" FILES "${Header_Files}")
 
 set(Source_Files "test.c")

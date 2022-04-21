@@ -6,7 +6,9 @@ c-str-span
 
 Replacement for C strings, supporting zero-copy use-cases (non-null-terminated).
 
-Extracted from https://github.com/Azure/azure-sdk-for-c
+Extracted from https://github.com/Azure/azure-sdk-for-c @ [`ac28b8`](https://github.com/Azure/azure-sdk-for-c/tree/ac28b8af9254798c1e891945e896d2ae2bdf745e) with:
+  - No dependency on other Azure SDK for C functionalities;
+  - C89 (ANSI C) compliance
 
 Documentation originally from: https://github.com/Azure/azure-sdk-for-c/tree/main/sdk/docs/core#working-with-spans, now below:
 
