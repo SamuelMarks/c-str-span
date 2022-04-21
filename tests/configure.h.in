@@ -1,0 +1,6 @@
+#ifndef C_CONFIG_H
+#define C_CONFIG_H
+
+#define _@TARGET_ARCH@_
+
+#endif /* !C_CONFIG_H */

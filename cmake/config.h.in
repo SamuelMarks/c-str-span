@@ -1,0 +1,9 @@
+#ifndef C_TEST_REPO_CONFIG_H
+#define C_TEST_REPO_CONFIG_H
+
+#define C_TEST_REPO_VERSION_MAJOR @c_str_span_VERSION_MAJOR@
+#define C_TEST_REPO_VERSION_MINOR @c_str_span_VERSION_MINOR@
+#define C_TEST_REPO_VERSION_PATCH @c_str_span_VERSION_PATCH@
+#define C_TEST_REPO_VERSION       "@c_str_span_VERSION@"
+
+#endif /* !C_TEST_REPO_CONFIG_H */
