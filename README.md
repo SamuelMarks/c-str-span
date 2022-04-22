@@ -4,11 +4,11 @@ c-str-span
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Linux, Windows, macOS](https://github.com/SamuelMarks/c-str-span/actions/workflows/linux-Windows-macOS.yml/badge.svg)](https://github.com/SamuelMarks/c-str-span/actions/workflows/linux-Windows-macOS.yml)
 
-Replacement for C strings, supporting zero-copy use-cases (non-null-terminated).
+UTF-8 replacement for C strings, supporting zero-copy use-cases (non-null-terminated).
 
 Extracted from https://github.com/Azure/azure-sdk-for-c @ [`ac28b8`](https://github.com/Azure/azure-sdk-for-c/tree/ac28b8af9254798c1e891945e896d2ae2bdf745e) with:
   - No dependency on other Azure SDK for C functionalities;
-  - C89 (ANSI C) compliance
+  - C89 (ANSI C) compliance.
 
 Documentation originally from: https://github.com/Azure/azure-sdk-for-c/tree/main/sdk/docs/core#working-with-spans, now below:
 
@@ -19,9 +19,9 @@ An `az_span` is a small data structure (defined in the [c_str_span.h](c_str_span
   - a byte pointer
   - an integer size
 
-Use this to create SDKs that pass `az_span` instances to functions to ensure that a buffer's address and size are always passed together; this reduces the chance of bugs. And, since we have the size, operations are fast; for example, we never need to call `strlen` to find the length of a string in order to append to it. Furthermore, when our SDK functions write or copy to an `az_span`, our functions ensure that we never write beyond the size of the buffer; this prevents data corruption. And finally, when reading from an `az_span`, we never read past the `az_span`'s size ensuring that we don't process uninitialized data.
+Use this to create SDKs that pass `az_span` instances to functions to ensure that a buffer's address and size are always passed together; this reduces the chance of bugs. And, since we have the size, operations are fast; for example, we never need to call `strlen` to find the length of a string in order to append to it. Furthermore, when your SDK functions write or copy to an `az_span`, those functions ensure that we never write beyond the size of the buffer; this prevents data corruption. And finally, when reading from an `az_span`, we never read past the `az_span`'s size ensuring that we don't process uninitialized data.
 
-Since your SDK functions require `az_span` parameters, customers must know how to create `az_span` instances so that you can call functions in our SDK. Here are some examples.
+Since your SDK functions require `az_span` parameters, customers must know how to create `az_span` instances so that you can call functions in their SDK. Here are some examples.
 
 Create an empty `az_span`:
 
@@ -66,7 +66,7 @@ Or, you can call this function to copy the string in the `az_span` to your own `
 void az_span_to_str(char* destination, int32_t destination_max_size, az_span source);
 ```
 
-There are many functions to manipulate `az_span` instances. You can slice (subset an `az_span`), parse an `az_span` containing a string into an number, format a number as a string into an `az_span`, check if two `az_span` instances are equal or the contents of two `az_span` instances are equal, and more.
+There are many functions to manipulate `az_span` instances. You can slice (subset an `az_span`), parse an `az_span` containing a string into a number, format a number as a string into an `az_span`, check if two `az_span` instances are equal or the contents of two `az_span` instances are equal, and more.
 
 ### Strings
 

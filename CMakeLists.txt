@@ -65,7 +65,7 @@ install(
 include(InstallRequiredSystemLibraries)
 set(CPACK_BUNDLE_NAME "${PROJECT_NAME}")
 set(CPACK_PACKAGE_VENDOR "SamuelMarks")
-set(CPACK_PACKAGE_DESCRIPTION "Replacement for C strings, supporting zero-copy use-cases (non-null-terminated).")
+set(CPACK_PACKAGE_DESCRIPTION "UTF-8 replacement for C strings, supporting zero-copy use-cases (non-null-terminated).")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "${CPACK_PACKAGE_DESCRIPTION_SUMMARY}")
 if (APPLE)
     set(CPACK_BUNDLE_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Info.plist")
