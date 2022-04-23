@@ -2,8 +2,6 @@
 
 #include <greatest.h>
 
-#undef _Bool
-#undef bool
 #if __STDC_VERSION__ >= 199901L
 #include <stdbool.h>
 #else

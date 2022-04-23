@@ -3,20 +3,13 @@
 /* Copyright (c) Microsoft Corporation. All rights reserved.
  * SPDX-License-Identifier: MIT */
 
-/*
-#include "az_hex_private.h"
-#include "az_span_private.h"
-#include <azure/core/az_precondition.h>
-#include <azure/core/az_span.h>
-#include <azure/core/internal/az_precondition_internal.h>
-#include <azure/core/internal/az_result_internal.h>
-#include <azure/core/internal/az_span_internal.h>*/
 #include "c_str_precondition_internal.h"
 #include "c_str_span_internal.h"
 #include "c_str_result.h"
+#include "c_str_span_private.h"
+#include "c_str_result_internal.h"
+#include "c_str_hex_private.h"
 
-#undef _Bool
-#undef bool
 #if __STDC_VERSION__ >= 199901L
 #include <stdbool.h>
 #else
@@ -29,16 +22,10 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#undef _Bool
-#undef bool
 #if __STDC_VERSION__ >= 199901L
 #include <stdbool.h>
 #else
 #include "c_str_span_stdbool.h"
-#include "c_str_span_internal.h"
-#include "c_str_span_private.h"
-#include "c_str_result_internal.h"
-#include "c_str_hex_private.h"
 #endif
 
 /*#include <azure/core/_az_cfg.h>*/
@@ -454,7 +441,7 @@ AZ_NODISCARD int32_t az_span_find(az_span source, az_span target)
 {
   /* This function implements the Naive string-search algorithm.
    * The rationale to use this algorithm instead of other potentially more
-   * performing ones (Rabin-Karp, e.g.) is due to no additional space needed.
+   * performant ones (Rabin-Karp, e.g.) is due to no additional space needed.
    * The logic:
    * 1. The function will look into each position of `source` if it contains the same value as the
    * first position of `target`.

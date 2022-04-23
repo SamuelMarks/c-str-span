@@ -7,6 +7,7 @@
 #include "c_str_precondition.h"
 #include "c_str_span.h"
 #include "c_str_precondition_internal.h"
+#include "c_str_span_export.h"
 
 #if __STDC_VERSION__ >= 199901L
 #include <stdbool.h>
@@ -77,7 +78,7 @@ AZ_NODISCARD AZ_INLINE bool _az_isfinite(double value)
       != _az_BINARY_VALUE_OF_POSITIVE_INFINITY;
 }
 
-AZ_NODISCARD az_result _az_is_expected_span(az_span* ref_span, az_span expected);
+extern C_STR_SPAN_EXPORT AZ_NODISCARD az_result _az_is_expected_span(az_span* ref_span, az_span expected);
 
 /**
  * @brief Removes all leading and trailing whitespace characters from the \p span. Function will
@@ -97,7 +98,7 @@ AZ_NODISCARD az_result _az_is_expected_span(az_span* ref_span, az_span expected)
  * @param[in] source #az_span pointing to a memory address that might contain whitespace characters.
  * @return The trimmed #az_span.
  */
-AZ_NODISCARD az_span _az_span_trim_whitespace(az_span source);
+extern C_STR_SPAN_EXPORT AZ_NODISCARD az_span _az_span_trim_whitespace(az_span source);
 
 /**
  * @brief Removes all leading whitespace characters from the start of \p span.
@@ -117,7 +118,7 @@ AZ_NODISCARD az_span _az_span_trim_whitespace(az_span source);
  * @param[in] source #az_span pointing to a memory address that might contain whitespace characters.
  * @return The trimmed #az_span.
  */
-AZ_NODISCARD az_span _az_span_trim_whitespace_from_start(az_span source);
+extern C_STR_SPAN_EXPORT AZ_NODISCARD az_span _az_span_trim_whitespace_from_start(az_span source);
 
 /**
  * @brief Removes all trailing whitespace characters from the end of \p span.
@@ -137,7 +138,7 @@ AZ_NODISCARD az_span _az_span_trim_whitespace_from_start(az_span source);
  * @param[in] source #az_span pointing to a memory address that might contain whitespace characters.
  * @return The trimmed #az_span.
  */
-AZ_NODISCARD az_span _az_span_trim_whitespace_from_end(az_span source);
+extern C_STR_SPAN_EXPORT AZ_NODISCARD az_span _az_span_trim_whitespace_from_end(az_span source);
 
 /*#include <azure/core/_az_cfg_suffix.h>*/
 

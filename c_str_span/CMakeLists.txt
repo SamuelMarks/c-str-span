@@ -1,20 +1,20 @@
 get_filename_component(LIBRARY_NAME "${CMAKE_CURRENT_SOURCE_DIR}" NAME)
 
 set(Header_Files
-        "c_str_span_stdbool.h"
-        "c_str_span_types.h"
         "c_str_hex_private.h"
-        "c_str_result_internal.h"
-        "c_str_result.h"
-        "c_str_precondition_internal.h"
         "c_str_precondition.h"
+        "c_str_precondition_internal.h"
+        "c_str_result.h"
+        "c_str_result_internal.h"
+        "c_str_span.h"
         "c_str_span_internal.h"
         "c_str_span_private.h"
-        "c_str_span.h"
+        "c_str_span_stdbool.h"
+        "c_str_span_types.h"
 )
 source_group("Header Files" FILES "${Header_Files}")
 
-set(Source_Files "c_str_span.c")
+set(Source_Files "c_str_span.c" "c_str_span_precondition.c")
 source_group("Source Files" FILES "${Source_Files}")
 
 add_library("${LIBRARY_NAME}" "${Header_Files}" "${Source_Files}")

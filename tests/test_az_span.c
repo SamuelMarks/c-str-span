@@ -1,13 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-/*
-#include "az_span_private.h"
-#include "az_test_definitions.h"
-#include <azure/core/az_span.h>
-#include <azure/core/internal/az_precondition_internal.h>
-#include <azure/core/internal/az_span_internal.h>
-*/
 #include "c_str_precondition_internal.h"
 
 #include "c_str_span_private.h"
@@ -24,8 +17,6 @@
 #include <stdint.h>
 
 #include <cmocka.h>
-
-/*#include <azure/core/_az_cfg.h>*/
 
 #include "test_az_span.h"
 

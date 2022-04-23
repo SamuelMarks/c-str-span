@@ -7,6 +7,7 @@
 #include "c_str_result.h"
 #include "c_str_span.h"
 #include "c_str_precondition_internal.h"
+#include "c_str_span_export.h"
 
 #include <stdint.h>
 
@@ -89,7 +90,7 @@ AZ_NODISCARD int32_t _az_span_url_encode_calc_length(az_span source);
  * occurrence of (but not including the) `delimiter`, or the end of `source` if `delimiter` is not
  * found. If `source` is empty, #az_span_empty() is returned instead.
  */
-az_span _az_span_token(
+extern C_STR_SPAN_EXPORT az_span _az_span_token(
     az_span source,
     az_span delimiter,
     az_span* out_remainder,
