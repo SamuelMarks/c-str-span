@@ -24,14 +24,32 @@ endif (NOT DEFINED TARGET_ARCH)
 
 configure_file("configure.h.in" "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_configure.h" @ONLY)
 
+#=========================#
+# Different compiler args #
+#=========================#
+
+add_library("${EXEC_NAME}_compiler_flags" INTERFACE)
+target_compile_features("${EXEC_NAME}_compiler_flags" INTERFACE "c_std_99")
+
+# add compiler warning flags just when building this project via
+# the BUILD_INTERFACE genex
+set(gcc_like "$<COMPILE_LANG_AND_ID:C,CXX,ARMClang,AppleClang,Clang,GNU,LCC>")
+set(msvc "$<COMPILE_LANG_AND_ID:C,CXX,MSVC>")
+target_compile_options(
+        "${EXEC_NAME}_compiler_flags"
+        INTERFACE
+        "$<${gcc_like}:$<BUILD_INTERFACE:-Wshadow;-Wformat=2;-Wall;-pedantic;-Wno-format-nonliteral;-Wno-unused-function;-Wno-c99-extensions;-Wno-long-long>>"
+        "$<${msvc}:$<BUILD_INTERFACE:-W3;-WX;-Zi;-permissive->>"
+)
+
 #=============#
 # Test target #
 #=============#
 
-set(Header_Files "test_lib.h")
+set(Header_Files "test_lib.h" "test_az_span.h")
 source_group("${EXEC_NAME} Header Files" FILES "${Header_Files}")
 
-set(Source_Files "test.c")
+set(Source_Files "test.c" "test_az_span.c")
 source_group("${EXEC_NAME} Source Files" FILES "${Source_Files}")
 
 add_executable("${EXEC_NAME}" "${Header_Files}" "${Source_Files}")
@@ -46,11 +64,15 @@ target_include_directories(
         "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
 )
 
+find_package(cmocka CONFIG REQUIRED)
+
 target_link_libraries(
         "${EXEC_NAME}"
         PRIVATE
-        "${PROJECT_NAME}_compiler_flags"
+        #"${PROJECT_NAME}_compiler_flags"
+        "${EXEC_NAME}_compiler_flags"
         "${PROJECT_NAME}"
+        "cmocka::cmocka"
 )
 if (MSVC)
     target_compile_definitions("${EXEC_NAME}" PRIVATE _CRT_SECURE_NO_WARNINGS)

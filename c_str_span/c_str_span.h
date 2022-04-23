@@ -2,6 +2,7 @@
 #define C_STR_SPAN_STR_SPAN_H
 
 #include "c_str_span_export.h"
+#include "c_str_result.h"
 #include "c_str_span_types.h"
 
 /* Copyright (c) Microsoft Corporation. All rights reserved.
@@ -42,7 +43,7 @@ typedef struct
   struct
   {
     uint8_t* ptr;
-    int32_t size; // size must be >= 0
+    int32_t size;
   } _internal;
 } az_span;
 
@@ -80,7 +81,7 @@ AZ_NODISCARD AZ_INLINE az_span az_span_create(uint8_t* ptr, int32_t size)
   return (az_span){ ._internal = { .ptr = ptr, .size = size } };
 }
 #else
-AZ_NODISCARD az_span az_span_create(uint8_t* ptr, int32_t size);
+extern C_STR_SPAN_EXPORT AZ_NODISCARD az_span az_span_create(uint8_t* ptr, int32_t size);
 #endif // AZ_NO_PRECONDITION_CHECKING
 
 /**
@@ -89,11 +90,12 @@ AZ_NODISCARD az_span az_span_create(uint8_t* ptr, int32_t size);
  * @remark There is no guarantee that the pointer backing this span will be `NULL` and the caller
  * shouldn't rely on it. However, the size will be 0.
  */
-#define AZ_SPAN_EMPTY                      \
-  (az_span)                                \
+#define AZ_SPAN_EMPTY (az_span) {NULL, 0}
+
+  /*(az_span)                                \
   {                                        \
     ._internal = {.ptr = NULL, .size = 0 } \
-  }
+  }*/
 
 // Returns the size (in bytes) of a literal string.
 // Note: Concatenating "" to S produces a compiler error if S is not a literal string
@@ -166,7 +168,7 @@ AZ_NODISCARD az_span az_span_create(uint8_t* ptr, int32_t size);
  * @return An #az_span over the byte buffer where the size is set to the string's length not
  * including the `\0` terminator.
  */
-AZ_NODISCARD az_span az_span_create_from_str(char* str);
+extern C_STR_SPAN_EXPORT AZ_NODISCARD az_span az_span_create_from_str(char* str);
 
 /******************************  SPAN MANIPULATION */
 
@@ -182,7 +184,7 @@ AZ_NODISCARD az_span az_span_create_from_str(char* str);
  * @return An #az_span into a portion (from \p start_index to \p end_index - 1) of the original
  * #az_span.
  */
-AZ_NODISCARD az_span az_span_slice(az_span span, int32_t start_index, int32_t end_index);
+extern C_STR_SPAN_EXPORT AZ_NODISCARD az_span az_span_slice(az_span span, int32_t start_index, int32_t end_index);
 
 /**
  * @brief Returns a new #az_span which is a sub-span of the specified \p span.
@@ -194,7 +196,7 @@ AZ_NODISCARD az_span az_span_slice(az_span span, int32_t start_index, int32_t en
  * @return An #az_span into a portion (from \p start_index to the size) of the original
  * #az_span.
  */
-AZ_NODISCARD az_span az_span_slice_to_end(az_span span, int32_t start_index);
+extern C_STR_SPAN_EXPORT AZ_NODISCARD az_span az_span_slice_to_end(az_span span, int32_t start_index);
 
 /**
  * @brief Determines whether two spans are equal by comparing their bytes.
@@ -236,7 +238,7 @@ AZ_NODISCARD AZ_INLINE bool az_span_is_content_equal(az_span span1, az_span span
  *
  * @remarks This function assumes the bytes in both spans are ASCII characters.
  */
-AZ_NODISCARD bool az_span_is_content_equal_ignoring_case(az_span span1, az_span span2);
+extern C_STR_SPAN_EXPORT AZ_NODISCARD bool az_span_is_content_equal_ignoring_case(az_span span1, az_span span2);
 
 /**
  * @brief Copies a \p source #az_span containing a string (that is not 0-terminated) to a \p
@@ -252,7 +254,7 @@ AZ_NODISCARD bool az_span_is_content_equal_ignoring_case(az_span span1, az_span 
  * than the \p source #az_span for the \p destination string to be zero-terminated.
  * Content is copied from the \p source buffer and then `\0` is added at the end.
  */
-void az_span_to_str(char* destination, int32_t destination_max_size, az_span source);
+extern C_STR_SPAN_EXPORT void az_span_to_str(char* destination, int32_t destination_max_size, az_span source);
 
 /**
  * @brief Searches for \p target in \p source, returning an #az_span within \p source if it finds
@@ -267,7 +269,7 @@ void az_span_to_str(char* destination, int32_t destination_max_size, az_span sou
  * target is non-empty.
  * @retval >=0 The position of \p target in \p source.
  */
-AZ_NODISCARD int32_t az_span_find(az_span source, az_span target);
+extern C_STR_SPAN_EXPORT AZ_NODISCARD int32_t az_span_find(az_span source, az_span target);
 
 /******************************  SPAN COPYING */
 
@@ -287,7 +289,7 @@ AZ_NODISCARD int32_t az_span_find(az_span source, az_span target);
  * @remarks If \p source is an empty #az_span or #AZ_SPAN_EMPTY, this function will just return
  * \p destination.
  */
-az_span az_span_copy(az_span destination, az_span source);
+extern C_STR_SPAN_EXPORT az_span az_span_copy(az_span destination, az_span source);
 
 /**
  * @brief Copies the `uint8_t` \p byte to the \p destination at its 0-th index.
@@ -301,7 +303,7 @@ az_span az_span_copy(az_span destination, az_span source);
  * @remarks The function assumes that the \p destination has a large enough size to hold one more
  * byte.
  */
-az_span az_span_copy_u8(az_span destination, uint8_t byte);
+extern C_STR_SPAN_EXPORT az_span az_span_copy_u8(az_span destination, uint8_t byte);
 
 /**
  * @brief Fills all the bytes of the \p destination #az_span with the specified value.
@@ -328,7 +330,7 @@ AZ_INLINE void az_span_fill(az_span destination, uint8_t value)
  * @retval #AZ_ERROR_UNEXPECTED_CHAR A non-ASCII digit is found within the span or the \p source
  * contains a number that would overflow or underflow `uint64_t`.
  */
-AZ_NODISCARD az_result az_span_atou64(az_span source, uint64_t* out_number);
+extern C_STR_SPAN_EXPORT AZ_NODISCARD az_result az_span_atou64(az_span source, uint64_t* out_number);
 
 /**
  * @brief Parses an #az_span containing ASCII digits into an `int64_t` number.
@@ -341,7 +343,7 @@ AZ_NODISCARD az_result az_span_atou64(az_span source, uint64_t* out_number);
  * @retval #AZ_ERROR_UNEXPECTED_CHAR A non-ASCII digit is found within the span or the \p source
  * contains a number that would overflow or underflow `int64_t`.
  */
-AZ_NODISCARD az_result az_span_atoi64(az_span source, int64_t* out_number);
+extern C_STR_SPAN_EXPORT AZ_NODISCARD az_result az_span_atoi64(az_span source, int64_t* out_number);
 
 /**
  * @brief Parses an #az_span containing ASCII digits into a `uint32_t` number.
@@ -354,7 +356,7 @@ AZ_NODISCARD az_result az_span_atoi64(az_span source, int64_t* out_number);
  * @retval #AZ_ERROR_UNEXPECTED_CHAR A non-ASCII digit is found within the span or the \p source
  * contains a number that would overflow or underflow `uint32_t`.
  */
-AZ_NODISCARD az_result az_span_atou32(az_span source, uint32_t* out_number);
+extern C_STR_SPAN_EXPORT AZ_NODISCARD az_result az_span_atou32(az_span source, uint32_t* out_number);
 
 /**
  * @brief Parses an #az_span containing ASCII digits into an `int32_t` number.
@@ -367,7 +369,7 @@ AZ_NODISCARD az_result az_span_atou32(az_span source, uint32_t* out_number);
  * @retval #AZ_ERROR_UNEXPECTED_CHAR A non-ASCII digit is found within the span or if the \p source
  * contains a number that would overflow or underflow `int32_t`.
  */
-AZ_NODISCARD az_result az_span_atoi32(az_span source, int32_t* out_number);
+extern C_STR_SPAN_EXPORT AZ_NODISCARD az_result az_span_atoi32(az_span source, int32_t* out_number);
 
 /**
  * @brief Parses an #az_span containing ASCII digits into a `double` number.
@@ -383,7 +385,7 @@ AZ_NODISCARD az_result az_span_atoi32(az_span source, int32_t* out_number);
  * @remark The #az_span being parsed must contain a number that is finite. Values such as `NaN`,
  * `INFINITY`, and those that would overflow a `double` to `+/-inf` are not allowed.
  */
-AZ_NODISCARD az_result az_span_atod(az_span source, double* out_number);
+extern C_STR_SPAN_EXPORT AZ_NODISCARD az_result az_span_atod(az_span source, double* out_number);
 
 /**
  * @brief Converts an `int32_t` into its digit characters (base 10) and copies them to the \p
@@ -400,7 +402,7 @@ AZ_NODISCARD az_result az_span_atod(az_span source, double* out_number);
  * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The \p destination is not big enough to contain the copied
  * bytes.
  */
-AZ_NODISCARD az_result az_span_i32toa(az_span destination, int32_t source, az_span* out_span);
+extern C_STR_SPAN_EXPORT AZ_NODISCARD az_result az_span_i32toa(az_span destination, int32_t source, az_span* out_span);
 
 /**
  * @brief Converts an `uint32_t` into its digit characters (base 10) and copies them to the \p
@@ -417,7 +419,7 @@ AZ_NODISCARD az_result az_span_i32toa(az_span destination, int32_t source, az_sp
  * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The \p destination is not big enough to contain the copied
  * bytes.
  */
-AZ_NODISCARD az_result az_span_u32toa(az_span destination, uint32_t source, az_span* out_span);
+extern C_STR_SPAN_EXPORT AZ_NODISCARD az_result az_span_u32toa(az_span destination, uint32_t source, az_span* out_span);
 
 /**
  * @brief Converts an `int64_t` into its digit characters (base 10) and copies them to the \p
@@ -434,7 +436,7 @@ AZ_NODISCARD az_result az_span_u32toa(az_span destination, uint32_t source, az_s
  * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The \p destination is not big enough to contain the copied
  * bytes.
  */
-AZ_NODISCARD az_result az_span_i64toa(az_span destination, int64_t source, az_span* out_span);
+extern C_STR_SPAN_EXPORT AZ_NODISCARD az_result az_span_i64toa(az_span destination, int64_t source, az_span* out_span);
 
 /**
  * @brief Converts a `uint64_t` into its digit characters (base 10) and copies them to the \p
@@ -451,7 +453,7 @@ AZ_NODISCARD az_result az_span_i64toa(az_span destination, int64_t source, az_sp
  * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The \p destination is not big enough to contain the copied
  * bytes.
  */
-AZ_NODISCARD az_result az_span_u64toa(az_span destination, uint64_t source, az_span* out_span);
+extern C_STR_SPAN_EXPORT AZ_NODISCARD az_result az_span_u64toa(az_span destination, uint64_t source, az_span* out_span);
 
 /**
  * @brief Converts a `double` into its digit characters (base 10 decimal notation) and copies them
@@ -481,7 +483,7 @@ AZ_NODISCARD az_result az_span_u64toa(az_span destination, uint64_t source, az_s
  * @remark The \p fractional_digits must be between 0 and 15 (inclusive). Any value passed in that
  * is larger will be clamped down to 15.
  */
-AZ_NODISCARD az_result
+extern C_STR_SPAN_EXPORT AZ_NODISCARD az_result
 az_span_dtoa(az_span destination, double source, int32_t fractional_digits, az_span* out_span);
 
 /******************************  NON-CONTIGUOUS SPAN  */
