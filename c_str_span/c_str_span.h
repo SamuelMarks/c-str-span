@@ -84,56 +84,6 @@ AZ_NODISCARD AZ_INLINE az_span az_span_create(uint8_t* ptr, int32_t size)
 extern C_STR_SPAN_EXPORT AZ_NODISCARD az_span az_span_create(uint8_t* ptr, int32_t size);
 #endif // AZ_NO_PRECONDITION_CHECKING
 
-/**
- * @brief An empty #az_span.
- *
- * @remark There is no guarantee that the pointer backing this span will be `NULL` and the caller
- * shouldn't rely on it. However, the size will be 0.
- */
-#define AZ_SPAN_EMPTY (az_span) {NULL, 0}
-
-  /*(az_span)                                \
-  {                                        \
-    ._internal = {.ptr = NULL, .size = 0 } \
-  }*/
-
-// Returns the size (in bytes) of a literal string.
-// Note: Concatenating "" to S produces a compiler error if S is not a literal string
-//       The stored string's length does not include the \0 terminator.
-#define _az_STRING_LITERAL_LEN(S) (sizeof(S "") - 1)
-
-/**
- * @brief Returns a literal #az_span over a literal string.
- * The size of the #az_span is equal to the length of the string.
- *
- * For example:
- *
- * `static const az_span hw = AZ_SPAN_LITERAL_FROM_STR("Hello world");`
- *
- * @remarks An empty ("") literal string results in an #az_span with size set to 0.
- */
-#define AZ_SPAN_LITERAL_FROM_STR(STRING_LITERAL)      \
-  {                                                   \
-    ._internal = {                                    \
-      .ptr = (uint8_t*)(STRING_LITERAL),              \
-      .size = _az_STRING_LITERAL_LEN(STRING_LITERAL), \
-    },                                                \
-  }
-
-/**
- * @brief Returns an #az_span expression over a literal string.
- *
- * For example:
- *
- * `some_function(AZ_SPAN_FROM_STR("Hello world"));`
- *
- * where
- *
- * `void some_function(const az_span span);`
- *
- */
-#define AZ_SPAN_FROM_STR(STRING_LITERAL) (az_span) AZ_SPAN_LITERAL_FROM_STR(STRING_LITERAL)
-
 // Returns 1 if the address of the array is equal to the address of its 1st element.
 // Returns 0 for anything that is not an array (for example any arbitrary pointer).
 #define _az_IS_ARRAY(array) (((void*)&(array)) == ((void*)(&(array)[0])))
@@ -159,6 +109,14 @@ extern C_STR_SPAN_EXPORT AZ_NODISCARD az_span az_span_create(uint8_t* ptr, int32
 #define AZ_SPAN_FROM_BUFFER(BYTE_BUFFER) \
   az_span_create(                        \
       (uint8_t*)(BYTE_BUFFER), (sizeof(BYTE_BUFFER) / (_az_IS_BYTE_ARRAY(BYTE_BUFFER) ? 1 : 0)))
+
+/**
+ * @brief An empty #az_span.
+ *
+ * @remark There is no guarantee that the pointer backing this span will be `NULL` and the caller
+ * shouldn't rely on it. However, the size will be 0.
+ */
+extern C_STR_SPAN_EXPORT AZ_NODISCARD az_span az_span_empty(void);
 
 /**
  * @brief Returns an #az_span from a 0-terminated array of bytes (chars).
@@ -286,7 +244,7 @@ extern C_STR_SPAN_EXPORT AZ_NODISCARD int32_t az_span_find(az_span source, az_sp
  * source.
  *
  * @remarks This function copies all of \p source into the \p destination even if they overlap.
- * @remarks If \p source is an empty #az_span or #AZ_SPAN_EMPTY, this function will just return
+ * @remarks If \p source is an empty #az_span or #az_span_empty(), this function will just return
  * \p destination.
  */
 extern C_STR_SPAN_EXPORT az_span az_span_copy(az_span destination, az_span source);

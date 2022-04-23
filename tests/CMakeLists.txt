@@ -24,24 +24,6 @@ endif (NOT DEFINED TARGET_ARCH)
 
 configure_file("configure.h.in" "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_configure.h" @ONLY)
 
-#=========================#
-# Different compiler args #
-#=========================#
-
-add_library("${EXEC_NAME}_compiler_flags" INTERFACE)
-target_compile_features("${EXEC_NAME}_compiler_flags" INTERFACE "c_std_99")
-
-# add compiler warning flags just when building this project via
-# the BUILD_INTERFACE genex
-set(gcc_like "$<COMPILE_LANG_AND_ID:C,CXX,ARMClang,AppleClang,Clang,GNU,LCC>")
-set(msvc "$<COMPILE_LANG_AND_ID:C,CXX,MSVC>")
-target_compile_options(
-        "${EXEC_NAME}_compiler_flags"
-        INTERFACE
-        "$<${gcc_like}:$<BUILD_INTERFACE:-Wshadow;-Wformat=2;-Wall;-pedantic;-Wno-format-nonliteral;-Wno-unused-function;-Wno-c99-extensions;-Wno-long-long>>"
-        "$<${msvc}:$<BUILD_INTERFACE:-W3;-WX;-Zi;-permissive->>"
-)
-
 #=============#
 # Test target #
 #=============#
@@ -69,8 +51,7 @@ find_package(cmocka CONFIG REQUIRED)
 target_link_libraries(
         "${EXEC_NAME}"
         PRIVATE
-        #"${PROJECT_NAME}_compiler_flags"
-        "${EXEC_NAME}_compiler_flags"
+        "${PROJECT_NAME}_compiler_flags"
         "${PROJECT_NAME}"
         "cmocka::cmocka"
 )

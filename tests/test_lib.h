@@ -15,7 +15,7 @@
 
 TEST x_lib_should_be(void) {
   /* TODO: Actually test things */
-  az_span s = AZ_SPAN_EMPTY;
+  az_span s = az_span_empty();
   ASSERT_EQ(s._internal.size, 0);
 
   PASS();

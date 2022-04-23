@@ -52,15 +52,26 @@
 // file as well.
 AZ_NODISCARD az_span az_span_create(uint8_t* ptr, int32_t size)
 {
+  az_span span;
   // If ptr is not null, then:
   //   size >= 0
   // Otherwise, if ptr is null, then:
   //   size == 0
   _az_PRECONDITION((ptr != NULL && size >= 0) || (ptr + (uint32_t)size == 0));
 
-  return (az_span){ ._internal = { .ptr = ptr, .size = size } };
+  span._internal.size = size;
+  span._internal.ptr = ptr;
+  return span;
 }
 #endif // AZ_NO_PRECONDITION_CHECKING
+
+AZ_NODISCARD az_span az_span_empty(void)
+{
+  az_span span;
+  span._internal.size = 0;
+  span._internal.ptr = NULL;
+  return span;
+}
 
 AZ_NODISCARD az_span az_span_create_from_str(char* str)
 {
@@ -69,7 +80,8 @@ AZ_NODISCARD az_span az_span_create_from_str(char* str)
   // Avoid passing in null pointer to strlen to avoid memory access violation.
   if (str == NULL)
   {
-    return AZ_SPAN_EMPTY;
+    const az_span span = {NULL, 0};
+    return span;
   }
 
   {
@@ -1044,6 +1056,7 @@ az_span _az_span_token(
     return az_span_slice(source, 0, *out_index);
   }
 
-  *out_remainder = AZ_SPAN_EMPTY;
+  out_remainder->_internal.size = 0;
+  out_remainder->_internal.ptr = NULL;
   return source;
 }
