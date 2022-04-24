@@ -48,7 +48,7 @@ target_include_directories(
 
 if (DEFINED VCPKG_TOOLCHAIN AND VCPKG_TOOLCHAIN)
     find_package(cmocka CONFIG REQUIRED)
-    set(test_dep "cmocka::cmocka")
+    set(cmocka_lib "cmocka::cmocka")
 else ()
     include("${CMAKE_SOURCE_DIR}/cmake/modules/FetchCMocka.cmake")
     include(FetchContent)
@@ -68,7 +68,7 @@ else ()
     # Download cmocka, and execute its cmakelists.txt
     FetchContent_MakeAvailable(cmocka)
 
-    set(test_dep "cmocka-static")
+    set(cmocka_lib "cmocka-static")
 endif ()
 
 target_link_libraries(
@@ -76,7 +76,7 @@ target_link_libraries(
         PRIVATE
         "${PROJECT_NAME}_compiler_flags"
         "${PROJECT_NAME}"
-        "${test_dep}"
+        "${cmocka_lib}"
 )
 if (MSVC)
     target_compile_definitions("${EXEC_NAME}" PRIVATE _CRT_SECURE_NO_WARNINGS)

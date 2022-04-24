@@ -90,9 +90,9 @@ extern C_STR_SPAN_EXPORT AZ_NODISCARD az_result _az_is_expected_span(az_span* re
  *
  * Example:
  * \code{.c}
- *  az_span a = az_span_create_from_str("  text with   \\n spaces   ");
+ *  az_span a = AZ_SPAN_FROM_STR("  text with   \\n spaces   ");
  *  az_span b = _az_span_trim_whitespace(a);
- *  // assert( b ==  az_span_create_from_str("text with   \\n spaces"));
+ *  // assert( b ==  AZ_SPAN_FROM_STR("text with   \\n spaces"));
  * \endcode
  *
  * @param[in] source #az_span pointing to a memory address that might contain whitespace characters.
@@ -110,9 +110,9 @@ extern C_STR_SPAN_EXPORT AZ_NODISCARD az_span _az_span_trim_whitespace(az_span s
  *
  * Example:
  * \code{.c}
- *  az_span a = az_span_create_from_str("  text with   \\n spaces   ");
+ *  az_span a = AZ_SPAN_FROM_STR("  text with   \\n spaces   ");
  *  az_span b = _az_span_trim_whitespace_from_start(a);
- *  // assert( b ==  az_span_create_from_str("text with   \\n spaces   "));
+ *  // assert( b ==  AZ_SPAN_FROM_STR("text with   \\n spaces   "));
  * \endcode
  *
  * @param[in] source #az_span pointing to a memory address that might contain whitespace characters.
@@ -130,9 +130,9 @@ extern C_STR_SPAN_EXPORT AZ_NODISCARD az_span _az_span_trim_whitespace_from_star
  *
  * Example:
  * \code{.c}
- *  az_span a = az_span_create_from_str("  text with   \\n spaces   ");
+ *  az_span a = AZ_SPAN_FROM_STR("  text with   \\n spaces   ");
  *  az_span b = _az_span_trim_whitespace_from_end(a);
- *  // assert( b ==  az_span_create_from_str("  text with   \\n spaces"));
+ *  // assert( b ==  AZ_SPAN_FROM_STR("  text with   \\n spaces"));
  * \endcode
  *
  * @param[in] source #az_span pointing to a memory address that might contain whitespace characters.

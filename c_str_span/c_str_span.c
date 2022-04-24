@@ -80,6 +80,21 @@ AZ_NODISCARD az_span az_span_create_from_str(char* str)
   }
 }
 
+AZ_NODISCARD az_span az_span_create_from_str_of_size(char* str, int32_t size)
+{
+  _az_PRECONDITION_NOT_NULL(str);
+
+  // Avoid passing in null pointer to strlen to avoid memory access violation.
+  if (str == NULL)
+  {
+    const az_span span = {NULL, 0};
+    return span;
+  }
+
+  _az_PRECONDITION(size >= 0);
+  return az_span_create((uint8_t *) str, size);
+}
+
 AZ_NODISCARD az_span az_span_slice(az_span span, int32_t start_index, int32_t end_index)
 {
   _az_PRECONDITION_VALID_SPAN(span, 0, true);

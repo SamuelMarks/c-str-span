@@ -84,6 +84,29 @@ AZ_NODISCARD AZ_INLINE az_span az_span_create(uint8_t* ptr, int32_t size)
 extern C_STR_SPAN_EXPORT AZ_NODISCARD az_span az_span_create(uint8_t* ptr, int32_t size);
 #endif // AZ_NO_PRECONDITION_CHECKING
 
+// Returns the size (in bytes) of a literal string.
+// Note: Concatenating "" to S produces a compiler error if S is not a literal string
+//       The stored string's length does not include the \0 terminator.
+#define _az_STRING_LITERAL_LEN(S) (sizeof(S "") - 1)
+
+/**
+ * @brief Returns an #az_span expression over a literal string.
+ *
+ * For example:
+ *
+ * `some_function(AZ_SPAN_FROM_STR("Hello world"));`
+ *
+ * where
+ *
+ * `void some_function(const az_span span);`
+ *
+ */
+#define AZ_SPAN_FROM_STR(STRING_LITERAL)      \
+    az_span_create_from_str_of_size(          \
+      STRING_LITERAL,                         \
+      _az_STRING_LITERAL_LEN(STRING_LITERAL)  \
+    )
+
 // Returns 1 if the address of the array is equal to the address of its 1st element.
 // Returns 0 for anything that is not an array (for example any arbitrary pointer).
 #define _az_IS_ARRAY(array) (((void*)&(array)) == ((void*)(&(array)[0])))
@@ -127,6 +150,16 @@ extern C_STR_SPAN_EXPORT AZ_NODISCARD az_span az_span_empty(void);
  * including the `\0` terminator.
  */
 extern C_STR_SPAN_EXPORT AZ_NODISCARD az_span az_span_create_from_str(char* str);
+
+/**
+ * @brief Returns an #az_span from a length-provided array of bytes (chars).
+ *
+ * @param[in] str The pointer to the array of bytes (chars).
+ * @param[in] size Length
+ *
+ * @return An #az_span over the byte buffer where the size is set to the provided size.
+ */
+extern C_STR_SPAN_EXPORT AZ_NODISCARD az_span az_span_create_from_str_of_size(char* str, int32_t size);
 
 /******************************  SPAN MANIPULATION */
 

@@ -36,16 +36,10 @@ uint8_t buffer[1024];
 some_function(AZ_SPAN_FROM_BUFFER(buffer));  // size = 1024
 ```
 
-Create an `az_span` literal from a string (the span does NOT include the 0-terminating byte):
-
-```C
-az_span span_over_str = AZ_SPAN_LITERAL_FROM_STR("Hello");  // size = 5
-```
-
 Create an `az_span` expression from a string (the span does NOT include the 0-terminating byte):
 
 ```C
-some_function(az_span_create_from_str("Hello"));  // size = 5
+some_function(AZ_SPAN_FROM_STR("Hello"));  // size = 5
 ```
 
 As shown above, an `az_span` over a string does not include the 0-terminator. If you need to 0-terminate the string, you can call this function to append a 0 byte (if the span's size is large enough to hold the extra byte):
@@ -73,7 +67,7 @@ There are many functions to manipulate `az_span` instances. You can slice (subse
 A string is a span of UTF-8 characters. It's not a zero-terminated string. Defined in [c_str_span.h](c_str_span/c_str_span.h).
 
 ```c
-az_span hello_world = az_span_create_from_str("Hello world!");
+az_span hello_world = AZ_SPAN_FROM_STR("Hello world!");
 ```
 
 ---
