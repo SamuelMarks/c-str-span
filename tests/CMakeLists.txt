@@ -46,14 +46,37 @@ target_include_directories(
         "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
 )
 
-find_package(cmocka CONFIG REQUIRED)
+if (DEFINED VCPKG_TOOLCHAIN AND VCPKG_TOOLCHAIN)
+    find_package(cmocka CONFIG REQUIRED)
+    set(test_dep "cmocka::cmocka")
+else ()
+    include("${CMAKE_SOURCE_DIR}/cmake/modules/FetchCMocka.cmake")
+    include(FetchContent)
+    FetchContent_Declare(
+            cmocka
+            GIT_REPOSITORY https://git.cryptomilk.org/projects/cmocka.git
+            GIT_TAG        cmocka-1.1.5
+            GIT_SHALLOW    1
+    )
+
+    set(WITH_STATIC_LIB ON CACHE BOOL "CMocka: Build with a static library" FORCE)
+    set(WITH_CMOCKERY_SUPPORT OFF CACHE BOOL "CMocka: Install a cmockery header" FORCE)
+    set(WITH_EXAMPLES OFF CACHE BOOL "CMocka: Build examples" FORCE)
+    set(UNIT_TESTING OFF CACHE BOOL "CMocka: Build with unit testing" FORCE)
+    set(PICKY_DEVELOPER OFF CACHE BOOL "CMocka: Build with picky developer flags" FORCE)
+
+    # Download cmocka, and execute its cmakelists.txt
+    FetchContent_MakeAvailable(cmocka)
+
+    set(test_dep "cmocka-static")
+endif ()
 
 target_link_libraries(
         "${EXEC_NAME}"
         PRIVATE
         "${PROJECT_NAME}_compiler_flags"
         "${PROJECT_NAME}"
-        "cmocka::cmocka"
+        "${test_dep}"
 )
 if (MSVC)
     target_compile_definitions("${EXEC_NAME}" PRIVATE _CRT_SECURE_NO_WARNINGS)
