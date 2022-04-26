@@ -99,18 +99,3 @@ write_basic_package_version_file(
 )
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
         DESTINATION "${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME}")
-
-#====================#
-# Package to install #
-#====================#
-
-list(APPEND installable_libs "${PROJECT_NAME}_compiler_flags")
-if (TARGET "${DEPENDANT_LIBRARY}")
-    list(APPEND installable_libs "${DEPENDANT_LIBRARY}")
-endif ()
-install(TARGETS ${installable_libs}
-        EXPORT "${PROJECT_NAME}Targets"
-        ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-        LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-        RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}")
-install(EXPORT "${PROJECT_NAME}Targets" DESTINATION "${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME}")
