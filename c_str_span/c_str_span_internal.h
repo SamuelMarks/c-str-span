@@ -13,33 +13,33 @@
 
 /*#include <azure/core/_az_cfg_prefix.h>*/
 
-// The smallest number that has the same number of digits as _az_MAX_SIZE_FOR_UINT64 (i.e. 10^19).
+/* The smallest number that has the same number of digits as _az_MAX_SIZE_FOR_UINT64 (i.e. 10^19). */
 #define _az_SMALLEST_20_DIGIT_NUMBER 10000000000000000000ULL
 
 enum
 {
-  // For example: 2,147,483,648
+  /* For example: 2,147,483,648 */
   _az_MAX_SIZE_FOR_UINT32 = 10,
 
-  // For example: 18,446,744,073,709,551,615
+  /* For example: 18,446,744,073,709,551,615 */
   _az_MAX_SIZE_FOR_UINT64 = 20,
 
-  // The number of unique values in base 10 (decimal).
+  /* The number of unique values in base 10 (decimal). */
   _az_NUMBER_OF_DECIMAL_VALUES = 10,
 
-  // The smallest number that has the same number of digits as _az_MAX_SIZE_FOR_UINT32 (i.e. 10^9).
+  /* The smallest number that has the same number of digits as _az_MAX_SIZE_FOR_UINT32 (i.e. 10^9). */
   _az_SMALLEST_10_DIGIT_NUMBER = 1000000000
 };
 
-// Use this helper to figure out how much the sliced_span has moved in comparison to the
-// original_span while writing and slicing a copy of the original.
-// The \p sliced_span must be some slice of the \p original_span (and have the same backing memory).
+/* Use this helper to figure out how much the sliced_span has moved in comparison to the */
+/* original_span while writing and slicing a copy of the original. */
+/* The \p sliced_span must be some slice of the \p original_span (and have the same backing memory). */
 AZ_INLINE AZ_NODISCARD int32_t _az_span_diff(az_span sliced_span, az_span original_span)
 {
   int32_t answer = az_span_size(original_span) - az_span_size(sliced_span);
 
-  // The passed in span parameters cannot be any two arbitrary spans.
-  // This validates the span parameters are valid and one is a sub-slice of another.
+  /* The passed in span parameters cannot be any two arbitrary spans. */
+  /* This validates the span parameters are valid and one is a sub-slice of another. */
   _az_PRECONDITION(answer == (int32_t)(az_span_ptr(sliced_span) - az_span_ptr(original_span)));
   return answer;
 }

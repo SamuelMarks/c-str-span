@@ -1,5 +1,5 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
-// SPDX-License-Identifier: MIT
+/* Copyright (c) Microsoft Corporation. All rights reserved.
+ * SPDX-License-Identifier: MIT */
 
 #include "c_str_precondition_internal.h"
 
@@ -45,10 +45,10 @@ static void az_single_char_ascii_lower_test(void** state)
     {
       az_span span = AZ_SPAN_FROM_BUFFER(buffer);
 
-      // Comparison to itself should return true for all values in the range.
+      /* Comparison to itself should return true for all values in the range. */
       assert_true(az_span_is_content_equal_ignoring_case(span, span));
 
-      // For ASCII letters, verify that comparing upper and lower case return true.
+      /* For ASCII letters, verify that comparing upper and lower case return true. */
       if (i >= 'A' && i <= 'Z') {
         uint8_t lower[1];
         lower[0] =(uint8_t) (i + 32);
@@ -67,7 +67,7 @@ static void az_single_char_ascii_lower_test(void** state)
         }
       } else {
         uint8_t j;
-        // Make sure that no other comparison returns true.
+        /* Make sure that no other comparison returns true. */
         for (j = 0; j <= SCHAR_MAX; ++j) {
           uint8_t other[1];
           other[0] = j;
@@ -103,7 +103,7 @@ static void test_az_span_is_content_equal(void** state)
   az_span a = AZ_SPAN_FROM_STR("one");
   az_span b = AZ_SPAN_FROM_STR("One");
   az_span c = AZ_SPAN_FROM_STR("one1");
-  az_span d = AZ_SPAN_FROM_STR("done"); // d contains a
+  az_span d = AZ_SPAN_FROM_STR("done"); /* d contains a */
 
   assert_false(az_span_is_content_equal(a, b));
   assert_false(az_span_is_content_equal(b, a));
@@ -115,15 +115,15 @@ static void test_az_span_is_content_equal(void** state)
   assert_true(az_span_is_content_equal(a, AZ_SPAN_FROM_STR("one")));
   assert_true(az_span_is_content_equal(a, a));
 
-  // Comparing subsets
+  /* Comparing subsets */
   assert_true(az_span_is_content_equal(a, az_span_slice_to_end(d, 1)));
   assert_true(az_span_is_content_equal(az_span_slice_to_end(d, 1), a));
 
-  // Comparing empty to non-empty
+  /* Comparing empty to non-empty */
   assert_false(az_span_is_content_equal(a, az_span_empty()));
   assert_false(az_span_is_content_equal(az_span_empty(), a));
 
-  // Empty spans are equal
+  /* Empty spans are equal */
   assert_true(az_span_is_content_equal(az_span_empty(), az_span_empty()));
 
   assert_true(az_span_is_content_equal(az_span_slice_to_end(a, 3), az_span_empty()));
@@ -380,15 +380,15 @@ static void test_az_isfinite(void** state)
   source = 0x7FEFFFFFFFFFFFFF;
   TEST_AZ_ISFINITE_HELPER(source, true);
 
-  source = 0x7FF0000000000000; // +inf
+  source = 0x7FF0000000000000; /* +inf */
   TEST_AZ_ISFINITE_HELPER(source, false);
-  source = 0x7FF0000000000001; // nan
+  source = 0x7FF0000000000001; /* nan */
   TEST_AZ_ISFINITE_HELPER(source, false);
-  source = 0x7FF7FFFFFFFFFFFF; // nan
+  source = 0x7FF7FFFFFFFFFFFF; /* nan */
   TEST_AZ_ISFINITE_HELPER(source, false);
-  source = 0x7FF8000000000000; // nan
+  source = 0x7FF8000000000000; /* nan */
   TEST_AZ_ISFINITE_HELPER(source, false);
-  source = 0x7FFFFFFFFFFFFFFF; // nan
+  source = 0x7FFFFFFFFFFFFFFF; /* nan */
   TEST_AZ_ISFINITE_HELPER(source, false);
 
   source = 0x8000000000000000;
@@ -396,30 +396,30 @@ static void test_az_isfinite(void** state)
   source = 0xFFEFFFFFFFFFFFFF;
   TEST_AZ_ISFINITE_HELPER(source, true);
 
-  source = 0xFFF0000000000000; // -inf
+  source = 0xFFF0000000000000; /* -inf */
   TEST_AZ_ISFINITE_HELPER(source, false);
-  source = 0xFFF7FFFFFFFFFFFF; // nan
+  source = 0xFFF7FFFFFFFFFFFF; /* nan */
   TEST_AZ_ISFINITE_HELPER(source, false);
-  source = 0xFFF8000000000000; // nan
+  source = 0xFFF8000000000000; /* nan */
   TEST_AZ_ISFINITE_HELPER(source, false);
-  source = 0xFFFFFFFFFFFFFFFF; // nan
+  source = 0xFFFFFFFFFFFFFFFF; /* nan */
   TEST_AZ_ISFINITE_HELPER(source, false);
 
   source = 0xFFFFFFFFFFFFFFFF + 1;
   TEST_AZ_ISFINITE_HELPER(source, true);
 }
 
-// Disable warning for float comparisons, for this particular test
-// error : comparing floating point with == or != is unsafe[-Werror = float - equal]
+/* Disable warning for float comparisons, for this particular test */
+/* error : comparing floating point with == or != is unsafe[-Werror = float - equal] */
 #ifdef __GNUC__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wfloat-equal"
-#endif // __GNUC__
+#endif /* __GNUC__ */
 
 #ifdef __clang__
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wfloat-equal"
-#endif // __clang__
+#endif /* __clang__ */
 
 static void az_span_atod_test(void** state)
 {
@@ -646,11 +646,11 @@ static void az_span_atod_test(void** state)
 
 #ifdef __GNUC__
 #pragma GCC diagnostic pop
-#endif // __GNUC__
+#endif /* __GNUC__ */
 
 #ifdef __clang__
 #pragma clang diagnostic pop
-#endif // __clang__
+#endif /* __clang__ */
 
 static void az_span_atod_non_finite_not_allowed(void** state)
 {
@@ -732,8 +732,8 @@ static void az_span_ato_number_no_out_of_bounds_reads(void** state)
   az_span source = AZ_SPAN_FROM_STR("   123456");
 
   (void)state;
-  // Makes sure we only read and parse up to the character '3', since that is the last character
-  // within the span slice
+  /* Makes sure we only read and parse up to the character '3', since that is the last character */
+  /* within the span slice */
   assert_int_equal(
       az_span_atoi32(az_span_slice(source, 0, 6), &value_i32), AZ_ERROR_UNEXPECTED_CHAR);
   assert_int_equal(az_span_atod(az_span_slice(source, 0, 6), &value_d), AZ_ERROR_UNEXPECTED_CHAR);
@@ -744,8 +744,8 @@ static void az_span_ato_number_no_out_of_bounds_reads(void** state)
   assert_int_equal(value_d, 123);
 
   source = AZ_SPAN_FROM_STR("   123A");
-  // Makes sure we only read and parse up to the character '3', since that is the last character
-  // within the span slice
+  /* Makes sure we only read and parse up to the character '3', since that is the last character */
+  /* within the span slice */
   assert_int_equal(
       az_span_atoi32(az_span_slice(source, 0, 6), &value_i32), AZ_ERROR_UNEXPECTED_CHAR);
   assert_int_equal(az_span_atod(az_span_slice(source, 0, 6), &value_d), AZ_ERROR_UNEXPECTED_CHAR);
@@ -756,8 +756,8 @@ static void az_span_ato_number_no_out_of_bounds_reads(void** state)
   assert_int_equal(value_d, 123);
 
   source = AZ_SPAN_FROM_STR("   123.");
-  // Makes sure we only read and parse up to the character '3', since that is the last character
-  // within the span slice
+  /* Makes sure we only read and parse up to the character '3', since that is the last character */
+  /* within the span slice */
   assert_int_equal(
       az_span_atoi32(az_span_slice(source, 0, 6), &value_i32), AZ_ERROR_UNEXPECTED_CHAR);
   assert_int_equal(az_span_atod(az_span_slice(source, 0, 6), &value_d), AZ_ERROR_UNEXPECTED_CHAR);
@@ -955,15 +955,15 @@ static void az_span_i64toa_test(void** state)
 
   assert_int_equal(az_span_i64toa(b_span, number, &remainder), AZ_OK);
   assert_int_equal(size_before_write, az_span_size(b_span));
-  // remainder should be size minus number of digits (3)
+  /* remainder should be size minus number of digits (3) */
   assert_int_equal(az_span_size(remainder), size_before_write - 3);
 
-  // create az_span for written data
+  /* create az_span for written data */
   b_span = az_span_create(az_span_ptr(b_span), az_span_size(b_span) - az_span_size(remainder));
 
   assert_true(az_span_is_content_equal(b_span, number_str));
 
-  // convert back
+  /* convert back */
   reverse = 0;
   assert_int_equal(az_span_atou64(b_span, &reverse), AZ_OK);
   assert_int_equal(reverse, number);
@@ -985,10 +985,10 @@ static void az_span_i64toa_negative_number_test(void** state)
 
   assert_int_equal(az_span_i64toa(b_span, number, &remainder), AZ_OK);
   assert_int_equal(size_before_write, az_span_size(b_span));
-  // remainder should be size minus number of digits (4)
+  /* remainder should be size minus number of digits (4) */
   assert_int_equal(az_span_size(remainder), size_before_write - 4);
 
-  // create az_span for written data
+  /* create az_span for written data */
   b_span = az_span_create(az_span_ptr(b_span), az_span_size(b_span) - az_span_size(remainder));
 
   assert_true(az_span_is_content_equal(b_span, number_str));
@@ -1237,8 +1237,8 @@ static void az_span_u32toa_overflow_fails(void** state)
 
 static void az_span_dtoa_succeeds(void** state)
 {
-  // We don't need more than 33 bytes to hold the supported doubles:
-  // [-][0-9]{16}.[0-9]{15}, i.e. 1+16+1+15
+  /* We don't need more than 33 bytes to hold the supported doubles: */
+  /* [-][0-9]{16}.[0-9]{15}, i.e. 1+16+1+15 */
   uint8_t raw_buffer[33] = { 0 };
 
   AZ_SPAN_DTOA_SUCCEEDS_HELPER(0, 15, AZ_SPAN_FROM_STR("0"));
@@ -1378,8 +1378,8 @@ static void az_span_dtoa_succeeds(void** state)
 
 static void az_span_dtoa_overflow_fails(void** state)
 {
-  // We don't need more than 33 bytes to hold the supported doubles:
-  // [-][0-9]{16}.[0-9]{15}, i.e. 1+16+1+15
+  /* We don't need more than 33 bytes to hold the supported doubles: */
+  /* [-][0-9]{16}.[0-9]{15}, i.e. 1+16+1+15 */
   uint8_t raw_buffer[33];
   az_span buff = AZ_SPAN_FROM_BUFFER(raw_buffer);
   az_span o;
@@ -1491,8 +1491,8 @@ static void az_span_dtoa_overflow_fails(void** state)
 
 static void az_span_dtoa_too_large(void** state)
 {
-  // We don't need more than 33 bytes to hold the supported doubles:
-  // [-][0-9]{16}.[0-9]{15}, i.e. 1+16+1+15
+  /* We don't need more than 33 bytes to hold the supported doubles: */
+  /* [-][0-9]{16}.[0-9]{15}, i.e. 1+16+1+15 */
   uint8_t raw_buffer[33] = { 0 };
   az_span buff = AZ_SPAN_FROM_BUFFER(raw_buffer);
   az_span o = az_span_empty();
@@ -1744,7 +1744,7 @@ static void test_az_span_token_success(void** state)
 
   (void)state;
 
-  // token: ""
+  /* token: "" */
   token = _az_span_token(span, delim, &out_span, &index);
   assert_int_equal(index, 0);
   assert_non_null(az_span_ptr(token));
@@ -1752,7 +1752,7 @@ static void test_az_span_token_success(void** state)
   assert_true(az_span_ptr(out_span) == (az_span_ptr(span) + az_span_size(delim)));
   assert_true(az_span_size(out_span) == (az_span_size(span) - az_span_size(delim)));
 
-  // token: "defg" (span+3)
+  /* token: "defg" (span+3) */
   span = out_span;
 
   token = _az_span_token(span, delim, &out_span, &index);
@@ -1764,7 +1764,7 @@ static void test_az_span_token_success(void** state)
   assert_true(
       az_span_size(out_span) == (az_span_size(span) - az_span_size(token) - az_span_size(delim)));
 
-  // token: "defg" (span+10)
+  /* token: "defg" (span+10) */
   span = out_span;
 
   token = _az_span_token(span, delim, &out_span, &index);
@@ -1776,7 +1776,7 @@ static void test_az_span_token_success(void** state)
   assert_true(
       az_span_size(out_span) == (az_span_size(span) - az_span_size(token) - az_span_size(delim)));
 
-  // token: "defg" (span+17)
+  /* token: "defg" (span+17) */
   span = out_span;
 
   token = _az_span_token(span, delim, &out_span, &index);

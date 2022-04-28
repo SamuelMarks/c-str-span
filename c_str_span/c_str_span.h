@@ -73,8 +73,8 @@ AZ_NODISCARD AZ_INLINE int32_t az_span_size(az_span span) { return span._interna
  *
  * @return The "view" over the byte buffer.
  */
-// Note: If you are modifying this function, make sure to modify the non-inline version in the
-// az_span.c file as well, and the _az_ version right below.
+/* Note: If you are modifying this function, make sure to modify the non-inline version in the */
+/* az_span.c file as well, and the _az_ version right below. */
 #ifdef AZ_NO_PRECONDITION_CHECKING
 AZ_NODISCARD AZ_INLINE az_span az_span_create(uint8_t* ptr, int32_t size)
 {
@@ -82,11 +82,11 @@ AZ_NODISCARD AZ_INLINE az_span az_span_create(uint8_t* ptr, int32_t size)
 }
 #else
 extern C_STR_SPAN_EXPORT AZ_NODISCARD az_span az_span_create(uint8_t* ptr, int32_t size);
-#endif // AZ_NO_PRECONDITION_CHECKING
+#endif /* AZ_NO_PRECONDITION_CHECKING */
 
-// Returns the size (in bytes) of a literal string.
-// Note: Concatenating "" to S produces a compiler error if S is not a literal string
-//       The stored string's length does not include the \0 terminator.
+/* Returns the size (in bytes) of a literal string. */
+/* Note: Concatenating "" to S produces a compiler error if S is not a literal string */
+/* The stored string's length does not include the \0 terminator. */
 #define _az_STRING_LITERAL_LEN(S) (sizeof(S "") - 1)
 
 /**
@@ -107,13 +107,13 @@ extern C_STR_SPAN_EXPORT AZ_NODISCARD az_span az_span_create(uint8_t* ptr, int32
       _az_STRING_LITERAL_LEN(STRING_LITERAL)  \
     )
 
-// Returns 1 if the address of the array is equal to the address of its 1st element.
-// Returns 0 for anything that is not an array (for example any arbitrary pointer).
+/* Returns 1 if the address of the array is equal to the address of its 1st element. */
+/* Returns 0 for anything that is not an array (for example any arbitrary pointer). */
 #define _az_IS_ARRAY(array) (((void*)&(array)) == ((void*)(&(array)[0])))
 
-// Returns 1 if the element size of the array is 1 (which is only true for byte arrays such as
-// uint8_t[] and char[]).
-// Returns 0 for any other element size (for example int32_t[]).
+/* Returns 1 if the element size of the array is 1 (which is only true for byte arrays such as */
+/* uint8_t[] and char[]). */
+/* Returns 0 for any other element size (for example int32_t[]). */
 #define _az_IS_BYTE_ARRAY(array) ((sizeof((array)[0]) == 1) && _az_IS_ARRAY(array))
 
 /**
@@ -128,7 +128,7 @@ extern C_STR_SPAN_EXPORT AZ_NODISCARD az_span az_span_create(uint8_t* ptr, int32
  * @remarks BYTE_BUFFER MUST be an array defined like `uint8_t buffer[10];` and not `uint8_t*
  * buffer`
  */
-// Force a division by 0 that gets detected by compilers for anything that isn't a byte array.
+/* Force a division by 0 that gets detected by compilers for anything that isn't a byte array. */
 #define AZ_SPAN_FROM_BUFFER(BYTE_BUFFER) \
   az_span_create(                        \
       (uint8_t*)(BYTE_BUFFER), (sizeof(BYTE_BUFFER) / (_az_IS_BYTE_ARRAY(BYTE_BUFFER) ? 1 : 0)))
@@ -203,17 +203,17 @@ AZ_NODISCARD AZ_INLINE bool az_span_is_content_equal(az_span span1, az_span span
   int32_t span1_size = az_span_size(span1);
   int32_t span2_size = az_span_size(span2);
 
-  // Make sure to avoid passing a null pointer to memcmp, which is considered undefined.
-  // We assume that if the size is non-zero, then the pointer can't be null.
+  /* Make sure to avoid passing a null pointer to memcmp, which is considered undefined. */
+  /* We assume that if the size is non-zero, then the pointer can't be null. */
   if (span1_size == 0)
   {
-    // Two empty spans are considered equal, even if their pointers are different.
+    /* Two empty spans are considered equal, even if their pointers are different. */
     return span2_size == 0;
   }
 
-  // If span2_size == 0, then the first condition which compares sizes will be false, since we
-  // checked the size of span1 above. And due to short-circuiting we won't be calling memcmp anyway.
-  // Therefore, we don't need to check for that explicitly.
+  /* If span2_size == 0, then the first condition which compares sizes will be false, since we */
+  /* checked the size of span1 above. And due to short-circuiting we won't be calling memcmp anyway. */
+  /* Therefore, we don't need to check for that explicitly. */
   return span1_size == span2_size
       && memcmp(az_span_ptr(span1), az_span_ptr(span2), (size_t)span1_size) == 0;
 }
@@ -304,7 +304,7 @@ extern C_STR_SPAN_EXPORT az_span az_span_copy_u8(az_span destination, uint8_t by
  */
 AZ_INLINE void az_span_fill(az_span destination, uint8_t value)
 {
-  // NOLINTNEXTLINE(clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling)
+  /* NOLINTNEXTLINE(clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling) */
   memset(az_span_ptr(destination), value, (size_t)az_span_size(destination));
 }
 
@@ -486,16 +486,16 @@ az_span_dtoa(az_span destination, double source, int32_t fractional_digits, az_s
  */
 typedef struct
 {
-  /// Any struct that was provided by the user for their specific implementation, passed through to
-  /// the #az_span_allocator_fn.
+  /* / Any struct that was provided by the user for their specific implementation, passed through to */
+  /* / the #az_span_allocator_fn. */
   void* user_context;
 
-  /// The amount of space consumed (i.e. written into) within the previously provided destination,
-  /// which can be used to infer the remaining number of bytes of the #az_span that are leftover.
+  /* / The amount of space consumed (i.e. written into) within the previously provided destination, */
+  /* / which can be used to infer the remaining number of bytes of the #az_span that are leftover. */
   int32_t bytes_used;
 
-  /// The minimum length of the destination #az_span required to be provided by the callback. If 0,
-  /// any non-empty sized buffer must be returned.
+  /* / The minimum length of the destination #az_span required to be provided by the callback. If 0, */
+  /* / any non-empty sized buffer must be returned. */
   int32_t minimum_required_size;
 } az_span_allocator_context;
 
