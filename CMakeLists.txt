@@ -42,10 +42,7 @@ configure_file(
 # Sub-targets #
 #=============#
 
-set(installable_libs "${PROJECT_NAME}")
-foreach (_lib ${installable_libs})
-    add_subdirectory("${_lib}")
-endforeach (_lib ${installable_libs})
+add_subdirectory("${PROJECT_NAME}")
 
 include(CTest)
 if (BUILD_TESTING)

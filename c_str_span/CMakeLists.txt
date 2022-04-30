@@ -54,7 +54,7 @@ install(FILES ${Header_Files} "${_export_file}"
 # Package to install #
 #====================#
 
-set(installable_libs "${LIBRARY_NAME}" "${PROJECT_NAME}_compiler_flags")
+set(installable_libs "${LIBRARY_NAME}") # "${PROJECT_NAME}_compiler_flags")
 if (TARGET "${DEPENDANT_LIBRARY}")
     list(APPEND installable_libs "${DEPENDANT_LIBRARY}")
 endif ()
