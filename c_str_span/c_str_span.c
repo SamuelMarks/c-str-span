@@ -1,32 +1,18 @@
-#include "c_str_span.h"
-
 /* Copyright (c) Microsoft Corporation. All rights reserved.
  * SPDX-License-Identifier: MIT */
-
-#include "c_str_precondition_internal.h"
-#include "c_str_span_internal.h"
-#include "c_str_result.h"
-#include "c_str_span_private.h"
-#include "c_str_result_internal.h"
-#include "c_str_hex_private.h"
-
-#if __STDC_VERSION__ >= 199901L
-#include <stdbool.h>
-#else
-#include "c_str_span_stdbool.h"
-#include "c_str_span_internal.h"
-#endif
 
 #include <ctype.h>
 #include <math.h>
 #include <stdint.h>
 #include <stdio.h>
 
-#if __STDC_VERSION__ >= 199901L
-#include <stdbool.h>
-#else
-#include "c_str_span_stdbool.h"
-#endif
+#include "c_str_span.h"
+#include "c_str_precondition_internal.h"
+#include "c_str_span_internal.h"
+#include "c_str_result.h"
+#include "c_str_span_private.h"
+#include "c_str_result_internal.h"
+#include "c_str_hex_private.h"
 
 /*#include <azure/core/_az_cfg.h>*/
 

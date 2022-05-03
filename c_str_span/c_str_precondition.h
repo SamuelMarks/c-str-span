@@ -34,11 +34,14 @@
  * and they are subject to change in future versions of the SDK which would break your code.
  */
 
-#if __STDC_VERSION__ >= 199901L
+#ifdef __cplusplus
+extern "C" {
+#elif __STDC_VERSION__ >= 199901L
 #include <stdbool.h>
 #else
 #include "c_str_span_stdbool.h"
-#endif
+#endif /* __cplusplus */
+
 #include <stddef.h>
 
 #include "c_str_span.h"
@@ -64,5 +67,9 @@ typedef void (*az_precondition_failed_fn)(void);
 void az_precondition_failed_set_callback(az_precondition_failed_fn az_precondition_failed_callback);
 
 /*#include <azure/core/_az_cfg_suffix.h>*/
+
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 
 #endif /* !C_STR_SPAN_PRECONDITION_H */

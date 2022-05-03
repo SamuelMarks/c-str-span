@@ -34,14 +34,17 @@
 
 #include "c_str_span.h"
 
-#if __STDC_VERSION__ >= 199901L
+#ifdef __cplusplus
+extern "C" {
+#elif __STDC_VERSION__ >= 199901L
 #include <stdbool.h>
 #else
 #include "c_str_span_stdbool.h"
-#endif
-#include <stddef.h>
-#include "c_str_precondition.h"
+#endif /* __cplusplus */
 
+#include <stddef.h>
+
+#include "c_str_precondition.h"
 #include "c_str_span_export.h"
 
 /*#include <azure/core/_az_cfg_prefix.h>*/
@@ -147,5 +150,9 @@ AZ_NODISCARD AZ_INLINE bool _az_span_overlap(az_span a, az_span b)
 #define _az_PRECONDITION_NO_OVERLAP_SPANS(a, b) _az_PRECONDITION(!_az_span_overlap(a, b))
 
 /*#include <azure/core/_az_cfg_suffix.h>*/
+
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 
 #endif /* C_STR_SPAN_PRECONDITION_INTERNAL_H */

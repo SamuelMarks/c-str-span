@@ -4,6 +4,10 @@
 /* Copyright (c) Microsoft Corporation. All rights reserved.
  * SPDX-License-Identifier: MIT */
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 #include <stdint.h>
 
 /**
@@ -31,5 +35,9 @@
 #else /* !_MSC_VER !__GNUC__ !__clang__ */
 #define AZ_INLINE static inline
 #endif /* _MSC_VER */
+
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 
 #endif /* C_STR_SPAN_TYPES_H */

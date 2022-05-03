@@ -4,19 +4,22 @@
 #ifndef C_STR_SPAN_SPAN_PRIVATE_H
 #define C_STR_SPAN_SPAN_PRIVATE_H
 
+#ifdef __cplusplus
+extern "C" {
+#elif __STDC_VERSION__ >= 199901L
+#include <stdbool.h>
+#else
+#include "c_str_span_stdbool.h"
+#endif /* __cplusplus */
+
+#include <stdint.h>
+
 #include "c_str_precondition.h"
 #include "c_str_span.h"
 #include "c_str_precondition_internal.h"
 #include "c_str_span_export.h"
 
-#if __STDC_VERSION__ >= 199901L
-#include <stdbool.h>
-#else
-#include "c_str_span_stdbool.h"
-#endif
-#include <stdint.h>
-
-/*#include <azure/core/_az_cfg_prefix.h>*/
+  /*#include <azure/core/_az_cfg_prefix.h>*/
 
 /* In IEEE 754, +inf is represented as 0 for the sign bit, all 1s for the biased exponent, and 0s */
 /* for the fraction bits. */
@@ -141,5 +144,9 @@ extern C_STR_SPAN_EXPORT AZ_NODISCARD az_span _az_span_trim_whitespace_from_star
 extern C_STR_SPAN_EXPORT AZ_NODISCARD az_span _az_span_trim_whitespace_from_end(az_span source);
 
 /*#include <azure/core/_az_cfg_suffix.h>*/
+
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 
 #endif /* C_STR_SPAN_SPAN_PRIVATE_H */

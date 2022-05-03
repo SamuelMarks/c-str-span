@@ -15,11 +15,14 @@
 #ifndef C_STR_SPAN_RESULT_H
 #define C_STR_SPAN_RESULT_H
 
-#if __STDC_VERSION__ >= 199901L
+#ifdef __cplusplus
+extern "C" {
+#elif __STDC_VERSION__ >= 199901L
 #include <stdbool.h>
 #else
 #include "c_str_span_stdbool.h"
-#endif
+#endif /* __cplusplus */
+
 #include <stdint.h>
 
 #include "c_str_span_types.h"
@@ -170,5 +173,9 @@ AZ_NODISCARD AZ_INLINE bool az_result_succeeded(az_result result)
 }
 
 /*#include <azure/core/_az_cfg_suffix.h>*/
+
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 
 #endif /* C_STR_SPAN_RESULT_H */

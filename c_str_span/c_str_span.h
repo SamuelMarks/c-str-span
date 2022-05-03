@@ -1,10 +1,6 @@
 #ifndef C_STR_SPAN_STR_SPAN_H
 #define C_STR_SPAN_STR_SPAN_H
 
-#include "c_str_span_export.h"
-#include "c_str_result.h"
-#include "c_str_span_types.h"
-
 /* Copyright (c) Microsoft Corporation. All rights reserved.
  * SPDX-License-Identifier: MIT */
 
@@ -22,15 +18,21 @@
 
 /*#include <azure/core/az_result.h>*/
 
-#if __STDC_VERSION__ >= 199901L
+#ifdef __cplusplus
+extern "C" {
+#elif __STDC_VERSION__ >= 199901L
 #include <stdbool.h>
 #else
 #include "c_str_span_stdbool.h"
-#include "c_str_result.h"
-#endif
+#endif /* __cplusplus */
+
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
+
+#include "c_str_span_export.h"
+#include "c_str_result.h"
+#include "c_str_span_types.h"
 
 /*#include <azure/core/_az_cfg_prefix.h>*/
 
@@ -527,5 +529,9 @@ typedef az_result (*az_span_allocator_fn)(
     az_span* out_next_destination);
 
 /*#include <azure/core/_az_cfg_suffix.h>*/
+
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 
 #endif /* !C_STR_SPAN_STR_SPAN_H */

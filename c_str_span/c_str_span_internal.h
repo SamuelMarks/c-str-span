@@ -4,6 +4,10 @@
 #ifndef C_STR_SPAN_SPAN_INTERNAL_H
 #define C_STR_SPAN_SPAN_INTERNAL_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 #include "c_str_result.h"
 #include "c_str_span.h"
 #include "c_str_precondition_internal.h"
@@ -97,5 +101,9 @@ extern C_STR_SPAN_EXPORT az_span _az_span_token(
     int32_t* out_index);
 
 /*#include <azure/core/_az_cfg_suffix.h>*/
+
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 
 #endif /* ! C_STR_SPAN_SPAN_INTERNAL_H */
