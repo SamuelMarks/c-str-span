@@ -46,6 +46,8 @@ extern "C" {
 
 #include "c_str_span.h"
 
+#include "c_str_span_export.h"
+
 /*#include <azure/core/_az_cfg_prefix.h>*/
 
 /**
@@ -64,7 +66,7 @@ typedef void (*az_precondition_failed_fn)(void);
  * @param[in] az_precondition_failed_callback A pointer to the function that will be invoked when an
  * Azure SDK function detects a precondition failure.
  */
-void az_precondition_failed_set_callback(az_precondition_failed_fn az_precondition_failed_callback);
+extern C_STR_SPAN_EXPORT void az_precondition_failed_set_callback(az_precondition_failed_fn az_precondition_failed_callback);
 
 /*#include <azure/core/_az_cfg_suffix.h>*/
 
