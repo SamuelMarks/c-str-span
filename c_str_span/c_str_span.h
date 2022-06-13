@@ -45,7 +45,7 @@ typedef struct
   struct
   {
     uint8_t* ptr;
-    int32_t size;
+    size_t size;
   } _internal;
 } az_span;
 
@@ -63,7 +63,7 @@ AZ_NODISCARD AZ_INLINE uint8_t* az_span_ptr(az_span span) { return span._interna
  * @param[in] span The #az_span whose size to return.
  * @return Size of \p span buffer.
  */
-AZ_NODISCARD AZ_INLINE int32_t az_span_size(az_span span) { return span._internal.size; }
+AZ_NODISCARD AZ_INLINE size_t az_span_size(az_span span) { return span._internal.size; }
 
 /********************************  CONSTRUCTORS */
 
@@ -202,8 +202,8 @@ extern C_STR_SPAN_EXPORT AZ_NODISCARD az_span az_span_slice_to_end(az_span span,
  */
 AZ_NODISCARD AZ_INLINE bool az_span_is_content_equal(az_span span1, az_span span2)
 {
-  int32_t span1_size = az_span_size(span1);
-  int32_t span2_size = az_span_size(span2);
+  size_t span1_size = az_span_size(span1);
+  size_t span2_size = az_span_size(span2);
 
   /* Make sure to avoid passing a null pointer to memcmp, which is considered undefined. */
   /* We assume that if the size is non-zero, then the pointer can't be null. */

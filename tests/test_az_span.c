@@ -948,7 +948,7 @@ static void az_span_i64toa_test(void** state)
   uint8_t buffer[100];
   az_span b_span = AZ_SPAN_FROM_BUFFER(buffer);
   az_span remainder;
-  int32_t size_before_write = az_span_size(b_span);
+  size_t size_before_write = az_span_size(b_span);
   int64_t number = 123;
   az_span number_str = AZ_SPAN_FROM_STR("123");
   uint64_t reverse;
@@ -976,7 +976,7 @@ static void az_span_i64toa_negative_number_test(void** state)
   uint8_t buffer[100];
   az_span b_span = AZ_SPAN_FROM_BUFFER(buffer);
   az_span remainder;
-  int32_t size_before_write = az_span_size(b_span);
+  size_t size_before_write = az_span_size(b_span);
   int64_t number = -123;
   az_span number_str = AZ_SPAN_FROM_STR("-123");
   int64_t reverse;

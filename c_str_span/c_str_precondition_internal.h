@@ -90,7 +90,7 @@ AZ_NODISCARD AZ_INLINE bool _az_span_is_valid(az_span span, int32_t min_size, bo
 {
 
   uint8_t* const ptr = az_span_ptr(span);
-  int32_t const span_size = az_span_size(span);
+  size_t const span_size = az_span_size(span);
 
   bool result = false;
 
