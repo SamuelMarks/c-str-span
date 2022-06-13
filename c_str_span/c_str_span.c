@@ -158,7 +158,7 @@ AZ_NODISCARD az_result az_span_atou64(az_span source, uint64_t* out_number)
 
       {
         uint64_t value = 0;
-        int32_t i;
+        size_t i;
         for (i = starting_index; i < span_size; ++i) {
           next_byte = source_ptr[i];
           if (!isdigit(next_byte)) {
@@ -213,7 +213,7 @@ AZ_NODISCARD az_result az_span_atou32(az_span source, uint32_t* out_number)
 
       {
         uint32_t value = 0;
-        int32_t i;
+        size_t i;
         for (i = starting_index; i < span_size; ++i) {
           next_byte = source_ptr[i];
           if (!isdigit(next_byte)) {
@@ -524,7 +524,7 @@ az_span az_span_copy(az_span destination, az_span source)
 
   {/* Even though the contract of this function is that the destination must be larger than source,
     * cap the data move if the source is too large, to avoid memory corruption. */
-    size_t dest_size = az_span_size(destination);
+    size_t const dest_size = az_span_size(destination);
     if (src_size > dest_size) {
       src_size = dest_size;
     }
