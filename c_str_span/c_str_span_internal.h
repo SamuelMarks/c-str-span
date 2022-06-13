@@ -75,7 +75,7 @@ _az_span_url_encode(az_span destination, az_span source, int32_t* out_length);
  * @return The length of source if it would be url-encoded.
  *
  */
-AZ_NODISCARD int32_t _az_span_url_encode_calc_length(az_span source);
+AZ_NODISCARD size_t _az_span_url_encode_calc_length(az_span source);
 
 /**
  * @brief String tokenizer for #az_span.
@@ -98,7 +98,7 @@ extern C_STR_SPAN_EXPORT az_span _az_span_token(
     az_span source,
     az_span delimiter,
     az_span* out_remainder,
-    int32_t* out_index);
+    size_t* out_index);
 
 /*#include <azure/core/_az_cfg_suffix.h>*/
 

@@ -78,12 +78,12 @@ AZ_NODISCARD AZ_INLINE size_t az_span_size(az_span span) { return span._internal
 /* Note: If you are modifying this function, make sure to modify the non-inline version in the */
 /* az_span.c file as well, and the _az_ version right below. */
 #ifdef AZ_NO_PRECONDITION_CHECKING
-AZ_NODISCARD AZ_INLINE az_span az_span_create(uint8_t* ptr, int32_t size)
+AZ_NODISCARD AZ_INLINE az_span az_span_create(uint8_t* ptr, size_t size)
 {
   return (az_span){ ._internal = { .ptr = ptr, .size = size } };
 }
 #else
-extern C_STR_SPAN_EXPORT AZ_NODISCARD az_span az_span_create(uint8_t* ptr, int32_t size);
+extern C_STR_SPAN_EXPORT AZ_NODISCARD az_span az_span_create(uint8_t* ptr, size_t size);
 #endif /* AZ_NO_PRECONDITION_CHECKING */
 
 /* Returns the size (in bytes) of a literal string. */
@@ -161,7 +161,7 @@ extern C_STR_SPAN_EXPORT AZ_NODISCARD az_span az_span_create_from_str(char* str)
  *
  * @return An #az_span over the byte buffer where the size is set to the provided size.
  */
-extern C_STR_SPAN_EXPORT AZ_NODISCARD az_span az_span_create_from_str_of_size(char* str, int32_t size);
+extern C_STR_SPAN_EXPORT AZ_NODISCARD az_span az_span_create_from_str_of_size(char* str, size_t size);
 
 /******************************  SPAN MANIPULATION */
 
@@ -177,7 +177,7 @@ extern C_STR_SPAN_EXPORT AZ_NODISCARD az_span az_span_create_from_str_of_size(ch
  * @return An #az_span into a portion (from \p start_index to \p end_index - 1) of the original
  * #az_span.
  */
-extern C_STR_SPAN_EXPORT AZ_NODISCARD az_span az_span_slice(az_span span, int32_t start_index, int32_t end_index);
+extern C_STR_SPAN_EXPORT AZ_NODISCARD az_span az_span_slice(az_span span, size_t start_index, size_t end_index);
 
 /**
  * @brief Returns a new #az_span which is a sub-span of the specified \p span.
@@ -189,7 +189,7 @@ extern C_STR_SPAN_EXPORT AZ_NODISCARD az_span az_span_slice(az_span span, int32_
  * @return An #az_span into a portion (from \p start_index to the size) of the original
  * #az_span.
  */
-extern C_STR_SPAN_EXPORT AZ_NODISCARD az_span az_span_slice_to_end(az_span span, int32_t start_index);
+extern C_STR_SPAN_EXPORT AZ_NODISCARD az_span az_span_slice_to_end(az_span span, size_t start_index);
 
 /**
  * @brief Determines whether two spans are equal by comparing their bytes.
@@ -202,8 +202,8 @@ extern C_STR_SPAN_EXPORT AZ_NODISCARD az_span az_span_slice_to_end(az_span span,
  */
 AZ_NODISCARD AZ_INLINE bool az_span_is_content_equal(az_span span1, az_span span2)
 {
-  size_t span1_size = az_span_size(span1);
-  size_t span2_size = az_span_size(span2);
+  size_t const span1_size = az_span_size(span1);
+  size_t const span2_size = az_span_size(span2);
 
   /* Make sure to avoid passing a null pointer to memcmp, which is considered undefined. */
   /* We assume that if the size is non-zero, then the pointer can't be null. */
@@ -217,7 +217,7 @@ AZ_NODISCARD AZ_INLINE bool az_span_is_content_equal(az_span span1, az_span span
   /* checked the size of span1 above. And due to short-circuiting we won't be calling memcmp anyway. */
   /* Therefore, we don't need to check for that explicitly. */
   return span1_size == span2_size
-      && memcmp(az_span_ptr(span1), az_span_ptr(span2), (size_t)span1_size) == 0;
+      && memcmp(az_span_ptr(span1), az_span_ptr(span2), span1_size) == 0;
 }
 
 /**
@@ -262,7 +262,7 @@ extern C_STR_SPAN_EXPORT void az_span_to_str(char* destination, int32_t destinat
  * target is non-empty.
  * @retval >=0 The position of \p target in \p source.
  */
-extern C_STR_SPAN_EXPORT AZ_NODISCARD int32_t az_span_find(az_span source, az_span target);
+extern C_STR_SPAN_EXPORT AZ_NODISCARD size_t az_span_find(az_span source, az_span target);
 
 /******************************  SPAN COPYING */
 
@@ -307,7 +307,7 @@ extern C_STR_SPAN_EXPORT az_span az_span_copy_u8(az_span destination, uint8_t by
 AZ_INLINE void az_span_fill(az_span destination, uint8_t value)
 {
   /* NOLINTNEXTLINE(clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling) */
-  memset(az_span_ptr(destination), value, (size_t)az_span_size(destination));
+  memset(az_span_ptr(destination), value, az_span_size(destination));
 }
 
 /******************************  SPAN PARSING AND FORMATTING */

@@ -1228,7 +1228,7 @@ static void az_span_u32toa_overflow_fails(void** state)
     assert_true(az_result_succeeded(az_span_dtoa(buffer, v, fractional_digits, &out_span))); \
     output = az_span_slice(buffer, 0, _az_span_diff(out_span, buffer));                      \
     assert_memory_equal(                                                                     \
-        az_span_ptr(output), az_span_ptr(expected), (size_t)az_span_size(expected));         \
+        az_span_ptr(output), az_span_ptr(expected), az_span_size(expected));         \
     assert_true(az_result_succeeded(az_span_dtoa(buffer, v, fractional_digits, &out_span))); \
     round_trip = 0;                                                                          \
     assert_true(az_result_succeeded(az_span_atod(output, &round_trip)));                     \
@@ -1740,7 +1740,7 @@ static void test_az_span_token_success(void** state)
   az_span delim = AZ_SPAN_FROM_STR("abc");
   az_span token;
   az_span out_span;
-  int32_t index = 0;
+  size_t index = 0;
 
   (void)state;
 
