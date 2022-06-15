@@ -247,7 +247,7 @@ extern C_STR_SPAN_EXPORT AZ_NODISCARD bool az_span_is_content_equal_ignoring_cas
  * than the \p source #az_span for the \p destination string to be zero-terminated.
  * Content is copied from the \p source buffer and then `\0` is added at the end.
  */
-extern C_STR_SPAN_EXPORT void az_span_to_str(char* destination, int32_t destination_max_size, az_span source);
+extern C_STR_SPAN_EXPORT void az_span_to_str(char* destination, size_t destination_max_size, az_span source);
 
 /**
  * @brief Searches for \p target in \p source, returning an #az_span within \p source if it finds

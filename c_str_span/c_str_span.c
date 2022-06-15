@@ -57,13 +57,7 @@ AZ_NODISCARD az_span az_span_create_from_str(char* str)
     return span;
   }
 
-  {
-    size_t const length = strlen(str);
-
-    _az_PRECONDITION(length >= 0);
-
-    return az_span_create((uint8_t *) str, length);
-  }
+  return az_span_create((uint8_t *) str, strlen(str));
 }
 
 AZ_NODISCARD az_span az_span_create_from_str_of_size(char* str, size_t size)
@@ -77,7 +71,6 @@ AZ_NODISCARD az_span az_span_create_from_str_of_size(char* str, size_t size)
     return span;
   }
 
-  _az_PRECONDITION(size >= 0);
   return az_span_create((uint8_t *) str, size);
 }
 
@@ -143,7 +136,7 @@ AZ_NODISCARD az_result az_span_atou64(az_span source, uint64_t* out_number)
 
     {
       /* If the first character is not a digit or an optional + sign, return error. */
-      int32_t starting_index = 0;
+      size_t starting_index = 0;
       uint8_t *source_ptr = az_span_ptr(source);
       uint8_t next_byte = source_ptr[0];
 
@@ -198,7 +191,7 @@ AZ_NODISCARD az_result az_span_atou32(az_span source, uint32_t* out_number)
 
     {
       /* If the first character is not a digit or an optional + sign, return error. */
-      int32_t starting_index = 0;
+      size_t starting_index = 0;
       uint8_t *source_ptr = az_span_ptr(source);
       uint8_t next_byte = source_ptr[0];
 
@@ -252,7 +245,7 @@ AZ_NODISCARD az_result az_span_atoi64(az_span source, int64_t* out_number)
     }
 
     {/* If the first character is not a digit, - sign, or an optional + sign, return error. */
-      int32_t starting_index = 0;
+      size_t starting_index = 0;
       uint8_t *source_ptr = az_span_ptr(source);
       uint8_t next_byte = source_ptr[0];
       int64_t sign = 1;
@@ -281,7 +274,7 @@ AZ_NODISCARD az_result az_span_atoi64(az_span source, int64_t* out_number)
         {
           /* Using unsigned int while parsing to account for potential overflow. */
           uint64_t value = 0;
-          int32_t i;
+          size_t i;
           for (i = starting_index; i < span_size; ++i) {
             next_byte = source_ptr[i];
             if (!isdigit(next_byte)) {
@@ -558,7 +551,7 @@ az_span az_span_copy_u8(az_span destination, uint8_t byte)
   }
 }
 
-void az_span_to_str(char* destination, int32_t destination_max_size, az_span source)
+void az_span_to_str(char* destination, size_t destination_max_size, az_span source)
 {
   _az_PRECONDITION_NOT_NULL(destination);
   _az_PRECONDITION(destination_max_size > 0);
@@ -583,12 +576,10 @@ void az_span_to_str(char* destination, int32_t destination_max_size, az_span sou
 
       /* If destination_max_size was 0, we don't want size_to_write to be negative and
        * corrupt data before the destination pointer. */
-      if (size_to_write < 0) {
+      if (size_to_write == SIZE_MAX) {
         size_to_write = 0;
       }
     }
-
-    _az_PRECONDITION(size_to_write >= 0);
 
     /* NOLINTNEXTLINE(clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling) */
     memmove((void *) destination, (void const *) az_span_ptr(source), size_to_write);
@@ -878,13 +869,13 @@ typedef enum
 /* Return a trim az_span. Depending on arg side, function will trim left of right */
 AZ_NODISCARD static az_span _az_span_trim_side(az_span source, az_span_trim_side side)
 {
-  int32_t increment = 1;
+  int8_t delta = 1;
   uint8_t* source_ptr = az_span_ptr(source);
   size_t source_size = az_span_size(source);
 
   if (side == RIGHT)
   {
-    increment = -1; /* Set increment to be decremental for moving ptr */
+    delta = -1; /* Set `delta` to be decremental for moving ptr */
     source_ptr += source_size - 1; /* Set initial position to the end */
   }
 
@@ -895,7 +886,7 @@ AZ_NODISCARD static az_span _az_span_trim_side(az_span source, az_span_trim_side
         break;
       }
       /* update ptr to next position */
-      source_ptr += increment;
+      source_ptr += delta;
     }
 
     /* return the slice depending on side */
@@ -975,7 +966,7 @@ AZ_NODISCARD size_t _az_span_url_encode_calc_length(az_span source)
   }
 }
 
-AZ_NODISCARD az_result _az_span_url_encode(az_span destination, az_span source, int32_t* out_length)
+AZ_NODISCARD az_result _az_span_url_encode(az_span destination, az_span source, ptrdiff_t* out_length)
 {
   _az_PRECONDITION_NOT_NULL(out_length);
   _az_PRECONDITION_VALID_SPAN(source, 0, true);
@@ -1018,7 +1009,7 @@ AZ_NODISCARD az_result _az_span_url_encode(az_span destination, az_span source, 
         }
       }
 
-      *out_length = (int32_t) (dest_ptr - dest_begin);
+      *out_length = (ptrdiff_t) (dest_ptr - dest_begin);
     }
   }
   return AZ_OK;

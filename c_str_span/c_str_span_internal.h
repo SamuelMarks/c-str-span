@@ -66,7 +66,7 @@ AZ_INLINE AZ_NODISCARD size_t _az_span_diff(az_span sliced_span, az_span origina
  * @remark The \p destination and \p source must not overlap.
  */
 AZ_NODISCARD az_result
-_az_span_url_encode(az_span destination, az_span source, int32_t* out_length);
+_az_span_url_encode(az_span destination, az_span source, ptrdiff_t* out_length);
 
 /**
  * @brief Calculates what would be the length of \p source #az_span after url-encoding it.

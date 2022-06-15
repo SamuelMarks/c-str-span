@@ -57,7 +57,7 @@ char* str = (char*) az_span_ptr(span); // str points to a 0-terminated string
 Or, you can call this function to copy the string in the `az_span` to your own `char*` buffer; this function will 0-terminate the string in the `char*` buffer:
 
 ```C
-void az_span_to_str(char* destination, int32_t destination_max_size, az_span source);
+void az_span_to_str(char* destination, size_t destination_max_size, az_span source);
 ```
 
 There are many functions to manipulate `az_span` instances. You can slice (subset an `az_span`), parse an `az_span` containing a string into a number, format a number as a string into an `az_span`, check if two `az_span` instances are equal or the contents of two `az_span` instances are equal, and more.
