@@ -8,18 +8,23 @@ set(Header_Files
         "c_str_result_internal.h"
         "c_str_span.h"
         "c_str_span_internal.h"
+        "c_str_span_printf.h"
         "c_str_span_private.h"
         "c_str_span_stdbool.h"
         "c_str_span_types.h"
 )
 source_group("Header Files" FILES "${Header_Files}")
 
-set(Source_Files "c_str_span.c" "c_str_span_precondition.c")
+set(Source_Files
+        "c_str_span.c"
+        "c_str_span_precondition.c"
+        "c_str_span_printf.c"
+)
 source_group("Source Files" FILES "${Source_Files}")
 
 add_library("${LIBRARY_NAME}" "${Header_Files}" "${Source_Files}")
 
-target_link_libraries("${LIBRARY_NAME}" PRIVATE "${PROJECT_NAME}_compiler_flags")
+target_link_libraries("${LIBRARY_NAME}" PUBLIC "${PROJECT_NAME}_compiler_flags")
 
 include(GenerateExportHeader)
 set(_export_file "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_export.h")

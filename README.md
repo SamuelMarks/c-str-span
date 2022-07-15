@@ -8,7 +8,9 @@ UTF-8 replacement for C strings, supporting zero-copy use-cases (non-null-termin
 
 Extracted from https://github.com/Azure/azure-sdk-for-c @ [`ac28b8`](https://github.com/Azure/azure-sdk-for-c/tree/ac28b8af9254798c1e891945e896d2ae2bdf745e) with:
   - No dependency on other Azure SDK for C functionalities;
-  - C89 (ANSI C) compliance.
+  - C89 (ANSI C) compliance;
+  - Use `size_t` over `int32_t` for size types;
+  - Implement `az_span_printf`.
 
 Documentation originally from: https://github.com/Azure/azure-sdk-for-c/tree/main/sdk/docs/core#working-with-spans, now below:
 
