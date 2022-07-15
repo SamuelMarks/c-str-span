@@ -825,7 +825,7 @@ az_span_dtoa(az_span destination, double source, int32_t fractional_digits, az_s
 /* TODO: pass az_span by value */
 AZ_NODISCARD az_result _az_is_expected_span(az_span* ref_span, az_span expected)
 {
-  size_t expected_size = az_span_size(expected);
+  size_t const expected_size = az_span_size(expected);
 
   /* EOF because ref_span is smaller than the expected span */
   if (expected_size > az_span_size(*ref_span))
@@ -834,7 +834,7 @@ AZ_NODISCARD az_result _az_is_expected_span(az_span* ref_span, az_span expected)
   }
 
   {
-    az_span actual_span = az_span_slice(*ref_span, 0, expected_size);
+    const az_span actual_span = az_span_slice(*ref_span, 0, expected_size);
 
     if (!az_span_is_content_equal(actual_span, expected)) {
       return AZ_ERROR_UNEXPECTED_CHAR;
@@ -871,7 +871,7 @@ AZ_NODISCARD static az_span _az_span_trim_side(az_span source, az_span_trim_side
 {
   int8_t delta = 1;
   uint8_t* source_ptr = az_span_ptr(source);
-  size_t source_size = az_span_size(source);
+  size_t const source_size = az_span_size(source);
 
   if (side == RIGHT)
   {

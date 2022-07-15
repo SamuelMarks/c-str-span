@@ -44,7 +44,7 @@ AZ_INLINE AZ_NODISCARD size_t _az_span_diff(az_span sliced_span, az_span origina
 
   /* The passed in span parameters cannot be any two arbitrary spans. */
   /* This validates the span parameters are valid and one is a sub-slice of another. */
-  _az_PRECONDITION(answer == (int32_t)(az_span_ptr(sliced_span) - az_span_ptr(original_span)));
+  _az_PRECONDITION(answer == (az_span_ptr(sliced_span) - az_span_ptr(original_span)));
   return answer;
 }
 

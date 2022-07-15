@@ -498,7 +498,7 @@ typedef struct
 
   /* / The minimum length of the destination #az_span required to be provided by the callback. If 0, */
   /* / any non-empty sized buffer must be returned. */
-  int32_t minimum_required_size;
+  size_t minimum_required_size;
 } az_span_allocator_context;
 
 /**

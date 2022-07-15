@@ -86,7 +86,7 @@ extern C_STR_SPAN_EXPORT az_precondition_failed_fn az_precondition_failed_get_ca
 #define _az_PRECONDITION_IS_NULL(arg) _az_PRECONDITION((arg) == NULL)
 
 
-AZ_NODISCARD AZ_INLINE bool _az_span_is_valid(az_span span, int32_t min_size, bool null_is_valid)
+AZ_NODISCARD AZ_INLINE bool _az_span_is_valid(az_span span, size_t min_size, bool null_is_valid)
 {
 
   uint8_t* const ptr = az_span_ptr(span);
