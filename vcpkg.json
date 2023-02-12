@@ -3,8 +3,5 @@
   "version-string": "0.0.1",
   "port-version": 1,
   "homepage": "https://github.com/SamuelMarks/c-str-span",
-  "description": "UTF-8 replacement for C strings, supporting zero-copy use-cases (non-null-terminated).",
-  "dependencies": [
-    "cmocka"
-  ]
+  "description": "UTF-8 replacement for C strings, supporting zero-copy use-cases (non-null-terminated)."
 }
