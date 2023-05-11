@@ -12,7 +12,8 @@ Extracted from https://github.com/Azure/azure-sdk-for-c @ [`ac28b8`](https://git
   - CTest integration;
   - More `const` correctness;
   - Use `size_t` over `int32_t` for size types;
-  - Implement `az_span_printf`.
+  - Implement `az_span_printf`;
+  - Added support for MSVC 2005, Open Watcom (incl. DOS target), MinGW, and Cygwin
 
 Documentation originally from: https://github.com/Azure/azure-sdk-for-c/tree/main/sdk/docs/core#working-with-spans, now below:
 
@@ -29,38 +30,38 @@ Since your SDK functions require `az_span` parameters, customers must know how t
 
 Create an empty `az_span`:
 
-```C
+```c
 az_span empty_span = az_span_empty(); // size = 0
 ```
 
 Create an `az_span` expression from a byte buffer:
 
-```C
+```c
 uint8_t buffer[1024];
 some_function(AZ_SPAN_FROM_BUFFER(buffer));  // size = 1024
 ```
 
 Create an `az_span` expression from a string (the span does NOT include the 0-terminating byte):
 
-```C
+```c
 some_function(AZ_SPAN_FROM_STR("Hello"));  // size = 5
 ```
 
 As shown above, an `az_span` over a string does not include the 0-terminator. If you need to 0-terminate the string, you can call this function to append a 0 byte (if the span's size is large enough to hold the extra byte):
 
-```C
+```c
 az_span az_span_copy_u8(az_span destination, uint8_t byte);
 ```
 
 and then call this function to get the address of the 0-terminated string:
 
-```C
+```c
 char* str = (char*) az_span_ptr(span); // str points to a 0-terminated string
 ```
 
 Or, you can call this function to copy the string in the `az_span` to your own `char*` buffer; this function will 0-terminate the string in the `char*` buffer:
 
-```C
+```c
 void az_span_to_str(char* destination, size_t destination_max_size, az_span source);
 ```
 

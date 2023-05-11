@@ -1,6 +1,6 @@
 {
   "name": "c-str-span",
-  "version-string": "0.0.1",
+  "version-string": "0.0.2",
   "port-version": 1,
   "homepage": "https://github.com/SamuelMarks/c-str-span",
   "description": "UTF-8 replacement for C strings, supporting zero-copy use-cases (non-null-terminated)."

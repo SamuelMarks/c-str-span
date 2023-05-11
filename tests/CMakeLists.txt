@@ -5,12 +5,12 @@ set(EXEC_NAME "${EXEC_NAME}_exec")
 # Dependencies download #
 #=======================#
 
-set(GREATEST_SHA256 "1292593d95c35eeccc89ffa1c91d6fe53b49f81cbf2c2b7758842b7f3186fcc2")
+set(GREATEST_SHA256 "b3f89ecad2301c64c580f328cc03a74d92f4cd4bf42ab18d3d4bfb7b8be5b948")
 set(DOWNLOAD_DIR "${PROJECT_BINARY_DIR}/test_downloads")
 
 file(MAKE_DIRECTORY "${DOWNLOAD_DIR}")
 set(GREATEST_FILE "${DOWNLOAD_DIR}/greatest.h")
-set(GREATEST_URL "https://raw.githubusercontent.com/silentbicycle/greatest/11a6af1/greatest.h")
+set(GREATEST_URL "https://raw.githubusercontent.com/SamuelMarks/greatest/cmake-and-msvc/greatest.h")
 file(DOWNLOAD "${GREATEST_URL}" "${GREATEST_FILE}"
         EXPECTED_HASH "SHA256=${GREATEST_SHA256}")
 
@@ -78,9 +78,9 @@ target_link_libraries(
         "${PROJECT_NAME}"
         "${cmocka_lib}"
 )
-if (MSVC)
-    target_compile_definitions("${EXEC_NAME}" PRIVATE _CRT_SECURE_NO_WARNINGS)
-endif (MSVC)
+# if (MSVC)
+#     target_compile_definitions("${EXEC_NAME}" PRIVATE _CRT_SECURE_NO_WARNINGS)
+# endif (MSVC)
 
 #=======#
 # CTest #

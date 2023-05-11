@@ -39,9 +39,9 @@ target_include_directories(
         "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
 )
 
-if (MSVC)
-    target_compile_definitions("${LIBRARY_NAME}" PRIVATE _CRT_SECURE_NO_WARNINGS)
-endif (MSVC)
+# if (MSVC)
+#     target_compile_definitions("${LIBRARY_NAME}" PRIVATE _CRT_SECURE_NO_WARNINGS)
+# endif (MSVC)
 
 #=========#
 # Install #
@@ -62,7 +62,7 @@ install(FILES ${Header_Files} "${_export_file}"
 set(installable_libs "${LIBRARY_NAME}" "${PROJECT_NAME}_compiler_flags")
 if (TARGET "${DEPENDANT_LIBRARY}")
     list(APPEND installable_libs "${DEPENDANT_LIBRARY}")
-endif ()
+endif (TARGET "${DEPENDANT_LIBRARY}")
 install(TARGETS ${installable_libs}
         EXPORT "${LIBRARY_NAME}Targets"
         ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
