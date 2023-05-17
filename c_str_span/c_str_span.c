@@ -1,10 +1,15 @@
 /* Copyright (c) Microsoft Corporation. All rights reserved.
  * SPDX-License-Identifier: MIT */
 
+#ifdef __cplusplus
+#include <cctype>
+#include <cmath>
+#include <cstdio>
+#else
 #include <ctype.h>
 #include <math.h>
-#include <stdint.h>
 #include <stdio.h>
+#endif
 
 #include "c_str_span.h"
 #include "c_str_precondition_internal.h"

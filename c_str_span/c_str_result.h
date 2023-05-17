@@ -16,6 +16,7 @@
 #define C_STR_SPAN_RESULT_H
 
 #ifdef __cplusplus
+#include <cstdint>
 extern "C" {
 #elif __STDC_VERSION__ >= 199901L
 #include <stdbool.h>
@@ -23,7 +24,13 @@ extern "C" {
 #include "c_str_span_stdbool.h"
 #endif /* __cplusplus */
 
+#ifndef __cplusplus
+#if defined(_MSC_VER) && _MSC_VER < 1600
+#include "c_str_span_stdint.h"
+#else
 #include <stdint.h>
+#endif
+#endif /* ! __cplusplus */
 
 #include "c_str_span_types.h"
 /*#include <azure/core/_az_cfg_prefix.h>*/

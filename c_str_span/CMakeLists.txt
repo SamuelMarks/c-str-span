@@ -13,6 +13,9 @@ set(Header_Files
         "c_str_span_stdbool.h"
         "c_str_span_types.h"
 )
+if (MSVC_VERSION STRLESS "1600") # MSVC 2010
+    list(APPEND Header_Files "c_str_span_stdint.h")
+endif (MSVC_VERSION STRLESS "1600")
 source_group("Header Files" FILES "${Header_Files}")
 
 set(Source_Files

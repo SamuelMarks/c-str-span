@@ -19,6 +19,9 @@
 /*#include <azure/core/az_result.h>*/
 
 #ifdef __cplusplus
+#include <cstddef>
+#include <cstdint>
+#include <cstring>
 extern "C" {
 #elif __STDC_VERSION__ >= 199901L
 #include <stdbool.h>
@@ -26,9 +29,15 @@ extern "C" {
 #include "c_str_span_stdbool.h"
 #endif /* __cplusplus */
 
+#ifndef __cplusplus
 #include <stddef.h>
-#include <stdint.h>
 #include <string.h>
+#if defined(_MSC_VER) && _MSC_VER < 1600
+#include "c_str_span_stdint.h"
+#else
+#include <stdint.h>
+#endif /* defined(_MSC_VER) && _MSC_VER < 1600 */
+#endif /* ! __cplusplus */
 
 #include "c_str_span_export.h"
 #include "c_str_result.h"

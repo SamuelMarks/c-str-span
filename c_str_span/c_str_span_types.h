@@ -5,10 +5,17 @@
  * SPDX-License-Identifier: MIT */
 
 #ifdef __cplusplus
+#include <cstdint>
 extern "C" {
 #endif /* __cplusplus */
 
+#ifndef __cplusplus
+#if defined(_MSC_VER) && _MSC_VER < 1600
+#include "c_str_span_stdint.h"
+#else
 #include <stdint.h>
+#endif /* defined(_MSC_VER) && _MSC_VER < 1600 */
+#endif /* ! __cplusplus */
 
 /**
  * @brief Enforce that the return value is handled (only applicable on supported compilers).

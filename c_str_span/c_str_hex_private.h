@@ -8,7 +8,6 @@
 #include <cstdint>
 extern "C" {
 #endif /* __cplusplus */
-#include <stdint.h>
 
 #include "c_str_span_types.h"
 

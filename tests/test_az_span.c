@@ -8,13 +8,24 @@
 
 #include "c_str_span_internal.h"
 
+#ifdef __cplusplus
+#include <cstdint>
+#include <cstdarg>
+#include <cstddef>
+#include <climits>
+#include <cmath>
+#include <cstdint>
+#else
+#include <stdint.h>
 #include <stdarg.h>
 #include <stddef.h>
-
 #include <limits.h>
 #include <math.h>
-#include <setjmp.h>
 #include <stdint.h>
+#endif /* ! __cplusplus */
+
+
+#include <setjmp.h>
 
 #include <cmocka.h>
 
