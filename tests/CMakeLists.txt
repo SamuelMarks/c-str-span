@@ -46,24 +46,16 @@ target_include_directories(
         "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
 )
 
-    if (MSVC_VERSION STRLESS "1600") # MSVC 2010
-        # cmocka needs stdint.h to be `#include`able without patching cmocka
-        file(COPY "${CMAKE_SOURCE_DIR}/c_str_span/c_str_span_stdint.h"
-             DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
-        file(RENAME "${CMAKE_CURRENT_BINARY_DIR}/c_str_span_stdint.h"
-                "${CMAKE_CURRENT_BINARY_DIR}/stdint.h")
-    endif (MSVC_VERSION STRLESS "1600")
-
 if (DEFINED VCPKG_TOOLCHAIN AND VCPKG_TOOLCHAIN)
     find_package(cmocka CONFIG REQUIRED)
     set(cmocka_lib "cmocka::cmocka")
 else ()
-    include("${CMAKE_SOURCE_DIR}/cmake/modules/FetchCMocka.cmake")
+    # include("${CMAKE_SOURCE_DIR}/cmake/modules/FetchCMocka.cmake")
     include(FetchContent)
     FetchContent_Declare(
             cmocka
             GIT_REPOSITORY https://git.cryptomilk.org/projects/cmocka.git
-            GIT_TAG        cmocka-1.1.5
+            GIT_TAG        cmocka-1.1.7
             GIT_SHALLOW    1
     )
 
@@ -75,6 +67,24 @@ else ()
 
     # Download cmocka, and execute its cmakelists.txt
     FetchContent_MakeAvailable(cmocka)
+
+    if (MSVC_VERSION STRLESS "1600") # MSVC 2010
+        # cmocka needs stdint.h to be `#include`able without patching cmocka
+        file(COPY
+                "${CMAKE_SOURCE_DIR}/c_str_span/c_str_span_stdbool.h"
+                "${CMAKE_SOURCE_DIR}/c_str_span/c_str_span_stdint.h"
+                DESTINATION "${CMAKE_BINARY_DIR}")
+        file(RENAME "${CMAKE_BINARY_DIR}/c_str_span_stdint.h"
+                "${CMAKE_BINARY_DIR}/_deps/cmocka-src/include/stdint.h")
+        file(RENAME "${CMAKE_BINARY_DIR}/c_str_span_stdbool.h"
+                "${CMAKE_BINARY_DIR}/_deps/cmocka-src/include/stdbool.h")
+    endif (MSVC_VERSION STRLESS "1600")
+
+    target_include_directories(
+        "${EXEC_NAME}"
+        PRIVATE
+        "$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/_deps/cmocka-src/include>"
+    )
 
     set(cmocka_lib "cmocka-static")
 endif ()

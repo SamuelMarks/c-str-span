@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.11)
 
 project(c_str_span VERSION 0.0.1 LANGUAGES C)
 
@@ -10,32 +10,26 @@ set(CMAKE_C_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN YES)
 set(CMAKE_C_STANDARD 90 CACHE STRING "")
 
+message(STATUS "CMAKE_C_COMPILER_ID = ${CMAKE_C_COMPILER_ID}")
+message(STATUS "CMAKE_SYSTEM_NAME = ${CMAKE_SYSTEM_NAME}")
 add_library("${PROJECT_NAME}_compiler_flags" INTERFACE)
 if (NOT DEFINED MSVC_VERSION
         OR MSVC_VERSION STRGREATER "1900" # 2015
         OR NOT (CMAKE_C_COMPILER_ID STREQUAL "OpenWatcom"))
     target_compile_features("${PROJECT_NAME}_compiler_flags" INTERFACE "c_std_${CMAKE_C_STANDARD}")
-elseif ((MSVC_VERSION STRLESS_EQUAL "1900"
-        OR CMAKE_C_COMPILER_ID STREQUAL "OpenWatcom"
-        OR CYGWIN)
-        AND NOT EXISTS "${CMAKE_BINARY_DIR}/c89stringutils_export.h")
-    file(COPY "${CMAKE_SOURCE_DIR}/c89stringutils/c89stringutils_export_pregen.h"
-            DESTINATION "${CMAKE_BINARY_DIR}")
-    file(RENAME "${CMAKE_BINARY_DIR}/c89stringutils_export_pregen.h"
-            "${CMAKE_BINARY_DIR}/c89stringutils_export.h")
+    if (CMAKE_VERSION VERSION_GREATER_EQUAL "3.15")
+        # add compiler warning flags just when building this project via
+        # the BUILD_INTERFACE genex
+        set(gcc_like "$<COMPILE_LANG_AND_ID:C,CXX,ARMClang,AppleClang,Clang,GNU,LCC>")
+        set(msvc "$<COMPILE_LANG_AND_ID:C,CXX,MSVC>")
+        target_compile_options(
+                "${PROJECT_NAME}_compiler_flags"
+                INTERFACE
+                "$<${gcc_like}:$<BUILD_INTERFACE:-Wshadow;-Wformat=2;-Wall;-pedantic>>"
+                "$<${msvc}:$<BUILD_INTERFACE:-W3;-WX;-Zi;-permissive->>"
+        )
+    endif (CMAKE_VERSION VERSION_GREATER_EQUAL "3.15")
 endif ()
-if (CMAKE_VERSION VERSION_GREATER_EQUAL "3.15")
-    # add compiler warning flags just when building this project via
-    # the BUILD_INTERFACE genex
-    set(gcc_like "$<COMPILE_LANG_AND_ID:C,CXX,ARMClang,AppleClang,Clang,GNU,LCC>")
-    set(msvc "$<COMPILE_LANG_AND_ID:C,CXX,MSVC>")
-    target_compile_options(
-            "${PROJECT_NAME}_compiler_flags"
-            INTERFACE
-            "$<${gcc_like}:$<BUILD_INTERFACE:-Wshadow;-Wformat=2;-Wall;-pedantic>>"
-            "$<${msvc}:$<BUILD_INTERFACE:-W3;-WX;-Zi;-permissive->>"
-    )
-endif (CMAKE_VERSION VERSION_GREATER_EQUAL "3.15")
 # Set the build directories
 if (CMAKE_SYSTEM_NAME STREQUAL "Windows"
         OR CMAKE_SYSTEM_NAME STREQUAL "CYGWIN"
