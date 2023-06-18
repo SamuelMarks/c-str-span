@@ -54,8 +54,7 @@ else ()
     include(FetchContent)
     FetchContent_Declare(
             cmocka
-            GIT_REPOSITORY https://git.cryptomilk.org/projects/cmocka.git
-            GIT_TAG        cmocka-1.1.7
+            GIT_REPOSITORY https://github.com/SamuelMarks/cmocka
             GIT_SHALLOW    1
     )
 
@@ -86,7 +85,7 @@ else ()
         "$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/_deps/cmocka-src/include>"
     )
 
-    set(cmocka_lib "cmocka-static")
+    set(cmocka_lib "cmocka")
 endif ()
 
 target_link_libraries(
