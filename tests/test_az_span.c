@@ -8,6 +8,16 @@
 
 #include "c_str_span_internal.h"
 
+#if defined(_WIN32) || defined(__WIN32__) || defined(__WINDOWS__)
+#ifdef _WIN64
+#define FAIL_SIZE_T_VAL (-1)
+#else
+#define FAIL_SIZE_T_VAL UINT_MAX
+#endif /* _WIN64 */
+#else
+#define FAIL_SIZE_T_VAL (-1)
+#endif /* defined(_WIN32) || defined(__WIN32__) || defined(__WINDOWS__) */
+
 #ifdef __cplusplus
 #include <cstdint>
 #include <cstdarg>
@@ -31,6 +41,7 @@
 #include <setjmp.h>
 
 #include <cmocka.h>
+#include <stdio.h>
 
 #include "test_az_span.h"
 
@@ -487,11 +498,11 @@ static void az_span_atod_test(void** state)
   assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("1.e3"), &value), AZ_OK);
   assert_true(value == 1000);
   assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("-1"), &value), AZ_OK);
-  assert_true(value == -1);
+  assert_true(value == -1.0);
   assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("1.0"), &value), AZ_OK);
   assert_true(value == 1);
   assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("-1.0"), &value), AZ_OK);
-  assert_true(value == -1);
+  assert_true(value == -1.0);
   assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("12345"), &value), AZ_OK);
   assert_true(value == 12345);
   assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("-12345"), &value), AZ_OK);
@@ -863,7 +874,7 @@ static void az_span_find_not_found_fail(void** state)
 
   (void)state;
 
-  assert_int_equal(az_span_find(span, target), -1);
+  assert_int_equal(az_span_find(span, target), FAIL_SIZE_T_VAL);
 }
 
 static void az_span_find_error_cases_fail(void** state)
@@ -875,7 +886,7 @@ static void az_span_find_error_cases_fail(void** state)
 
   assert_int_equal(az_span_find(az_span_empty(), az_span_empty()), 0);
   assert_int_equal(az_span_find(span, az_span_empty()), 0);
-  assert_int_equal(az_span_find(az_span_empty(), target), -1);
+  assert_int_equal(az_span_find(az_span_empty(), target), FAIL_SIZE_T_VAL);
 }
 
 static void az_span_find_target_longer_than_source_fails(void** state)
@@ -885,7 +896,7 @@ static void az_span_find_target_longer_than_source_fails(void** state)
 
   (void)state;
 
-  assert_int_equal(az_span_find(span, target), -1);
+  assert_int_equal(az_span_find(span, target), FAIL_SIZE_T_VAL);
 }
 
 static void az_span_find_target_overlap_continuation_of_source_fails(void** state)
@@ -895,7 +906,7 @@ static void az_span_find_target_overlap_continuation_of_source_fails(void** stat
 
   (void)state;
 
-  assert_int_equal(az_span_find(span, target), -1);
+  assert_int_equal(az_span_find(span, target), FAIL_SIZE_T_VAL);
 }
 
 static void az_span_find_target_more_chars_than_prefix_of_source_fails(void** state)
@@ -905,7 +916,7 @@ static void az_span_find_target_more_chars_than_prefix_of_source_fails(void** st
 
   (void)state;
 
-  assert_int_equal(az_span_find(span, target), -1);
+  assert_int_equal(az_span_find(span, target), FAIL_SIZE_T_VAL);
 }
 
 static void az_span_find_overlapping_target_success(void** state)
@@ -950,8 +961,8 @@ static void az_span_find_overlapping_checks_success(void** state)
   az_span span = AZ_SPAN_FROM_STR("abcdefghij");
   az_span source = az_span_slice(span, 1, 4);
   az_span target = az_span_slice(span, 6, 9);
-  assert_int_equal(az_span_find(source, target), -1);
-  assert_int_equal(az_span_find(source, az_span_slice(span, 1, 5)), -1);
+  assert_int_equal(az_span_find(source, target), FAIL_SIZE_T_VAL);
+  assert_int_equal(az_span_find(source, az_span_slice(span, 1, 5)), FAIL_SIZE_T_VAL);
   assert_int_equal(az_span_find(source, az_span_slice(span, 2, 4)), 1);
 
   (void)state;
@@ -1794,7 +1805,7 @@ static void test_az_span_token_success(void** state)
   span = out_span;
 
   token = _az_span_token(span, delim, &out_span, &index);
-  assert_int_equal(index, -1);
+  assert_int_equal(index, FAIL_SIZE_T_VAL);
   assert_true(az_span_ptr(token) == az_span_ptr(span));
   assert_int_equal(az_span_size(token), 4);
   assert_true(az_span_size(out_span) == 0);
