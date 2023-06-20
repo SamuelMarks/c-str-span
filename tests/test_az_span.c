@@ -1,6 +1,9 @@
 /* Copyright (c) Microsoft Corporation. All rights reserved.
  * SPDX-License-Identifier: MIT */
 
+#define STR_HELPER(x) #x
+#define STR(x) STR_HELPER(x)
+
 #include "c_str_precondition_internal.h"
 
 #include "c_str_span_private.h"
@@ -28,6 +31,7 @@
 #else
 #if defined(_MSC_VER) && _MSC_VER < 1600
 #include "c_str_span_stdint.h"
+#include "c_str_span_stdbool.h"
 #else
 #include <stdint.h>
 #endif /* defined(_MSC_VER) && _MSC_VER < 1600 */
@@ -430,8 +434,10 @@ static void test_az_isfinite(void** state)
   source = 0xFFFFFFFFFFFFFFFF; /* nan */
   TEST_AZ_ISFINITE_HELPER(source, false);
 
+#if !defined(_MSC_VER) || _MSC_VER >= 1600
   source = 0xFFFFFFFFFFFFFFFF + 1;
   TEST_AZ_ISFINITE_HELPER(source, true);
+#endif /* !defined(_MSC_VER) || _MSC_VER >= 1600 */
 }
 
 /* Disable warning for float comparisons, for this particular test */
@@ -469,9 +475,9 @@ static void az_span_atod_test(void** state)
   assert_true(value == 4294967295);
   assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("-4294967296"), &value), AZ_OK);
   assert_true(value == -4294967296);
-  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("9223372036854775807"), &value), AZ_OK);
-  assert_true(value == 9223372036854775807);
-  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("-9223372036854775808"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR(STR(LLONG_MAX)), &value), AZ_OK);
+  assert_true(value == LLONG_MAX);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR(STR(LLONG_MIN)), &value), AZ_OK);
   assert_true(value == -2147483647 * (double)4294967298);
 
   assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("1.23e3"), &value), AZ_OK);

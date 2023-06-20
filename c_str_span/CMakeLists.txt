@@ -10,11 +10,10 @@ set(Header_Files
         "c_str_span_internal.h"
         "c_str_span_printf.h"
         "c_str_span_private.h"
-        "c_str_span_stdbool.h"
         "c_str_span_types.h"
 )
 if (MSVC_VERSION STRLESS "1600") # MSVC 2010
-    list(APPEND Header_Files "c_str_span_stdint.h")
+    list(APPEND Header_Files "c_str_span_stdbool.h" "c_str_span_stdint.h")
 endif (MSVC_VERSION STRLESS "1600")
 source_group("Header Files" FILES "${Header_Files}")
 
@@ -27,7 +26,11 @@ source_group("Source Files" FILES "${Source_Files}")
 
 add_library("${LIBRARY_NAME}" "${Header_Files}" "${Source_Files}")
 
-target_link_libraries("${LIBRARY_NAME}" PUBLIC "${PROJECT_NAME}_compiler_flags")
+if (DEFINED MSVC_VERSION
+        AND MSVC_VERSION STRGREATER "1900" # 2015
+        OR NOT (CMAKE_C_COMPILER_ID STREQUAL "OpenWatcom") AND NOT MSVC)
+    target_link_libraries("${LIBRARY_NAME}" PUBLIC "${PROJECT_NAME}_compiler_flags")
+endif ()
 
 include(GenerateExportHeader)
 set(_export_file "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_export.h")

@@ -46,7 +46,7 @@ target_include_directories(
         "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
 )
 
-if (DEFINED VCPKG_TOOLCHAIN AND VCPKG_TOOLCHAIN)
+if (DEFINED VCPKG_TOOLCHAIN AND VCPKG_TOOLCHAIN AND NOT MSVC)
     find_package(cmocka CONFIG REQUIRED)
     set(cmocka_lib "cmocka::cmocka")
 else ()
@@ -66,18 +66,6 @@ else ()
 
     # Download cmocka, and execute its cmakelists.txt
     FetchContent_MakeAvailable(cmocka)
-
-    if (MSVC_VERSION STRLESS "1600") # MSVC 2010
-        # cmocka needs stdint.h to be `#include`able without patching cmocka
-        file(COPY
-                "${CMAKE_SOURCE_DIR}/c_str_span/c_str_span_stdbool.h"
-                "${CMAKE_SOURCE_DIR}/c_str_span/c_str_span_stdint.h"
-                DESTINATION "${CMAKE_BINARY_DIR}")
-        file(RENAME "${CMAKE_BINARY_DIR}/c_str_span_stdint.h"
-                "${CMAKE_BINARY_DIR}/_deps/cmocka-src/include/stdint.h")
-        file(RENAME "${CMAKE_BINARY_DIR}/c_str_span_stdbool.h"
-                "${CMAKE_BINARY_DIR}/_deps/cmocka-src/include/stdbool.h")
-    endif (MSVC_VERSION STRLESS "1600")
 
     target_include_directories(
         "${EXEC_NAME}"
