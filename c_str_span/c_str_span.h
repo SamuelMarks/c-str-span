@@ -54,7 +54,7 @@ typedef struct
   struct
   {
     uint8_t* ptr;
-    size_t size;
+    size_t size;  // size must be >= 0
   } _internal;
 } az_span;
 
@@ -487,6 +487,281 @@ extern C_STR_SPAN_EXPORT AZ_NODISCARD az_result az_span_u64toa(az_span destinati
  */
 extern C_STR_SPAN_EXPORT AZ_NODISCARD az_result
 az_span_dtoa(az_span destination, double source, int32_t fractional_digits, az_span* out_span);
+
+/* @brief Checks if str is alphabetical or numeric (A-z|0-9)
+   @remark An empty span will return true
+   @remark Locale isn't considered, this is implemented as a simple switch/case
+ */
+AZ_NODISCARD AZ_INLINE bool az_span_isalnum(az_span span) {
+  const size_t size = az_span_size(span);
+  size_t i = 0;
+  for (i = 0; i < size; i++) {
+    switch (az_span_ptr(span)[i]) {
+      case '0':
+      case '1':
+      case '2':
+      case '3':
+      case '4':
+      case '5':
+      case '6':
+      case '7':
+      case '8':
+      case '9':
+      case 'a':
+      case 'b':
+      case 'c':
+      case 'd':
+      case 'e':
+      case 'f':
+      case 'g':
+      case 'h':
+      case 'i':
+      case 'j':
+      case 'k':
+      case 'l':
+      case 'm':
+      case 'n':
+      case 'o':
+      case 'p':
+      case 'q':
+      case 'r':
+      case 's':
+      case 't':
+      case 'u':
+      case 'v':
+      case 'w':
+      case 'x':
+      case 'y':
+      case 'z':
+      case 'A':
+      case 'B':
+      case 'C':
+      case 'D':
+      case 'E':
+      case 'F':
+      case 'G':
+      case 'H':
+      case 'I':
+      case 'J':
+      case 'K':
+      case 'L':
+      case 'M':
+      case 'N':
+      case 'O':
+      case 'P':
+      case 'Q':
+      case 'R':
+      case 'S':
+      case 'T':
+      case 'U':
+      case 'V':
+      case 'W':
+      case 'X':
+      case 'Y':
+      case 'Z':
+        break;
+      default:
+        return false;
+    }
+  }
+  return true;
+}
+
+/* @brief Checks if str is alphabetical (A-z)
+ * @remark An empty span will return true
+ * @remark Locale isn't considered, this is implemented as a simple switch/case
+ */
+AZ_NODISCARD AZ_INLINE bool az_span_isalpha(az_span span) {
+  size_t i;
+  for (i = 0; i < az_span_size(span); i++) {
+    switch (az_span_ptr(span)[i]) {
+      case 'a':
+      case 'b':
+      case 'c':
+      case 'd':
+      case 'e':
+      case 'f':
+      case 'g':
+      case 'h':
+      case 'i':
+      case 'j':
+      case 'k':
+      case 'l':
+      case 'm':
+      case 'n':
+      case 'o':
+      case 'p':
+      case 'q':
+      case 'r':
+      case 's':
+      case 't':
+      case 'u':
+      case 'v':
+      case 'w':
+      case 'x':
+      case 'y':
+      case 'z':
+      case 'A':
+      case 'B':
+      case 'C':
+      case 'D':
+      case 'E':
+      case 'F':
+      case 'G':
+      case 'H':
+      case 'I':
+      case 'J':
+      case 'K':
+      case 'L':
+      case 'M':
+      case 'N':
+      case 'O':
+      case 'P':
+      case 'Q':
+      case 'R':
+      case 'S':
+      case 'T':
+      case 'U':
+      case 'V':
+      case 'W':
+      case 'X':
+      case 'Y':
+      case 'Z':
+        break;
+      default:
+        return false;
+    }
+  }
+  return true;
+}
+
+/* @brief Checks if str is blank
+ * @remark An empty span will return true
+ * @remark Doesn't deal with decimals or scientific notation
+ */
+AZ_NODISCARD AZ_INLINE bool az_span_isblank(az_span span) {
+  size_t i;
+  for (i = 0; i < az_span_size(span); i++) {
+    switch (az_span_ptr(span)[i]) {
+      case ' ':
+      case '\t':
+        break;
+      default:
+        return false;
+    }
+  }
+  return true;
+}
+
+/* @brief Checks if str only contains digits
+ * @remark An empty span will return true
+ * @remark Doesn't deal with decimals or scientific notation
+ */
+AZ_NODISCARD AZ_INLINE bool az_span_isdigit(az_span span) {
+  size_t i;
+  for (i = 0; i < az_span_size(span); i++) {
+    switch (az_span_ptr(span)[i]) {
+    case '0':
+    case '1':
+    case '2':
+    case '3':
+    case '4':
+    case '5':
+    case '6':
+    case '7':
+    case '8':
+    case '9':
+      break;
+    default:
+      return false;
+    }
+  }
+  return true;
+}
+
+/* @brief Checks if str is alphabetical and lowercase (A-Z)
+ * @remark An empty span will return true
+ * @remark Locale isn't considered, this is implemented as a simple switch/case
+ */
+AZ_NODISCARD AZ_INLINE bool az_span_islower(az_span span) {
+  size_t i;
+  for (i = 0; i < az_span_size(span); i++) {
+    switch (az_span_ptr(span)[i]) {
+    case 'a':
+    case 'b':
+    case 'c':
+    case 'd':
+    case 'e':
+    case 'f':
+    case 'g':
+    case 'h':
+    case 'i':
+    case 'j':
+    case 'k':
+    case 'l':
+    case 'm':
+    case 'n':
+    case 'o':
+    case 'p':
+    case 'q':
+    case 'r':
+    case 's':
+    case 't':
+    case 'u':
+    case 'v':
+    case 'w':
+    case 'x':
+    case 'y':
+    case 'z':
+      break;
+    default:
+      return false;
+    }
+  }
+  return true;
+}
+
+/* @brief Checks if str is alphabetical and lowercase (A-Z)
+ * @remark An empty span will return true
+ * @remark Locale isn't considered, this is implemented as a simple switch/case
+ */
+AZ_NODISCARD AZ_INLINE bool az_span_isupper(az_span span) {
+  size_t i;
+  for (i = 0; i < az_span_size(span); i++) {
+    switch (az_span_ptr(span)[i]) {
+      case 'A':
+      case 'B':
+      case 'C':
+      case 'D':
+      case 'E':
+      case 'F':
+      case 'G':
+      case 'H':
+      case 'I':
+      case 'J':
+      case 'K':
+      case 'L':
+      case 'M':
+      case 'N':
+      case 'O':
+      case 'P':
+      case 'Q':
+      case 'R':
+      case 'S':
+      case 'T':
+      case 'U':
+      case 'V':
+      case 'W':
+      case 'X':
+      case 'Y':
+      case 'Z':
+        break;
+      default:
+        return false;
+    }
+  }
+  return true;
+}
 
 /******************************  NON-CONTIGUOUS SPAN  */
 
