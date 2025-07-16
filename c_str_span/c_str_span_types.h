@@ -18,7 +18,8 @@ extern "C" {
 #endif /* ! __cplusplus */
 
 /**
- * @brief Enforce that the return value is handled (only applicable on supported compilers).
+ * @brief Enforce that the return value is handled (only applicable on supported
+ * compilers).
  */
 #ifdef _MSC_VER
 #define AZ_UNUSED

@@ -80,50 +80,50 @@ typedef unsigned short wctype_t;
 #endif /* _WCTYPE_T_DEFINED */
 /* 7.18.1.1  Exact-width integer types */
 typedef __int8 int8_t;
-typedef unsigned __int8   uint8_t;
-typedef __int16  int16_t;
-typedef unsigned __int16  uint16_t;
-typedef __int32  int32_t;
-typedef unsigned __int32  uint32_t;
-typedef __int64  int64_t;
-typedef unsigned __int64   uint64_t;
+typedef unsigned __int8 uint8_t;
+typedef __int16 int16_t;
+typedef unsigned __int16 uint16_t;
+typedef __int32 int32_t;
+typedef unsigned __int32 uint32_t;
+typedef __int64 int64_t;
+typedef unsigned __int64 uint64_t;
 /* 7.18.1.2  Minimum-width integer types */
 typedef signed char int_least8_t;
-typedef unsigned char   uint_least8_t;
-typedef short  int_least16_t;
-typedef unsigned short  uint_least16_t;
-typedef int  int_least32_t;
-typedef unsigned   uint_least32_t;
-typedef __int64  int_least64_t;
-typedef unsigned __int64   uint_least64_t;
+typedef unsigned char uint_least8_t;
+typedef short int_least16_t;
+typedef unsigned short uint_least16_t;
+typedef int int_least32_t;
+typedef unsigned uint_least32_t;
+typedef __int64 int_least64_t;
+typedef unsigned __int64 uint_least64_t;
 /*  7.18.1.3  Fastest minimum-width integer types
  *  Not actually guaranteed to be fastest for all purposes
  *  Here we use the exact-width types for 8 and 16-bit ints.
  */
 typedef __int8 int_fast8_t;
 typedef unsigned __int8 uint_fast8_t;
-typedef __int16  int_fast16_t;
-typedef unsigned __int16  uint_fast16_t;
-typedef __int32  int_fast32_t;
-typedef unsigned  __int32  uint_fast32_t;
-typedef __int64  int_fast64_t;
-typedef unsigned __int64   uint_fast64_t;
+typedef __int16 int_fast16_t;
+typedef unsigned __int16 uint_fast16_t;
+typedef __int32 int_fast32_t;
+typedef unsigned __int32 uint_fast32_t;
+typedef __int64 int_fast64_t;
+typedef unsigned __int64 uint_fast64_t;
 /* 7.18.1.5  Greatest-width integer types */
-typedef __int64  intmax_t;
-typedef unsigned __int64   uintmax_t;
+typedef __int64 intmax_t;
+typedef unsigned __int64 uintmax_t;
 /* 7.18.2  Limits of specified-width integer types */
 /* 7.18.2.1  Limits of exact-width integer types */
 #define INT8_MIN (-128)
 #define INT16_MIN (-32768)
 #define INT32_MIN (-2147483647 - 1)
-#define INT64_MIN  (-9223372036854775807LL - 1)
+#define INT64_MIN (-9223372036854775807LL - 1)
 #define INT8_MAX 127
 #define INT16_MAX 32767
 #define INT32_MAX 2147483647
 #define INT64_MAX 9223372036854775807LL
 #define UINT8_MAX 255
 #define UINT16_MAX 65535
-#define UINT32_MAX 0xffffffffU  /* 4294967295U */
+#define UINT32_MAX 0xffffffffU           /* 4294967295U */
 #define UINT64_MAX 0xffffffffffffffffULL /* 18446744073709551615ULL */
 /* 7.18.2.2  Limits of minimum-width integer types */
 #define INT_LEAST8_MIN INT8_MIN
@@ -183,7 +183,7 @@ typedef unsigned __int64   uintmax_t;
 #define SIZE_MAX UINT32_MAX
 #endif
 #endif
-#ifndef WCHAR_MIN  /* also in wchar.h */
+#ifndef WCHAR_MIN /* also in wchar.h */
 #define WCHAR_MIN 0U
 #define WCHAR_MAX 0xffffU
 #endif
@@ -205,9 +205,9 @@ typedef unsigned __int64   uintmax_t;
         *expression* with *promoted* type."
         The trick used here is from Clive D W Feather.
 */
-#define INT8_C(val) (INT_LEAST8_MAX-INT_LEAST8_MAX+(val))
-#define INT16_C(val) (INT_LEAST16_MAX-INT_LEAST16_MAX+(val))
-#define INT32_C(val) (INT_LEAST32_MAX-INT_LEAST32_MAX+(val))
+#define INT8_C(val) (INT_LEAST8_MAX - INT_LEAST8_MAX + (val))
+#define INT16_C(val) (INT_LEAST16_MAX - INT_LEAST16_MAX + (val))
+#define INT32_C(val) (INT_LEAST32_MAX - INT_LEAST32_MAX + (val))
 /*  The 'trick' doesn't work in C89 for long long because, without
     suffix, (val) will be evaluated as int, not intmax_t */
 #define INT64_C(val) val##i64

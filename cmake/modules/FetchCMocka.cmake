@@ -1,35 +1,53 @@
-# Copyright 2020 OLIVIER LE DOEUFF
+# This script handles finding or fetching the CMocka unit testing library.
 #
-# Permission is hereby granted, free of charge, to any person obtaining a copy of this software
-# and associated documentation files (the "Software"), to deal in the Software without restriction,
-# including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
-# and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so,
-# subject to the following conditions:
+# Usage:
+# 1. Add this file to your project's `cmake` directory.
+# 2. In your main CMakeLists.txt, add the following:
 #
-# The above copyright notice and this permission notice shall be included in all copies or
-# substantial portions of the Software.
+#    list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+#    include(FetchCMocka)
 #
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
-# INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-# DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH
-# THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+# This will define the following imported targets if CMocka is found or fetched:
+# - cmocka::cmocka         (shared library)
+# - cmocka::cmocka-static  (static library)
 
 include(FetchContent)
 
-FetchContent_Declare(
-  cmocka
-  GIT_REPOSITORY https://git.cryptomilk.org/projects/cmocka.git
-  GIT_TAG        cmocka-1.1.7
-  GIT_SHALLOW    1
-)
+find_package(cmocka QUIET)
 
-set(WITH_STATIC_LIB ON CACHE BOOL "CMocka: Build with a static library" FORCE)
-set(WITH_CMOCKERY_SUPPORT OFF CACHE BOOL "CMocka: Install a cmockery header" FORCE)
-set(WITH_EXAMPLES OFF CACHE BOOL "CMocka: Build examples" FORCE)
-set(UNIT_TESTING OFF CACHE BOOL "CMocka: Build with unit testing" FORCE)
-set(PICKY_DEVELOPER OFF CACHE BOOL "CMocka: Build with picky developer flags" FORCE)
+if(NOT cmocka_FOUND)
+    message(STATUS "CMocka not found via find_package. Fetching from git...")
 
-FetchContent_MakeAvailable(cmocka)
+    # --- Fetch CMocka from Git Repository ---
+    FetchContent_Declare(
+            cmocka
+            GIT_REPOSITORY https://github.com/SamuelMarks/cmocka.git
+            GIT_TAG        3b20eadfe4a2b96281d5f8c58790b22f323da9fb
+            GIT_SHALLOW    TRUE
+    )
+
+    # --- Configure CMocka Build Options ---
+    # Before making the content available, we can set CMake cache variables
+    # to control the build configuration of the fetched project.
+    #
+    # WITH_STATIC_LIB=ON:  Ensures the static library is built.
+    # WITH_EXAMPLES=OFF:   We don't need to build their examples.
+    # UNIT_TESTING=OFF:    We don't need to build their own tests.
+    #
+    # We use set() with CACHE INTERNAL to avoid polluting the user's CMake cache view.
+    set(WITH_STATIC_LIB ON CACHE BOOL "Build the static cmocka library" FORCE)
+    set(WITH_EXAMPLES OFF CACHE BOOL "Build cmocka examples" FORCE)
+    set(UNIT_TESTING OFF CACHE BOOL "Build the unit tests" FORCE)
+
+    FetchContent_MakeAvailable(cmocka)
+else()
+    message(STATUS "Found CMocka installed at: ${cmocka_DIR}")
+endif()
+
+if(TARGET cmocka-shared AND NOT TARGET cmocka::cmocka)
+    add_library(cmocka::cmocka ALIAS cmocka-shared)
+endif()
+
+if(TARGET cmocka-static AND NOT TARGET cmocka::cmocka-static)
+    add_library(cmocka::cmocka-static ALIAS cmocka-static)
+endif()

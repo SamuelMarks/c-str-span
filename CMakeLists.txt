@@ -16,15 +16,18 @@ if (NOT DEFINED MSVC_VERSION
         OR NOT (CMAKE_C_COMPILER_ID STREQUAL "OpenWatcom"))
     target_compile_features("${PROJECT_NAME}_compiler_flags" INTERFACE "c_std_${CMAKE_C_STANDARD}")
     if (CMAKE_VERSION VERSION_GREATER_EQUAL "3.15")
-        # add compiler warning flags just when building this project via
-        # the BUILD_INTERFACE genex
         set(gcc_like "$<COMPILE_LANG_AND_ID:C,CXX,ARMClang,AppleClang,Clang,GNU,LCC>")
         set(msvc "$<COMPILE_LANG_AND_ID:C,CXX,MSVC>")
         target_compile_options(
                 "${PROJECT_NAME}_compiler_flags"
                 INTERFACE
-                "$<${gcc_like}:$<BUILD_INTERFACE:-Wshadow;-Wformat=2;-Wall;-Wno-long-long;-pedantic>>"
+                "$<$<AND:${gcc_like},$<CONFIG:Debug>>:$<BUILD_INTERFACE:-Wshadow;-Wformat=2;-Wall;-Wno-missing-braces;-Wno-long-long;-pedantic;-fprofile-arcs;-ftest-coverage>>"
                 "$<${msvc}:$<BUILD_INTERFACE:-W3;-WX;-Zi;-permissive->>"
+        )
+        target_link_options(
+                "${PROJECT_NAME}_compiler_flags"
+                INTERFACE
+                "$<$<AND:${gcc_like},$<CONFIG:Debug>>:$<BUILD_INTERFACE:--coverage>>"
         )
     endif (CMAKE_VERSION VERSION_GREATER_EQUAL "3.15")
 endif ()
@@ -61,7 +64,7 @@ include(CTest)
 option(BUILD_TESTING "Build the tests" OFF)
 option(C_STR_SPAN_BUILD_TESTING "Build the tests" OFF)
 if (BUILD_TESTING AND C_STR_SPAN_BUILD_TESTING)
-    add_subdirectory("tests")
+    add_subdirectory("${PROJECT_NAME}/tests")
 endif (BUILD_TESTING AND C_STR_SPAN_BUILD_TESTING)
 
 #=========#

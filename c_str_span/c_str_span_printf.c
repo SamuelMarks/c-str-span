@@ -7,8 +7,8 @@
 
 #define AZ_SPAN_FPRINTF(func_name, OUT)                                        \
   void func_name(const uint8_t *format, ...) {                                 \
-    /* `az_span`s supported with "%Q", with special characters escaped.
-     * doesn't support "%03d" or other fancier syntax
+    /* `az_span`s supported with "%Q", with special characters escaped.        \
+     * doesn't support "%03d" or other fancier syntax                          \
      * */                                                                      \
     size_t i;                                                                  \
     va_list ap;                                                                \

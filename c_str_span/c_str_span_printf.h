@@ -14,12 +14,13 @@ extern "C" {
 
 #include "c_str_span_export.h"
 
-/*extern C_STR_SPAN_EXPORT void az_span_fprintf(FILE * __restrict OUT, const uint8_t *format, ...);*/
+/*extern C_STR_SPAN_EXPORT void az_span_fprintf(FILE * __restrict OUT, const
+ * uint8_t *format, ...);*/
 
 /* `az_span`s supported with "%Q", with special characters escaped.
  * doesn't support "%03d" or other fancier syntax
  * */
-extern C_STR_SPAN_EXPORT void az_span_printf(const uint8_t * format, ...);
+extern C_STR_SPAN_EXPORT void az_span_printf(const uint8_t *format, ...);
 
 #ifdef __cplusplus
 }

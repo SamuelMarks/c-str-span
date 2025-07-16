@@ -5,8 +5,8 @@
 #if __STDC_VERSION__ >= 199901L
 #include <stdbool.h>
 #else
-#include "c_str_span_stdbool.h"
 #include "c_str_span_internal.h"
+#include "c_str_span_stdbool.h"
 #endif
 
 #include <c_str_span.h>

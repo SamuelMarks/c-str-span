@@ -1,8 +1,5 @@
-if (NOT BUILD_TESTING OR NOT C_STR_SPAN_BUILD_TESTING)
-    return()
-endif (NOT BUILD_TESTING OR NOT C_STR_SPAN_BUILD_TESTING)
 get_filename_component(EXEC_NAME "${CMAKE_CURRENT_SOURCE_DIR}" NAME)
-set(EXEC_NAME "${EXEC_NAME}_exec")
+set(EXEC_NAME "${PROJECT_NAME}_${EXEC_NAME}")
 
 #=======================#
 # Dependencies download #
