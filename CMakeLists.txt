@@ -10,8 +10,6 @@ set(CMAKE_C_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN YES)
 set(CMAKE_C_STANDARD 90 CACHE STRING "")
 
-message(STATUS "CMAKE_C_COMPILER_ID = ${CMAKE_C_COMPILER_ID}")
-message(STATUS "CMAKE_SYSTEM_NAME = ${CMAKE_SYSTEM_NAME}")
 add_library("${PROJECT_NAME}_compiler_flags" INTERFACE)
 if (NOT DEFINED MSVC_VERSION
         OR MSVC_VERSION STRGREATER "1900" # 2015
@@ -25,7 +23,7 @@ if (NOT DEFINED MSVC_VERSION
         target_compile_options(
                 "${PROJECT_NAME}_compiler_flags"
                 INTERFACE
-                "$<${gcc_like}:$<BUILD_INTERFACE:-Wshadow;-Wformat=2;-Wall;-pedantic>>"
+                "$<${gcc_like}:$<BUILD_INTERFACE:-Wshadow;-Wformat=2;-Wall;-Wno-long-long;-pedantic>>"
                 "$<${msvc}:$<BUILD_INTERFACE:-W3;-WX;-Zi;-permissive->>"
         )
     endif (CMAKE_VERSION VERSION_GREATER_EQUAL "3.15")

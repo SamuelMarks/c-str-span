@@ -1817,7 +1817,7 @@ static void test_az_span_token_success(void** state)
   assert_true(az_span_size(out_span) == 0);
 }
 
-int test_az_span()
+int test_az_span(void)
 {
   const struct CMUnitTest tests[] = {
     cmocka_unit_test(az_span_slice_to_end_test),

@@ -21,14 +21,17 @@ extern "C" {
  * @brief Enforce that the return value is handled (only applicable on supported compilers).
  */
 #ifdef _MSC_VER
+#define AZ_UNUSED
 #if _MSC_VER >= 1700
 #define AZ_NODISCARD _Check_return_
 #else
 #define AZ_NODISCARD
 #endif
 #elif defined(__GNUC__) || defined(__clang__) /* !_MSC_VER */
+#define AZ_UNUSED __attribute__((unused))
 #define AZ_NODISCARD __attribute__((warn_unused_result))
 #else /* !_MSC_VER !__GNUC__ !__clang__ */
+#define AZ_UNUSED
 #define AZ_NODISCARD
 #endif /* _MSC_VER */
 

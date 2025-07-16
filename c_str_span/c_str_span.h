@@ -212,7 +212,7 @@ extern C_STR_SPAN_EXPORT AZ_NODISCARD az_span az_span_slice_to_end(az_span span,
  * @return `true` if the sizes of both spans are identical and the bytes in both spans are
  * also identical. Otherwise, `false`.
  */
-AZ_NODISCARD AZ_INLINE bool az_span_is_content_equal(az_span span1, az_span span2)
+AZ_UNUSED AZ_NODISCARD AZ_INLINE bool az_span_is_content_equal(az_span span1, az_span span2)
 {
   size_t const span1_size = az_span_size(span1);
   size_t const span2_size = az_span_size(span2);
@@ -243,7 +243,7 @@ AZ_NODISCARD AZ_INLINE bool az_span_is_content_equal(az_span span1, az_span span
  *
  * @remarks This function assumes the bytes in both spans are ASCII characters.
  */
-extern C_STR_SPAN_EXPORT AZ_NODISCARD bool az_span_is_content_equal_ignoring_case(az_span span1, az_span span2);
+extern C_STR_SPAN_EXPORT AZ_NODISCARD AZ_UNUSED bool az_span_is_content_equal_ignoring_case(az_span span1, az_span span2);
 
 /**
  * @brief Copies a \p source #az_span containing a string (that is not 0-terminated) to a \p
@@ -316,7 +316,7 @@ extern C_STR_SPAN_EXPORT az_span az_span_copy_u8(az_span destination, uint8_t by
  * @param destination The #az_span whose bytes will be set to \p value.
  * @param[in] value The byte to be replicated within the destination #az_span.
  */
-AZ_INLINE void az_span_fill(az_span destination, uint8_t value)
+AZ_UNUSED AZ_INLINE void az_span_fill(az_span destination, uint8_t value)
 {
   /* NOLINTNEXTLINE(clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling) */
   memset(az_span_ptr(destination), value, az_span_size(destination));
@@ -494,7 +494,7 @@ az_span_dtoa(az_span destination, double source, int32_t fractional_digits, az_s
 /* @brief Checks if char (uint8_t) is alphabetical or numeric (A-z|0-9)
    @remark Locale isn't considered, this is implemented as a simple switch/case
  */
-AZ_NODISCARD AZ_INLINE bool uint8_t_isalnum(const uint8_t c) {
+AZ_UNUSED AZ_NODISCARD AZ_INLINE bool uint8_t_isalnum(const uint8_t c) {
   switch (c) {
     case '0':
     case '1':
@@ -569,7 +569,7 @@ AZ_NODISCARD AZ_INLINE bool uint8_t_isalnum(const uint8_t c) {
    @remark An empty str will return true
    @remark Locale isn't considered, this is implemented as a simple switch/case
  */
-AZ_NODISCARD AZ_INLINE bool az_span_isalnum(const az_span span) {
+AZ_UNUSED AZ_NODISCARD AZ_INLINE bool az_span_isalnum(const az_span span) {
   const size_t size = az_span_size(span);
   size_t i;
   for (i = 0; i < size; i++) {
@@ -647,7 +647,7 @@ AZ_NODISCARD AZ_INLINE bool az_span_isalnum(const az_span span) {
 /* @brief Checks if char (uint8_t) is alphabetical (A-z)
  * @remark Locale isn't considered, this is implemented as a simple switch/case
  */
-AZ_NODISCARD AZ_INLINE bool uint8_t_isalpha(const uint8_t c) {
+AZ_UNUSED AZ_NODISCARD AZ_INLINE bool uint8_t_isalpha(const uint8_t c) {
   switch (c) {
     case 'a':
     case 'b':
@@ -712,7 +712,7 @@ AZ_NODISCARD AZ_INLINE bool uint8_t_isalpha(const uint8_t c) {
  * @remark An empty str will return true
  * @remark Locale isn't considered, this is implemented as a simple switch/case
  */
-AZ_NODISCARD AZ_INLINE bool az_span_isalpha(const az_span span) {
+AZ_UNUSED AZ_NODISCARD AZ_INLINE bool az_span_isalpha(const az_span span) {
   size_t i;
   for (i = 0; i < az_span_size(span); i++) {
     switch (az_span_ptr(span)[i]) {
@@ -777,7 +777,7 @@ AZ_NODISCARD AZ_INLINE bool az_span_isalpha(const az_span span) {
 }
 
 /* @brief Checks if char (uint8_t) is blank */
-AZ_NODISCARD AZ_INLINE bool uint8_t_isblank(const uint8_t c) {
+AZ_UNUSED AZ_NODISCARD AZ_INLINE bool uint8_t_isblank(const uint8_t c) {
   switch (c) {
     case ' ':
     case '\t':
@@ -791,7 +791,7 @@ AZ_NODISCARD AZ_INLINE bool uint8_t_isblank(const uint8_t c) {
 /* @brief Checks if str (az_span) is blank
  * @remark An empty str will return true
  */
-AZ_NODISCARD AZ_INLINE bool az_span_isblank(const az_span span) {
+AZ_UNUSED AZ_NODISCARD AZ_INLINE bool az_span_isblank(const az_span span) {
   size_t i;
   for (i = 0; i < az_span_size(span); i++) {
     switch (az_span_ptr(span)[i]) {
@@ -808,7 +808,7 @@ AZ_NODISCARD AZ_INLINE bool az_span_isblank(const az_span span) {
 /* @brief Checks if char (uint8_t) only contains digits
  * @remark Doesn't deal with decimals or scientific notation
  */
-AZ_NODISCARD AZ_INLINE bool uint8_t_isdigit(const uint8_t c) {
+AZ_UNUSED AZ_NODISCARD AZ_INLINE bool uint8_t_isdigit(const uint8_t c) {
   switch (c) {
     case '0':
     case '1':
@@ -831,7 +831,7 @@ AZ_NODISCARD AZ_INLINE bool uint8_t_isdigit(const uint8_t c) {
  * @remark An empty str will return true
  * @remark Doesn't deal with decimals or scientific notation
  */
-AZ_NODISCARD AZ_INLINE bool az_span_isdigit(const az_span span) {
+AZ_UNUSED AZ_NODISCARD AZ_INLINE bool az_span_isdigit(const az_span span) {
   size_t i;
   for (i = 0; i < az_span_size(span); i++) {
     switch (az_span_ptr(span)[i]) {
@@ -856,7 +856,7 @@ AZ_NODISCARD AZ_INLINE bool az_span_isdigit(const az_span span) {
 /* @brief Checks if char (uint8_t) is alphabetical and lowercase (A-Z)
  * @remark Locale isn't considered, this is implemented as a simple switch/case
  */
-AZ_NODISCARD AZ_INLINE bool uint8_t_islower(const uint8_t c) {
+AZ_UNUSED AZ_NODISCARD AZ_INLINE bool uint8_t_islower(const uint8_t c) {
   switch (c) {
     case 'a':
     case 'b':
@@ -895,7 +895,7 @@ AZ_NODISCARD AZ_INLINE bool uint8_t_islower(const uint8_t c) {
  * @remark An empty str will return true
  * @remark Locale isn't considered, this is implemented as a simple switch/case
  */
-AZ_NODISCARD AZ_INLINE bool az_span_islower(const az_span span) {
+AZ_UNUSED AZ_NODISCARD AZ_INLINE bool az_span_islower(const az_span span) {
   size_t i;
   for (i = 0; i < az_span_size(span); i++) {
     /* not using `uint8_t_islower` function as that adds a branch */
@@ -937,7 +937,7 @@ AZ_NODISCARD AZ_INLINE bool az_span_islower(const az_span span) {
 /* @brief Checks if char (uint8_t) is alphabetical and lowercase (A-Z)
  * @remark Locale isn't considered, this is implemented as a simple switch/case
  */
-AZ_NODISCARD AZ_INLINE bool uint8_t_isupper(const uint8_t c) {
+AZ_UNUSED AZ_NODISCARD AZ_INLINE bool uint8_t_isupper(const uint8_t c) {
   switch (c) {
     case 'A':
     case 'B':
@@ -976,7 +976,7 @@ AZ_NODISCARD AZ_INLINE bool uint8_t_isupper(const uint8_t c) {
  * @remark An empty str will return true
  * @remark Locale isn't considered, this is implemented as a simple switch/case
  */
-AZ_NODISCARD AZ_INLINE bool az_span_isupper(const az_span span) {
+AZ_UNUSED AZ_NODISCARD AZ_INLINE bool az_span_isupper(const az_span span) {
   size_t i;
   for (i = 0; i < az_span_size(span); i++) {
     switch (az_span_ptr(span)[i]) {

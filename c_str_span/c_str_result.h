@@ -174,7 +174,7 @@ AZ_NODISCARD AZ_INLINE bool az_result_failed(az_result result)
  * @return `true` if the operation that returned this \p result was successful, otherwise return
  * `false`.
  */
-AZ_NODISCARD AZ_INLINE bool az_result_succeeded(az_result result)
+AZ_UNUSED AZ_NODISCARD AZ_INLINE bool az_result_succeeded(az_result result)
 {
   return !az_result_failed(result);
 }

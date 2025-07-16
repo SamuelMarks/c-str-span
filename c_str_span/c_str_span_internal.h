@@ -43,7 +43,7 @@ enum
 /* Use this helper to figure out how much the sliced_span has moved in comparison to the */
 /* original_span while writing and slicing a copy of the original. */
 /* The \p sliced_span must be some slice of the \p original_span (and have the same backing memory). */
-AZ_INLINE AZ_NODISCARD size_t _az_span_diff(az_span sliced_span, az_span original_span)
+AZ_UNUSED AZ_INLINE AZ_NODISCARD size_t _az_span_diff(az_span sliced_span, az_span original_span)
 {
   const size_t answer = az_span_size(original_span) - az_span_size(sliced_span);
 

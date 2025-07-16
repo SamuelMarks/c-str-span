@@ -421,8 +421,10 @@ AZ_NODISCARD az_result az_span_atod(az_span source, double* out_number)
         {
           int32_t chars_consumed = 0;
           /* NOLINTNEXTLINE(clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling) */
-          int32_t n = sscanf((char *) source_ptr, format, out_number, &chars_consumed);
-
+#if defined(__GNUC__) || defined(__clang__)
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+          const int32_t n = sscanf((char *) source_ptr, format, out_number, &chars_consumed);
+#endif /* defined(__GNUC__) || defined(__clang__) */
           /* Success if the entire source was consumed by sscanf and it set the out_number argument. */
           return (size == chars_consumed && n == 1 && _az_isfinite(*out_number)) ? AZ_OK
                                                                                  : AZ_ERROR_UNEXPECTED_CHAR;
