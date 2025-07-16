@@ -58,6 +58,7 @@ configure_file(
 add_subdirectory("${PROJECT_NAME}")
 
 include(CTest)
+option(BUILD_TESTING "Build the tests" OFF)
 if (BUILD_TESTING)
     add_subdirectory("tests")
 endif (BUILD_TESTING)
