@@ -59,9 +59,10 @@ add_subdirectory("${PROJECT_NAME}")
 
 include(CTest)
 option(BUILD_TESTING "Build the tests" OFF)
-if (BUILD_TESTING)
+option(C_STR_SPAN_BUILD_TESTING "Build the tests" OFF)
+if (BUILD_TESTING AND C_STR_SPAN_BUILD_TESTING)
     add_subdirectory("tests")
-endif (BUILD_TESTING)
+endif (BUILD_TESTING AND C_STR_SPAN_BUILD_TESTING)
 
 #=========#
 # Install #
