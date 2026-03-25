@@ -1,6 +1,7 @@
 /* Copyright (c) Microsoft Corporation. All rights reserved.
  * SPDX-License-Identifier: MIT */
 
+/* clang-format off */
 #ifdef __cplusplus
 #include <cctype>
 #include <cmath>
@@ -18,6 +19,7 @@
 #include "c_str_span.h"
 #include "c_str_span_internal.h"
 #include "c_str_span_private.h"
+/* clang-format on */
 
 /*#include <azure/core/_az_cfg.h>*/
 

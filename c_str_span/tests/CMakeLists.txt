@@ -67,6 +67,10 @@ else ()
     # Download cmocka, and execute its cmakelists.txt
     FetchContent_MakeAvailable(cmocka)
 
+    if(MSVC AND MSVC_VERSION LESS 1800)
+        target_compile_definitions(cmocka PRIVATE PRIx64="I64x" PRIu64="I64u" PRId64="I64d")
+    endif()
+
     target_include_directories(
         "${EXEC_NAME}"
         PRIVATE

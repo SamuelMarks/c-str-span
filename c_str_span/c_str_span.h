@@ -1,6 +1,25 @@
 #ifndef C_STR_SPAN_STR_SPAN_H
 #define C_STR_SPAN_STR_SPAN_H
 
+/* clang-format off */
+#if defined(_MSC_VER) && _MSC_VER < 1600
+#include "c_str_span_stdint.h"
+#else
+#include <stdint.h>
+#endif /* defined(_MSC_VER) && _MSC_VER < 1600 */
+
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
+#include <stdbool.h>
+#elif defined(_MSC_VER) && _MSC_VER < 1800
+#include "c_str_span_stdbool.h"
+#else
+#include <stdbool.h>
+#endif /* defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L */
+
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 /* Copyright (c) Microsoft Corporation. All rights reserved.
  * SPDX-License-Identifier: MIT
  * Copyright (c) Offscale.io. All rights reserved.
@@ -23,30 +42,13 @@
 
 /*#include <azure/core/az_result.h>*/
 
-#ifdef __cplusplus
-#include <cstddef>
-#include <cstdint>
-#include <cstring>
-extern "C" {
-#elif __STDC_VERSION__ >= 199901L
-#include <stdbool.h>
-#else
-#include "c_str_span_stdbool.h"
-#endif /* __cplusplus */
 
-#ifndef __cplusplus
-#include <stddef.h>
-#include <string.h>
-#if defined(_MSC_VER) && _MSC_VER < 1600
-#include "c_str_span_stdint.h"
-#else
-#include <stdint.h>
-#endif /* defined(_MSC_VER) && _MSC_VER < 1600 */
-#endif /* ! __cplusplus */
 
 #include "c_str_result.h"
 #include "c_str_span_export.h"
 #include "c_str_span_types.h"
+#include <string.h>
+/* clang-format on */
 
 /*#include <azure/core/_az_cfg_prefix.h>*/
 
@@ -58,7 +60,7 @@ extern "C" {
 typedef struct {
   struct {
     uint8_t *ptr;
-    size_t size; // size must be >= 0
+    size_t size; /* size must be >= 0 */
   } _internal;
 } az_span;
 
@@ -146,10 +148,10 @@ extern C_STR_SPAN_EXPORT AZ_NODISCARD az_span az_span_create(uint8_t *ptr,
  *
  * `uint8_t buffer[1024];`
  *
- * `some_function(AZ_SPAN_FROM_BUFFER(buffer));  // Size = 1024`
+ * `some_function(AZ_SPAN_FROM_BUFFER(buffer));  [Size = 1024]`
  *
  * @remarks BYTE_BUFFER MUST be an array defined like `uint8_t buffer[10];` and
- * not `uint8_t* buffer`
+ * not `uint8_t * buffer`
  */
 /* Force a division by 0 that gets detected by compilers for anything that isn't
  * a byte array. */
@@ -158,13 +160,13 @@ extern C_STR_SPAN_EXPORT AZ_NODISCARD az_span az_span_create(uint8_t *ptr,
       (uint8_t *)(BYTE_BUFFER),                                                \
       (sizeof(BYTE_BUFFER) / (_az_IS_BYTE_ARRAY(BYTE_BUFFER) ? 1 : 0)))
 
-/**
- * @brief An empty #az_span.
- *
- * @remark There is no guarantee that the pointer backing this span will be
- * `NULL` and the caller shouldn't rely on it. However, the size will be 0.
- */
-extern C_STR_SPAN_EXPORT AZ_NODISCARD az_span az_span_empty(void);
+    /**
+     * @brief An empty #az_span.
+     *
+     * @remark There is no guarantee that the pointer backing this span will be
+     * `NULL` and the caller shouldn't rely on it. However, the size will be 0.
+     */
+    extern C_STR_SPAN_EXPORT AZ_NODISCARD az_span az_span_empty(void);
 
 /**
  * @brief Returns an #az_span from a 0-terminated array of bytes (chars).
@@ -1138,8 +1140,8 @@ typedef az_result (*az_span_allocator_fn)(
 
 /*#include <azure/core/_az_cfg_suffix.h>*/
 
+#endif /* !C_STR_SPAN_STR_SPAN_H */
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
-
-#endif /* !C_STR_SPAN_STR_SPAN_H */

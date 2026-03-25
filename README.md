@@ -2,7 +2,7 @@ c-str-span
 ==========
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-[![Linux, Windows, macOS](https://github.com/SamuelMarks/c-str-span/actions/workflows/linux-Windows-macOS.yml/badge.svg)](https://github.com/SamuelMarks/c-str-span/actions/workflows/linux-Windows-macOS.yml)
+[![CI](https://github.com/SamuelMarks/c-str-span/actions/workflows/ci.yml/badge.svg)](https://github.com/SamuelMarks/c-str-span/actions/workflows/ci.yml)
 ![coverage](reports/test_coverage.svg)
 [![C89](https://img.shields.io/badge/C-89-blue)](https://en.wikipedia.org/wiki/C89_(C_version))
 
@@ -16,6 +16,29 @@ Extracted from https://github.com/Azure/azure-sdk-for-c @ [`ac28b8`](https://git
   - Use `size_t` over `int32_t` for size types;
   - Implement `az_span_printf`;
   - Added support for MSVC 2005, Open Watcom (incl. DOS target), MinGW, and Cygwin
+  - Header-only amalgamation support (STB-style).
+
+### Amalgamation (Header-Only)
+
+This library supports an STB-style header-only distribution via a CMake amalgamation script.
+To generate the amalgamated header:
+
+```bash
+cmake -B build -DC_STR_SPAN_BUILD_AMALGAMATION=ON
+cmake --build build --target c_str_span_amalgamation
+```
+
+This generates `c_str_span_amalgamation.h`. To consume it, simply define `C_STR_SPAN_IMPLEMENTATION` in exactly *one* source file before including it:
+
+```c
+#define C_STR_SPAN_IMPLEMENTATION
+#include "c_str_span_amalgamation.h"
+
+int main(void) {
+    az_span span = az_span_from_str("Hello");
+    return (int)az_span_size(span);
+}
+```
 
 Documentation originally from: https://github.com/Azure/azure-sdk-for-c/tree/main/sdk/docs/core#working-with-spans, now below:
 

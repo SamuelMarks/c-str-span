@@ -4,6 +4,7 @@
 #define STR_HELPER(x) #x
 #define STR(x) STR_HELPER(x)
 
+/* clang-format off */
 #include "c_str_precondition_internal.h"
 
 #include "c_str_span.h"
@@ -46,6 +47,7 @@
 #include <stdio.h>
 
 #include "test_az_span.h"
+/* clang-format on */
 
 #define TEST_EXPECT_SUCCESS(exp) assert_true(az_result_succeeded(exp))
 

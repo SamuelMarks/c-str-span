@@ -1,21 +1,28 @@
 #ifndef C_STR_SPAN_TYPES_H
 #define C_STR_SPAN_TYPES_H
 
-/* Copyright (c) Microsoft Corporation. All rights reserved.
- * SPDX-License-Identifier: MIT */
-
-#ifdef __cplusplus
-#include <cstdint>
-extern "C" {
-#endif /* __cplusplus */
-
-#ifndef __cplusplus
+/* clang-format off */
 #if defined(_MSC_VER) && _MSC_VER < 1600
 #include "c_str_span_stdint.h"
 #else
 #include <stdint.h>
 #endif /* defined(_MSC_VER) && _MSC_VER < 1600 */
-#endif /* ! __cplusplus */
+
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
+#include <stdbool.h>
+#elif defined(_MSC_VER) && _MSC_VER < 1800
+#include "c_str_span_stdbool.h"
+#else
+#include <stdbool.h>
+#endif /* defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L */
+/* clang-format on */
+
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
+/* Copyright (c) Microsoft Corporation. All rights reserved.
+ * SPDX-License-Identifier: MIT */
 
 /**
  * @brief Enforce that the return value is handled (only applicable on supported
@@ -45,14 +52,14 @@ extern "C" {
 #if __STDC_VERSION__ >= 199901L
 #define AZ_INLINE __attribute__((always_inline)) static inline
 #else
-#define AZ_INLINE __attribute__((always_inline)) static
+#define AZ_INLINE __attribute__((always_inline)) static __inline__
 #endif
 #else /* !_MSC_VER !__GNUC__ !__clang__ */
-#define AZ_INLINE static inline
+#define AZ_INLINE static __inline__
 #endif /* _MSC_VER */
+
+#endif /* C_STR_SPAN_TYPES_H */
 
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
-
-#endif /* C_STR_SPAN_TYPES_H */

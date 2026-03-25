@@ -25,7 +25,28 @@ set(Source_Files
 )
 source_group("Source Files" FILES "${Source_Files}")
 
+option(C_STR_SPAN_BUILD_AMALGAMATION "Generate header-only amalgamation (STB-style)" OFF)
+
 add_library("${LIBRARY_NAME}" "${Header_Files}" "${Source_Files}")
+
+if(C_STR_SPAN_BUILD_AMALGAMATION)
+    set(AMAL_OUT "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_amalgamation.h")
+    execute_process(
+        COMMAND ${CMAKE_COMMAND}
+            -DSRC_DIR=${CMAKE_CURRENT_SOURCE_DIR}
+            -DOUT_FILE=${AMAL_OUT}
+            -P ${CMAKE_SOURCE_DIR}/cmake/Amalgamate.cmake
+    )
+    add_custom_target(${LIBRARY_NAME}_amalgamation ALL
+        COMMAND ${CMAKE_COMMAND}
+            -DSRC_DIR=${CMAKE_CURRENT_SOURCE_DIR}
+            -DOUT_FILE=${AMAL_OUT}
+            -P ${CMAKE_SOURCE_DIR}/cmake/Amalgamate.cmake
+        DEPENDS ${Header_Files} ${Source_Files}
+        COMMENT "Generating STB-style amalgamation: ${AMAL_OUT}"
+    )
+    install(FILES "${AMAL_OUT}" DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}")
+endif()
 
 if (DEFINED MSVC_VERSION
         AND MSVC_VERSION STRGREATER "1900" # 2015

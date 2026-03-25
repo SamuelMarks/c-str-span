@@ -16,19 +16,29 @@
 #ifndef C_STR_SPAN_RESULT_INTERNAL_H
 #define C_STR_SPAN_RESULT_INTERNAL_H
 
-#ifdef __cplusplus
-#include <cstdint>
-extern "C" {
-#else
+/* clang-format off */
 #if defined(_MSC_VER) && _MSC_VER < 1600
 #include "c_str_span_stdint.h"
 #else
 #include <stdint.h>
 #endif /* defined(_MSC_VER) && _MSC_VER < 1600 */
+
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
+#include <stdbool.h>
+#elif defined(_MSC_VER) && _MSC_VER < 1800
+#include "c_str_span_stdbool.h"
+#else
+#include <stdbool.h>
+#endif /* defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L */
+
+#ifdef __cplusplus
+extern "C" {
 #endif /* __cplusplus */
+
 
 #include "c_str_result.h"
 #include "c_str_span.h"
+/* clang-format on */
 
 /*#include <azure/core/_az_cfg_prefix.h>*/
 
@@ -57,8 +67,8 @@ extern "C" {
 
 /*#include <azure/core/_az_cfg_suffix.h>*/
 
+#endif /* !C_STR_SPAN_RESULT_INTERNAL_H */
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
-
-#endif /* !C_STR_SPAN_RESULT_INTERNAL_H */

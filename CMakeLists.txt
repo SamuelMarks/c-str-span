@@ -61,10 +61,14 @@ configure_file(
 add_subdirectory("${PROJECT_NAME}")
 
 include(CTest)
-option(BUILD_TESTING "Build the tests" OFF)
-option(C_STR_SPAN_BUILD_TESTING "Build the tests" OFF)
+option(BUILD_TESTING "Build the tests" ON)
+option(C_STR_SPAN_BUILD_TESTING "Build the tests" ON)
+set(C_STR_SPAN_BUILD_TESTING ON)
 if (BUILD_TESTING AND C_STR_SPAN_BUILD_TESTING)
+    message(STATUS "TESTS ENABLED")
     add_subdirectory("${PROJECT_NAME}/tests")
+else()
+    message(STATUS "TESTS DISABLED: BUILD_TESTING=${BUILD_TESTING} C_STR_SPAN_BUILD_TESTING=${C_STR_SPAN_BUILD_TESTING}")
 endif (BUILD_TESTING AND C_STR_SPAN_BUILD_TESTING)
 
 #=========#

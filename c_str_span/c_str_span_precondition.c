@@ -1,7 +1,9 @@
 /* Copyright (c) Microsoft Corporation. All rights reserved.
  * SPDX-License-Identifier: MIT */
 
+/* clang-format off */
 #include "c_str_precondition_internal.h"
+/* clang-format on */
 
 /*#include <azure/core/_az_cfg.h>*/
 

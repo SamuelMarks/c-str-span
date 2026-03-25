@@ -1,7 +1,9 @@
+/* clang-format off */
 #include <greatest.h>
 
 #include "test_az_span.h"
 #include "test_lib.h"
+/* clang-format on */
 
 /* Add definitions that need to be in the test runner's main file. */
 GREATEST_MAIN_DEFS();

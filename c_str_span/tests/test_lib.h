@@ -1,3 +1,4 @@
+/* clang-format off */
 #include <c_str_span_configure.h>
 
 #include <greatest.h>
@@ -10,6 +11,7 @@
 #endif
 
 #include <c_str_span.h>
+/* clang-format on */
 
 TEST x_lib_should_be(void) {
   /* TODO: Actually test things */

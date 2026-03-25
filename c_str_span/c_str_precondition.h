@@ -4,6 +4,25 @@
 #ifndef C_STR_SPAN_PRECONDITION_H
 #define C_STR_SPAN_PRECONDITION_H
 
+/* clang-format off */
+#if defined(_MSC_VER) && _MSC_VER < 1600
+#include "c_str_span_stdint.h"
+#else
+#include <stdint.h>
+#endif /* defined(_MSC_VER) && _MSC_VER < 1600 */
+
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
+#include <stdbool.h>
+#elif defined(_MSC_VER) && _MSC_VER < 1800
+#include "c_str_span_stdbool.h"
+#else
+#include <stdbool.h>
+#endif /* defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L */
+
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 /**
  * @file
  *
@@ -39,19 +58,13 @@
  * the SDK which would break your code.
  */
 
-#ifdef __cplusplus
-extern "C" {
-#elif __STDC_VERSION__ >= 199901L
-#include <stdbool.h>
-#else
-#include "c_str_span_stdbool.h"
-#endif /* __cplusplus */
 
 #include <stddef.h>
 
 #include "c_str_span.h"
 
 #include "c_str_span_export.h"
+/* clang-format on */
 
 /*#include <azure/core/_az_cfg_prefix.h>*/
 
@@ -77,8 +90,8 @@ extern C_STR_SPAN_EXPORT void az_precondition_failed_set_callback(
 
 /*#include <azure/core/_az_cfg_suffix.h>*/
 
+#endif /* !C_STR_SPAN_PRECONDITION_H */
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
-
-#endif /* !C_STR_SPAN_PRECONDITION_H */

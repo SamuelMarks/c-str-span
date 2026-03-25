@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  build:
+    uses: SamuelMarks/c-ci/.github/workflows/c-cmake-ci.yml@master
+  
+  build-amalgamation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Build Amalgamation
+        run: |
+          cmake -B build_amal -S . -DC_STR_SPAN_BUILD_AMALGAMATION=ON
+          cmake --build build_amal --target c_str_span_amalgamation
+          
+      - name: Verify Amalgamation Exists
+        run: |
+          if [ ! -f build_amal/c_str_span_amalgamation.h ]; then
+            echo "Amalgamation header was not created!"
+            exit 1
+          fi
+          
+      - name: Test Amalgamation Compilation
+        run: |
+          cat << 'EOF' > test_amal.c
+          #define C_STR_SPAN_IMPLEMENTATION
+          #include "build_amal/c_str_span_amalgamation.h"
+          int main(void) {
+              az_span s = az_span_empty();
+              return (int)az_span_size(s);
+          }
+          EOF
+          gcc -Wall -Wextra -pedantic -std=c89 test_amal.c -o test_amal
+          ./test_amal

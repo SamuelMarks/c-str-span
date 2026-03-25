@@ -16,24 +16,29 @@
 #ifndef C_STR_SPAN_RESULT_H
 #define C_STR_SPAN_RESULT_H
 
-#ifdef __cplusplus
-#include <cstdint>
-extern "C" {
-#elif __STDC_VERSION__ >= 199901L
-#include <stdbool.h>
-#else
-#include "c_str_span_stdbool.h"
-#endif /* __cplusplus */
-
-#ifndef __cplusplus
+/* clang-format off */
 #if defined(_MSC_VER) && _MSC_VER < 1600
 #include "c_str_span_stdint.h"
 #else
 #include <stdint.h>
-#endif
-#endif /* ! __cplusplus */
+#endif /* defined(_MSC_VER) && _MSC_VER < 1600 */
+
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
+#include <stdbool.h>
+#elif defined(_MSC_VER) && _MSC_VER < 1800
+#include "c_str_span_stdbool.h"
+#else
+#include <stdbool.h>
+#endif /* defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L */
+
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
+
 
 #include "c_str_span_types.h"
+/* clang-format on */
 /*#include <azure/core/_az_cfg_prefix.h>*/
 
 enum {
@@ -191,8 +196,8 @@ AZ_UNUSED AZ_NODISCARD AZ_INLINE bool az_result_succeeded(az_result result) {
 
 /*#include <azure/core/_az_cfg_suffix.h>*/
 
+#endif /* C_STR_SPAN_RESULT_H */
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
-
-#endif /* C_STR_SPAN_RESULT_H */

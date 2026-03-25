@@ -17,7 +17,9 @@
 #undef false
 #endif /* false */
 
+/* clang-format off */
 #include <stdlib.h>
+/* clang-format on */
 
 typedef size_t bool;
 #define true 1
