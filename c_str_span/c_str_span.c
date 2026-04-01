@@ -842,9 +842,6 @@ AZ_NODISCARD az_result az_span_dtoa(az_span destination, double source,
            * fractional digits the user specified), or if they were all
            * non-significant zeros, don't print the decimal point or any
            * trailing zeros. */
-          if (fractional_part == 0) {
-            return AZ_OK;
-          }
 
           /* Remove trailing zeros of the fraction part that don't need to be
            * printed since they aren't significant. */

@@ -1093,7 +1093,6 @@ TEST az_span_test_macro_only_allows_byte_buffers(void) {
     {
       az_span valid = AZ_SPAN_FROM_BUFFER(uint8_buffer);
       ASSERT_EQ(2, az_span_size(valid));
-      PASS();
     }
   }
 

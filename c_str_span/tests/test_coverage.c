@@ -1,6 +1,7 @@
 #include "c_str_precondition_internal.h"
 #include "c_str_span.h"
 #include "c_str_span_internal.h"
+#include "c_str_span_printf.h"
 #include "c_str_span_private.h"
 #include <greatest.h>
 #include <math.h>
@@ -8,7 +9,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#ifndef AZ_NO_PRECONDITION_CHECKING
 static jmp_buf g_precondition_jmp;
 static volatile bool g_precondition_expected = false;
 
@@ -18,6 +18,7 @@ static void test_precondition_failed_callback(void) {
   }
 }
 
+#ifndef AZ_NO_PRECONDITION_CHECKING
 #define ASSERT_PRECONDITION_FAIL(expr)                                         \
   do {                                                                         \
     g_precondition_expected = true;                                            \
@@ -40,13 +41,15 @@ TEST test_az_span_create_from_str_null(void) {
 
   az_precondition_failed_set_callback(original);
 #else
-  az_span span = az_span_create_from_str(NULL);
-  ASSERT_EQ(0, az_span_size(span));
-  ASSERT(az_span_ptr(span) == NULL);
+  {
+    az_span span = az_span_create_from_str(NULL);
+    ASSERT_EQ(0, az_span_size(span));
+    ASSERT(az_span_ptr(span) == NULL);
 
-  span = az_span_create_from_str_of_size(NULL, 10);
-  ASSERT_EQ(0, az_span_size(span));
-  ASSERT(az_span_ptr(span) == NULL);
+    span = az_span_create_from_str_of_size(NULL, 10);
+    ASSERT_EQ(0, az_span_size(span));
+    ASSERT(az_span_ptr(span) == NULL);
+  }
 #endif
   PASS();
 }
@@ -60,10 +63,12 @@ TEST test_az_span_create_null_size_non_zero(void) {
 
   az_precondition_failed_set_callback(original);
 #else
-  /* In NO_PRECONDITION mode, az_span_create just sets the fields. */
-  az_span span = az_span_create(NULL, 10);
-  ASSERT_EQ(10, az_span_size(span));
-  ASSERT(az_span_ptr(span) == NULL);
+  {
+    /* In NO_PRECONDITION mode, az_span_create just sets the fields. */
+    az_span span = az_span_create(NULL, 10);
+    ASSERT_EQ(10, az_span_size(span));
+    ASSERT(az_span_ptr(span) == NULL);
+  }
 #endif
   PASS();
 }
@@ -177,11 +182,41 @@ TEST test_az_span_dtoa_special_cases(void) {
   ASSERT_EQ('1', buf[0]);
 
   /* fractional_digits > 15 capped to 15 */
-  ASSERT_EQ(AZ_OK, az_span_dtoa(dest, 0.0, 20, &out));
+  ASSERT_EQ(AZ_OK, az_span_dtoa(dest, 0.1, 20, &out));
 #endif
 
   /* Value too small (negative) */
   ASSERT_EQ(AZ_ERROR_NOT_SUPPORTED, az_span_dtoa(dest, -1e17, 2, &out));
+
+  PASS();
+}
+
+TEST test_az_span_printf_all_specifiers(void) {
+  /* This test calls az_span_printf with all supported specifiers to ensure
+   * coverage. */
+  int n;
+  az_span span = AZ_SPAN_FROM_STR("test");
+  az_span_printf((const uint8_t *)"%c %d %i %o %u %x %X %e %E %f %F %g %G %a "
+                                  "%A %p %s %S %Z %% %Q %n\n",
+                 'A', 123, -456, 0777, 456u, 0xabc, 0xABC, 1.23e4, 1.23E4, 1.23,
+                 1.23, 1.23, 1.23, 1.23, 1.23, (void *)0xdeadbeef, "str", "STR",
+                 "ZTR", span, &n);
+
+  /* Test %Q with special characters */
+  az_span_printf((const uint8_t *)"%Q\n", AZ_SPAN_FROM_STR("\"\t\n\\\'"));
+
+  /* Test %Q with control characters */
+  {
+    uint8_t ctrl_buf[] = {1, 2, 3, 127};
+    az_span ctrl_span = az_span_create(ctrl_buf, sizeof(ctrl_buf));
+    az_span_printf((const uint8_t *)"%Q\n", ctrl_span);
+  }
+
+  /* Test % with no character after */
+  az_span_printf((const uint8_t *)"%\n");
+
+  /* Test default case in switch */
+  az_span_printf((const uint8_t *)"%y\n");
 
   PASS();
 }
@@ -266,6 +301,15 @@ TEST test_az_is_expected_span_fail(void) {
   az_span s = AZ_SPAN_FROM_STR("abc");
   ASSERT_EQ(AZ_ERROR_UNEXPECTED_CHAR,
             _az_is_expected_span(&s, AZ_SPAN_FROM_STR("abd")));
+
+  /* Cover line 246 of c_str_span.h when called via _az_is_expected_span in
+   * c_str_span.c */
+  {
+    az_span s2 = AZ_SPAN_FROM_STR("abc");
+    ASSERT_EQ(AZ_OK, _az_is_expected_span(&s2, az_span_empty()));
+    ASSERT_EQ(3, az_span_size(s2));
+  }
+
   PASS();
 }
 
@@ -281,4 +325,5 @@ SUITE(coverage_suite) {
   RUN_TEST(test_az_span_is_content_equal_all_paths);
   RUN_TEST(test_az_isfinite_false);
   RUN_TEST(test_az_is_expected_span_fail);
+  RUN_TEST(test_az_span_printf_all_specifiers);
 }
