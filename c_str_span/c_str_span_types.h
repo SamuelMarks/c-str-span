@@ -1,3 +1,9 @@
+/**
+ * @file
+ *
+ * @brief Definition of types and macros used across the c_str_span library.
+ */
+
 #ifndef C_STR_SPAN_TYPES_H
 #define C_STR_SPAN_TYPES_H
 
@@ -52,8 +58,8 @@ extern "C" {
 #define AZ_INLINE static __inline__
 #endif /* _MSC_VER */
 
-#endif /* C_STR_SPAN_TYPES_H */
-
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
+
+#endif /* C_STR_SPAN_TYPES_H */

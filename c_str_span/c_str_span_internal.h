@@ -1,6 +1,12 @@
 /* Copyright (c) Microsoft Corporation. All rights reserved.
  * SPDX-License-Identifier: MIT */
 
+/**
+ * @file
+ *
+ * @brief Internal helper functions and constants for az_span operations.
+ */
+
 #ifndef C_STR_SPAN_SPAN_INTERNAL_H
 #define C_STR_SPAN_SPAN_INTERNAL_H
 
@@ -45,11 +51,17 @@ enum {
   _az_SMALLEST_10_DIGIT_NUMBER = 1000000000
 };
 
-/* Use this helper to figure out how much the sliced_span has moved in
- * comparison to the */
-/* original_span while writing and slicing a copy of the original. */
-/* The \p sliced_span must be some slice of the \p original_span (and have the
- * same backing memory). */
+/**
+ * @brief Calculates the difference in bytes between two #az_span.
+ *
+ * @param[in] sliced_span The sub-span.
+ * @param[in] original_span The original span.
+ * @return The number of bytes the \p sliced_span has moved from the start of
+ * \p original_span.
+ *
+ * @remark The \p sliced_span must be some slice of the \p original_span and
+ * have the same backing memory.
+ */
 AZ_UNUSED AZ_INLINE AZ_NODISCARD size_t _az_span_diff(az_span sliced_span,
                                                       az_span original_span) {
   const size_t answer = az_span_size(original_span) - az_span_size(sliced_span);

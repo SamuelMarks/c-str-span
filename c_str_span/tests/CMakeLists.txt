@@ -35,7 +35,7 @@ configure_file("configure.h.in" "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_con
 set(Header_Files "test_lib.h" "test_az_span.h")
 source_group("${EXEC_NAME} Header Files" FILES "${Header_Files}")
 
-set(Source_Files "test.c" "test_az_span.c")
+set(Source_Files "test.c" "test_az_span.c" "test_coverage.c")
 source_group("${EXEC_NAME} Source Files" FILES "${Source_Files}")
 
 add_executable("${EXEC_NAME}" "${Header_Files}" "${Source_Files}")

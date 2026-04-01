@@ -1,6 +1,12 @@
 /* Copyright (c) Microsoft Corporation. All rights reserved.
  * SPDX-License-Identifier: MIT */
 
+/**
+ * @file
+ *
+ * @brief Private helper functions and constants for the az_span library.
+ */
+
 #ifndef C_STR_SPAN_SPAN_PRIVATE_H
 #define C_STR_SPAN_SPAN_PRIVATE_H
 

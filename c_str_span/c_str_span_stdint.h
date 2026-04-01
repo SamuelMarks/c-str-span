@@ -1,3 +1,9 @@
+/**
+ * @file
+ *
+ * @brief Compatibility header for stdint.h.
+ */
+
 #ifndef C_STR_SPAN_STDINT_H
 #define C_STR_SPAN_STDINT_H
 

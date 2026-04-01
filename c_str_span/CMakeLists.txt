@@ -29,6 +29,15 @@ option(C_STR_SPAN_BUILD_AMALGAMATION "Generate header-only amalgamation (STB-sty
 
 add_library("${LIBRARY_NAME}" "${Header_Files}" "${Source_Files}")
 
+if (NOT PRECONDITIONS)
+    target_compile_definitions("${LIBRARY_NAME}" PUBLIC AZ_NO_PRECONDITION_CHECKING)
+endif ()
+
+find_library(MATH_LIBRARY m)
+if(MATH_LIBRARY)
+    target_link_libraries("${LIBRARY_NAME}" PUBLIC ${MATH_LIBRARY})
+endif()
+
 if(C_STR_SPAN_BUILD_AMALGAMATION)
     set(AMAL_OUT "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_amalgamation.h")
     execute_process(

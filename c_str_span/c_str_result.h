@@ -61,10 +61,24 @@ typedef int32_t az_result;
 /* - 16..30 Facility. */
 /* - 0..15 Code. */
 
+/**
+ * @brief Creates an #az_result error value.
+ *
+ * @param[in] facility The facility code for the error.
+ * @param[in] code The specific error code.
+ * @return An #az_result representing the error.
+ */
 #define _az_RESULT_MAKE_ERROR(facility, code)                                  \
   ((az_result)((uint32_t)_az_ERROR_FLAG | ((uint32_t)(facility) << 16U) |      \
                (uint32_t)(code)))
 
+/**
+ * @brief Creates an #az_result success value.
+ *
+ * @param[in] facility The facility code for the success.
+ * @param[in] code The specific success code.
+ * @return An #az_result representing the success.
+ */
 #define _az_RESULT_MAKE_SUCCESS(facility, code)                                \
   ((az_result)(((uint32_t)(facility) << 16U) | (uint32_t)(code)))
 

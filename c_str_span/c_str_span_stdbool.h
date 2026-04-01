@@ -1,8 +1,14 @@
-/*
- * stdbool isn't always included with every popular C89 implementation
+/**
+ * @file
  *
- * This variant is modified from MUSL
- * */
+ * @brief Compatibility header for stdbool.h.
+ *
+ * stdbool isn't always included with every popular C89 implementation.
+ * This variant is modified from MUSL.
+ */
+
+#ifndef C_STR_SPAN_STDBOOL_H
+#define C_STR_SPAN_STDBOOL_H
 
 #if (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L) ||              \
     (defined(_MSC_VER) && _MSC_VER >= 1800)
@@ -34,3 +40,5 @@ typedef size_t bool;
 
 #endif /* (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L) ||        \
           (defined(_MSC_VER) && _MSC_VER >= 1800) */
+
+#endif /* C_STR_SPAN_STDBOOL_H */

@@ -2,6 +2,11 @@ cmake_minimum_required(VERSION 3.11..4)
 
 project(c_str_span VERSION 0.0.1 LANGUAGES C)
 
+option(PRECONDITIONS "Enable precondition checking" ON)
+if (NOT PRECONDITIONS)
+    add_compile_definitions(AZ_NO_PRECONDITION_CHECKING)
+endif ()
+
 #===============#
 # Compiler args #
 #===============#

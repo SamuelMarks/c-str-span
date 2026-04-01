@@ -1,6 +1,13 @@
 /* Copyright (c) Microsoft Corporation. All rights reserved.
  * SPDX-License-Identifier: MIT */
 
+/**
+ * @file
+ *
+ * @brief Public symbols for overriding the default precondition failure
+ * behavior.
+ */
+
 #ifndef C_STR_SPAN_PRECONDITION_H
 #define C_STR_SPAN_PRECONDITION_H
 

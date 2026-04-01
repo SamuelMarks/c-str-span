@@ -11,6 +11,7 @@
 #include "c_str_span_private.h"
 
 #include "c_str_span_internal.h"
+#include "c_str_span_printf.h"
 
 #if defined(_WIN32) || defined(__WIN32__) || defined(__WINDOWS__)
 #ifdef _WIN64
@@ -1896,7 +1897,178 @@ TEST test_az_span_token_success(void) {
   PASS();
 }
 
+TEST az_span_u64toa_test(void) {
+  uint8_t buffer[100];
+  az_span b_span = AZ_SPAN_FROM_BUFFER(buffer);
+  az_span remainder;
+  size_t size_before_write = az_span_size(b_span);
+  uint64_t number = 12345678901234567890ULL;
+  az_span number_str = AZ_SPAN_FROM_STR("12345678901234567890");
+  uint64_t reverse;
+
+  ASSERT_EQ(AZ_OK, az_span_u64toa(b_span, number, &remainder));
+  ASSERT_EQ(az_span_size(b_span), size_before_write);
+  ASSERT_EQ(size_before_write - 20, az_span_size(remainder));
+
+  b_span = az_span_create(az_span_ptr(b_span),
+                          az_span_size(b_span) - az_span_size(remainder));
+
+  ASSERT(az_span_is_content_equal(b_span, number_str));
+
+  reverse = 0;
+  ASSERT_EQ(AZ_OK, az_span_atou64(b_span, &reverse));
+  ASSERT_EQ(number, reverse);
+
+  /* Test zero */
+  b_span = AZ_SPAN_FROM_BUFFER(buffer);
+  ASSERT_EQ(AZ_OK, az_span_u64toa(b_span, 0, &remainder));
+  ASSERT_EQ(az_span_size(b_span) - 1, az_span_size(remainder));
+  ASSERT(az_span_ptr(b_span)[0] == '0');
+
+  PASS();
+}
+
+TEST az_span_char_checks_test(void) {
+  ASSERT(uint8_t_isalnum('a'));
+  ASSERT(uint8_t_isalnum('Z'));
+  ASSERT(uint8_t_isalnum('5'));
+  ASSERT(!uint8_t_isalnum('!'));
+
+  ASSERT(az_span_isalnum(AZ_SPAN_FROM_STR("abc012XYZ")));
+  ASSERT(!az_span_isalnum(AZ_SPAN_FROM_STR("abc-012")));
+
+  ASSERT(uint8_t_isalpha('g'));
+  ASSERT(!uint8_t_isalpha('3'));
+
+  ASSERT(az_span_isalpha(AZ_SPAN_FROM_STR("OnlyLetters")));
+  ASSERT(!az_span_isalpha(AZ_SPAN_FROM_STR("Letters and Spaces")));
+
+  ASSERT(uint8_t_isblank(' '));
+  ASSERT(uint8_t_isblank('\t'));
+  ASSERT(!uint8_t_isblank('\n'));
+
+  ASSERT(az_span_isblank(AZ_SPAN_FROM_STR(" \t  ")));
+  ASSERT(!az_span_isblank(AZ_SPAN_FROM_STR("  \n ")));
+
+  ASSERT(uint8_t_isdigit('7'));
+  ASSERT(!uint8_t_isdigit('a'));
+
+  ASSERT(az_span_isdigit(AZ_SPAN_FROM_STR("1234567890")));
+  ASSERT(!az_span_isdigit(AZ_SPAN_FROM_STR("123.45")));
+
+  ASSERT(uint8_t_islower('m'));
+  ASSERT(!uint8_t_islower('M'));
+
+  ASSERT(az_span_islower(AZ_SPAN_FROM_STR("alllower")));
+  ASSERT(!az_span_islower(AZ_SPAN_FROM_STR("NotAllLower")));
+
+  ASSERT(uint8_t_isupper('P'));
+  ASSERT(!uint8_t_isupper('p'));
+
+  ASSERT(az_span_isupper(AZ_SPAN_FROM_STR("ALLUPPER")));
+  ASSERT(!az_span_isupper(AZ_SPAN_FROM_STR("NotAllUpper")));
+
+  PASS();
+}
+
+TEST az_span_url_encode_test(void) {
+  az_span const source = AZ_SPAN_FROM_STR("Hello World! & @");
+  size_t const encoded_len = _az_span_url_encode_calc_length(source);
+  uint8_t buffer[100];
+  az_span const destination = az_span_create(buffer, sizeof(buffer));
+  ptrdiff_t out_len = 0;
+
+  ASSERT_EQ(AZ_OK, _az_span_url_encode(destination, source, &out_len));
+  ASSERT_EQ((ptrdiff_t)encoded_len, out_len);
+
+  {
+    az_span const result = az_span_create(buffer, (size_t)out_len);
+    ASSERT(az_span_is_content_equal(
+        result, AZ_SPAN_FROM_STR("Hello%20World%21%20%26%20%40")));
+  }
+
+  PASS();
+}
+
+TEST az_span_printf_test(void) {
+  /* We can't easily capture stdout without redirecting, so we just call it to
+   * ensure no crashes and coverage. In a real scenario we'd use a variant that
+   * writes to a buffer. */
+  az_span_printf((const uint8_t *)"Testing az_span_printf: %s %d %f %Q\n",
+                 "string", 42, 3.14, AZ_SPAN_FROM_STR("span"));
+  PASS();
+}
+
+TEST az_result_helpers_test(void) {
+  ASSERT(az_result_failed(AZ_ERROR_NOT_ENOUGH_SPACE));
+  ASSERT(!az_result_failed(AZ_OK));
+  ASSERT(az_result_succeeded(AZ_OK));
+  ASSERT(!az_result_succeeded(AZ_ERROR_NOT_ENOUGH_SPACE));
+  PASS();
+}
+
+SUITE(az_core_result_suite) { RUN_TEST(az_result_helpers_test); }
+
+static int g_precondition_failed_called = 0;
+static void test_precondition_failed_callback(void) {
+  g_precondition_failed_called++;
+}
+
+#ifndef AZ_NO_PRECONDITION_CHECKING
+TEST az_precondition_callback_test(void) {
+  az_precondition_failed_fn original = az_precondition_failed_get_callback();
+  az_precondition_failed_set_callback(test_precondition_failed_callback);
+
+  g_precondition_failed_called = 0;
+  _az_PRECONDITION(1 == 0);
+  ASSERT_EQ(1, g_precondition_failed_called);
+
+  _az_PRECONDITION(1 == 1);
+  ASSERT_EQ(1, g_precondition_failed_called);
+
+  az_precondition_failed_set_callback(original);
+  PASS();
+}
+#endif
+
+SUITE(az_core_precondition_suite) {
+#ifndef AZ_NO_PRECONDITION_CHECKING
+  RUN_TEST(az_precondition_callback_test);
+#endif
+}
+
+#include "c_str_hex_private.h"
+
+TEST az_hex_helpers_test(void) {
+  ASSERT_EQ('0', _az_number_to_upper_hex(0));
+  ASSERT_EQ('9', _az_number_to_upper_hex(9));
+  ASSERT_EQ('A', _az_number_to_upper_hex(10));
+  ASSERT_EQ('F', _az_number_to_upper_hex(15));
+  PASS();
+}
+
+TEST az_span_internal_helpers_test(void) {
+  az_span s1 = AZ_SPAN_FROM_STR("abc");
+  az_span s2 = az_span_slice_to_end(s1, 1);
+  ASSERT_EQ(1, _az_span_diff(s2, s1));
+
+  ASSERT(
+      az_result_succeeded(_az_is_expected_span(&s1, AZ_SPAN_FROM_STR("abc"))));
+  ASSERT(az_result_failed(_az_is_expected_span(&s1, AZ_SPAN_FROM_STR("abd"))));
+
+  PASS();
+}
+
+SUITE(az_core_internal_suite) {
+  RUN_TEST(az_hex_helpers_test);
+  RUN_TEST(az_span_internal_helpers_test);
+}
+
 SUITE(az_core_span_suite) {
+  RUN_TEST(az_span_url_encode_test);
+  RUN_TEST(az_span_printf_test);
+  RUN_TEST(az_span_u64toa_test);
+  RUN_TEST(az_span_char_checks_test);
   RUN_TEST(az_span_slice_to_end_test);
   RUN_TEST(test_az_span_getters);
   RUN_TEST(az_single_char_ascii_lower_test);

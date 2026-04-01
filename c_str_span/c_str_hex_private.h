@@ -1,6 +1,12 @@
 /* Copyright (c) Microsoft Corporation. All rights reserved.
  * SPDX-License-Identifier: MIT */
 
+/**
+ * @file
+ *
+ * @brief Internal helper functions for hexadecimal conversions.
+ */
+
 #ifndef C_STR_SPAN_HEX_PRIVATE_H
 #define C_STR_SPAN_HEX_PRIVATE_H
 

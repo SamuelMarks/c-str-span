@@ -1,3 +1,9 @@
+/**
+ * @file
+ *
+ * @brief Implementation of az_span operations.
+ */
+
 /* Copyright (c) Microsoft Corporation. All rights reserved.
  * SPDX-License-Identifier: MIT */
 

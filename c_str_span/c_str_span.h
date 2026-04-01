@@ -1,3 +1,9 @@
+/**
+ * @file
+ *
+ * @brief Public API for az_span operations.
+ */
+
 #ifndef C_STR_SPAN_STR_SPAN_H
 #define C_STR_SPAN_STR_SPAN_H
 
@@ -553,10 +559,15 @@ extern C_STR_SPAN_EXPORT AZ_NODISCARD az_result
 az_span_dtoa(az_span destination, double source, int32_t fractional_digits,
              az_span *out_span);
 
-/* @brief Checks if char (uint8_t) is alphabetical or numeric (A-z|0-9)
-   @remark Locale isn't considered, this is implemented as a simple switch/case
+/**
+ * @brief Checks if char (uint8_t) is alphabetical or numeric (A-z|0-9).
+ *
+ * @param[in] c The character to check.
+ * @return `true` if \p c is alphabetical or numeric, otherwise `false`.
+ *
+ * @remark Locale isn't considered, this is implemented as a simple switch/case.
  */
-AZ_UNUSED AZ_NODISCARD AZ_INLINE bool uint8_t_isalnum(const uint8_t c) {
+AZ_NODISCARD AZ_INLINE bool uint8_t_isalnum(const uint8_t c) {
   switch (c) {
   case '0':
   case '1':
@@ -627,89 +638,36 @@ AZ_UNUSED AZ_NODISCARD AZ_INLINE bool uint8_t_isalnum(const uint8_t c) {
   return true;
 }
 
-/* @brief Checks if str (az_span) is alphabetical or numeric (A-z|0-9)
-   @remark An empty str will return true
-   @remark Locale isn't considered, this is implemented as a simple switch/case
+/**
+ * @brief Checks if str (az_span) is alphabetical or numeric (A-z|0-9).
+ *
+ * @param[in] span The #az_span to check.
+ * @return `true` if all characters in \p span are alphabetical or numeric,
+ * otherwise `false`.
+ *
+ * @remark An empty str will return true.
+ * @remark Locale isn't considered, this is implemented as a simple switch/case.
  */
-AZ_UNUSED AZ_NODISCARD AZ_INLINE bool az_span_isalnum(const az_span span) {
+AZ_NODISCARD AZ_INLINE bool az_span_isalnum(const az_span span) {
   const size_t size = az_span_size(span);
   size_t i;
   for (i = 0; i < size; i++) {
-    switch (az_span_ptr(span)[i]) {
-    case '0':
-    case '1':
-    case '2':
-    case '3':
-    case '4':
-    case '5':
-    case '6':
-    case '7':
-    case '8':
-    case '9':
-    case 'a':
-    case 'b':
-    case 'c':
-    case 'd':
-    case 'e':
-    case 'f':
-    case 'g':
-    case 'h':
-    case 'i':
-    case 'j':
-    case 'k':
-    case 'l':
-    case 'm':
-    case 'n':
-    case 'o':
-    case 'p':
-    case 'q':
-    case 'r':
-    case 's':
-    case 't':
-    case 'u':
-    case 'v':
-    case 'w':
-    case 'x':
-    case 'y':
-    case 'z':
-    case 'A':
-    case 'B':
-    case 'C':
-    case 'D':
-    case 'E':
-    case 'F':
-    case 'G':
-    case 'H':
-    case 'I':
-    case 'J':
-    case 'K':
-    case 'L':
-    case 'M':
-    case 'N':
-    case 'O':
-    case 'P':
-    case 'Q':
-    case 'R':
-    case 'S':
-    case 'T':
-    case 'U':
-    case 'V':
-    case 'W':
-    case 'X':
-    case 'Y':
-    case 'Z':
-      break;
-    default:
+    if (!uint8_t_isalnum(az_span_ptr(span)[i])) {
       return false;
     }
   }
   return true;
 }
 
-/* @brief Checks if char (uint8_t) is alphabetical (A-z)
- * @remark Locale isn't considered, this is implemented as a simple switch/case
+/**
+ * @brief Checks if char (uint8_t) is alphabetical (A-z).
+ *
+ * @param[in] c The character to check.
+ * @return `true` if \p c is alphabetical, otherwise `false`.
+ *
+ * @remark Locale isn't considered, this is implemented as a simple switch/case.
  */
-AZ_UNUSED AZ_NODISCARD AZ_INLINE bool uint8_t_isalpha(const uint8_t c) {
+AZ_NODISCARD AZ_INLINE bool uint8_t_isalpha(const uint8_t c) {
   switch (c) {
   case 'a':
   case 'b':
@@ -770,76 +728,33 @@ AZ_UNUSED AZ_NODISCARD AZ_INLINE bool uint8_t_isalpha(const uint8_t c) {
   return true;
 }
 
-/* @brief Checks if str (az_span) is alphabetical (A-z)
- * @remark An empty str will return true
- * @remark Locale isn't considered, this is implemented as a simple switch/case
+/**
+ * @brief Checks if str (az_span) is alphabetical (A-z).
+ *
+ * @param[in] span The #az_span to check.
+ * @return `true` if all characters in \p span are alphabetical, otherwise
+ * `false`.
+ *
+ * @remark An empty str will return true.
+ * @remark Locale isn't considered, this is implemented as a simple switch/case.
  */
-AZ_UNUSED AZ_NODISCARD AZ_INLINE bool az_span_isalpha(const az_span span) {
+AZ_NODISCARD AZ_INLINE bool az_span_isalpha(const az_span span) {
   size_t i;
   for (i = 0; i < az_span_size(span); i++) {
-    switch (az_span_ptr(span)[i]) {
-    case 'a':
-    case 'b':
-    case 'c':
-    case 'd':
-    case 'e':
-    case 'f':
-    case 'g':
-    case 'h':
-    case 'i':
-    case 'j':
-    case 'k':
-    case 'l':
-    case 'm':
-    case 'n':
-    case 'o':
-    case 'p':
-    case 'q':
-    case 'r':
-    case 's':
-    case 't':
-    case 'u':
-    case 'v':
-    case 'w':
-    case 'x':
-    case 'y':
-    case 'z':
-    case 'A':
-    case 'B':
-    case 'C':
-    case 'D':
-    case 'E':
-    case 'F':
-    case 'G':
-    case 'H':
-    case 'I':
-    case 'J':
-    case 'K':
-    case 'L':
-    case 'M':
-    case 'N':
-    case 'O':
-    case 'P':
-    case 'Q':
-    case 'R':
-    case 'S':
-    case 'T':
-    case 'U':
-    case 'V':
-    case 'W':
-    case 'X':
-    case 'Y':
-    case 'Z':
-      break;
-    default:
+    if (!uint8_t_isalpha(az_span_ptr(span)[i])) {
       return false;
     }
   }
   return true;
 }
 
-/* @brief Checks if char (uint8_t) is blank */
-AZ_UNUSED AZ_NODISCARD AZ_INLINE bool uint8_t_isblank(const uint8_t c) {
+/**
+ * @brief Checks if char (uint8_t) is blank.
+ *
+ * @param[in] c The character to check.
+ * @return `true` if \p c is a space or tab, otherwise `false`.
+ */
+AZ_NODISCARD AZ_INLINE bool uint8_t_isblank(const uint8_t c) {
   switch (c) {
   case ' ':
   case '\t':
@@ -850,27 +765,33 @@ AZ_UNUSED AZ_NODISCARD AZ_INLINE bool uint8_t_isblank(const uint8_t c) {
   return true;
 }
 
-/* @brief Checks if str (az_span) is blank
- * @remark An empty str will return true
+/**
+ * @brief Checks if str (az_span) is blank.
+ *
+ * @param[in] span The #az_span to check.
+ * @return `true` if all characters in \p span are blank, otherwise `false`.
+ *
+ * @remark An empty str will return true.
  */
-AZ_UNUSED AZ_NODISCARD AZ_INLINE bool az_span_isblank(const az_span span) {
+AZ_NODISCARD AZ_INLINE bool az_span_isblank(const az_span span) {
   size_t i;
   for (i = 0; i < az_span_size(span); i++) {
-    switch (az_span_ptr(span)[i]) {
-    case ' ':
-    case '\t':
-      break;
-    default:
+    if (!uint8_t_isblank(az_span_ptr(span)[i])) {
       return false;
     }
   }
   return true;
 }
 
-/* @brief Checks if char (uint8_t) only contains digits
- * @remark Doesn't deal with decimals or scientific notation
+/**
+ * @brief Checks if char (uint8_t) only contains digits.
+ *
+ * @param[in] c The character to check.
+ * @return `true` if \p c is a digit, otherwise `false`.
+ *
+ * @remark Doesn't deal with decimals or scientific notation.
  */
-AZ_UNUSED AZ_NODISCARD AZ_INLINE bool uint8_t_isdigit(const uint8_t c) {
+AZ_NODISCARD AZ_INLINE bool uint8_t_isdigit(const uint8_t c) {
   switch (c) {
   case '0':
   case '1':
@@ -889,36 +810,34 @@ AZ_UNUSED AZ_NODISCARD AZ_INLINE bool uint8_t_isdigit(const uint8_t c) {
   return true;
 }
 
-/* @brief Checks if str (az_span) only contains digits
- * @remark An empty str will return true
- * @remark Doesn't deal with decimals or scientific notation
+/**
+ * @brief Checks if str (az_span) only contains digits.
+ *
+ * @param[in] span The #az_span to check.
+ * @return `true` if all characters in \p span are digits, otherwise `false`.
+ *
+ * @remark An empty str will return true.
+ * @remark Doesn't deal with decimals or scientific notation.
  */
-AZ_UNUSED AZ_NODISCARD AZ_INLINE bool az_span_isdigit(const az_span span) {
+AZ_NODISCARD AZ_INLINE bool az_span_isdigit(const az_span span) {
   size_t i;
   for (i = 0; i < az_span_size(span); i++) {
-    switch (az_span_ptr(span)[i]) {
-    case '0':
-    case '1':
-    case '2':
-    case '3':
-    case '4':
-    case '5':
-    case '6':
-    case '7':
-    case '8':
-    case '9':
-      break;
-    default:
+    if (!uint8_t_isdigit(az_span_ptr(span)[i])) {
       return false;
     }
   }
   return true;
 }
 
-/* @brief Checks if char (uint8_t) is alphabetical and lowercase (A-Z)
- * @remark Locale isn't considered, this is implemented as a simple switch/case
+/**
+ * @brief Checks if char (uint8_t) is alphabetical and lowercase (a-z).
+ *
+ * @param[in] c The character to check.
+ * @return `true` if \p c is a lowercase letter, otherwise `false`.
+ *
+ * @remark Locale isn't considered, this is implemented as a simple switch/case.
  */
-AZ_UNUSED AZ_NODISCARD AZ_INLINE bool uint8_t_islower(const uint8_t c) {
+AZ_NODISCARD AZ_INLINE bool uint8_t_islower(const uint8_t c) {
   switch (c) {
   case 'a':
   case 'b':
@@ -953,53 +872,35 @@ AZ_UNUSED AZ_NODISCARD AZ_INLINE bool uint8_t_islower(const uint8_t c) {
   return true;
 }
 
-/* @brief Checks if str (az_span) is alphabetical and lowercase (A-Z)
- * @remark An empty str will return true
- * @remark Locale isn't considered, this is implemented as a simple switch/case
+/**
+ * @brief Checks if str (az_span) is alphabetical and lowercase (a-z).
+ *
+ * @param[in] span The #az_span to check.
+ * @return `true` if all characters in \p span are lowercase letters, otherwise
+ * `false`.
+ *
+ * @remark An empty str will return true.
+ * @remark Locale isn't considered, this is implemented as a simple switch/case.
  */
-AZ_UNUSED AZ_NODISCARD AZ_INLINE bool az_span_islower(const az_span span) {
+AZ_NODISCARD AZ_INLINE bool az_span_islower(const az_span span) {
   size_t i;
   for (i = 0; i < az_span_size(span); i++) {
-    /* not using `uint8_t_islower` function as that adds a branch */
-    switch (az_span_ptr(span)[i]) {
-    case 'a':
-    case 'b':
-    case 'c':
-    case 'd':
-    case 'e':
-    case 'f':
-    case 'g':
-    case 'h':
-    case 'i':
-    case 'j':
-    case 'k':
-    case 'l':
-    case 'm':
-    case 'n':
-    case 'o':
-    case 'p':
-    case 'q':
-    case 'r':
-    case 's':
-    case 't':
-    case 'u':
-    case 'v':
-    case 'w':
-    case 'x':
-    case 'y':
-    case 'z':
-      break;
-    default:
+    if (!uint8_t_islower(az_span_ptr(span)[i])) {
       return false;
     }
   }
   return true;
 }
 
-/* @brief Checks if char (uint8_t) is alphabetical and lowercase (A-Z)
- * @remark Locale isn't considered, this is implemented as a simple switch/case
+/**
+ * @brief Checks if char (uint8_t) is alphabetical and uppercase (A-Z).
+ *
+ * @param[in] c The character to check.
+ * @return `true` if \p c is an uppercase letter, otherwise `false`.
+ *
+ * @remark Locale isn't considered, this is implemented as a simple switch/case.
  */
-AZ_UNUSED AZ_NODISCARD AZ_INLINE bool uint8_t_isupper(const uint8_t c) {
+AZ_NODISCARD AZ_INLINE bool uint8_t_isupper(const uint8_t c) {
   switch (c) {
   case 'A':
   case 'B':
@@ -1034,42 +935,20 @@ AZ_UNUSED AZ_NODISCARD AZ_INLINE bool uint8_t_isupper(const uint8_t c) {
   return true;
 }
 
-/* @brief Checks if str (az_span) is alphabetical and lowercase (A-Z)
- * @remark An empty str will return true
- * @remark Locale isn't considered, this is implemented as a simple switch/case
+/**
+ * @brief Checks if str (az_span) is alphabetical and uppercase (A-Z).
+ *
+ * @param[in] span The #az_span to check.
+ * @return `true` if all characters in \p span are uppercase letters, otherwise
+ * `false`.
+ *
+ * @remark An empty str will return true.
+ * @remark Locale isn't considered, this is implemented as a simple switch/case.
  */
-AZ_UNUSED AZ_NODISCARD AZ_INLINE bool az_span_isupper(const az_span span) {
+AZ_NODISCARD AZ_INLINE bool az_span_isupper(const az_span span) {
   size_t i;
   for (i = 0; i < az_span_size(span); i++) {
-    switch (az_span_ptr(span)[i]) {
-    case 'A':
-    case 'B':
-    case 'C':
-    case 'D':
-    case 'E':
-    case 'F':
-    case 'G':
-    case 'H':
-    case 'I':
-    case 'J':
-    case 'K':
-    case 'L':
-    case 'M':
-    case 'N':
-    case 'O':
-    case 'P':
-    case 'Q':
-    case 'R':
-    case 'S':
-    case 'T':
-    case 'U':
-    case 'V':
-    case 'W':
-    case 'X':
-    case 'Y':
-    case 'Z':
-      break;
-    default:
+    if (!uint8_t_isupper(az_span_ptr(span)[i])) {
       return false;
     }
   }
