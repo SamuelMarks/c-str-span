@@ -5,14 +5,18 @@ set(EXEC_NAME "${PROJECT_NAME}_${EXEC_NAME}")
 # Dependencies download #
 #=======================#
 
-set(GREATEST_SHA256 "b3f89ecad2301c64c580f328cc03a74d92f4cd4bf42ab18d3d4bfb7b8be5b948")
-set(DOWNLOAD_DIR "${PROJECT_BINARY_DIR}/test_downloads")
+include(FetchContent)
+FetchContent_Declare(
+        greatest
+        GIT_REPOSITORY https://github.com/SamuelMarks/greatest.git
+        GIT_TAG        master
+)
+FetchContent_MakeAvailable(greatest)
 
-file(MAKE_DIRECTORY "${DOWNLOAD_DIR}")
-set(GREATEST_FILE "${DOWNLOAD_DIR}/greatest.h")
-set(GREATEST_URL "https://raw.githubusercontent.com/SamuelMarks/greatest/cmake-and-msvc/greatest.h")
-file(DOWNLOAD "${GREATEST_URL}" "${GREATEST_FILE}"
-        EXPECTED_HASH "SHA256=${GREATEST_SHA256}")
+if (NOT TARGET greatest)
+    add_library(greatest INTERFACE)
+    target_include_directories(greatest INTERFACE "${greatest_SOURCE_DIR}")
+endif ()
 
 #===========#
 # Configure #
@@ -40,53 +44,19 @@ include(GNUInstallDirs)
 target_include_directories(
         "${EXEC_NAME}"
         PRIVATE
-        "$<BUILD_INTERFACE:${DOWNLOAD_DIR}>"
         "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>"
         "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>"
         "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
 )
-
-if (DEFINED VCPKG_TOOLCHAIN AND VCPKG_TOOLCHAIN AND NOT MSVC)
-    find_package(cmocka CONFIG REQUIRED)
-    set(cmocka_lib "cmocka::cmocka")
-else ()
-    # include("${CMAKE_SOURCE_DIR}/cmake/modules/FetchCMocka.cmake")
-    include(FetchContent)
-    FetchContent_Declare(
-            cmocka
-            GIT_REPOSITORY https://github.com/SamuelMarks/cmocka
-            GIT_SHALLOW    1
-    )
-
-    set(WITH_STATIC_LIB ON CACHE BOOL "CMocka: Build with a static library" FORCE)
-    set(WITH_CMOCKERY_SUPPORT OFF CACHE BOOL "CMocka: Install a cmockery header" FORCE)
-    set(WITH_EXAMPLES OFF CACHE BOOL "CMocka: Build examples" FORCE)
-    set(UNIT_TESTING OFF CACHE BOOL "CMocka: Build with unit testing" FORCE)
-    set(PICKY_DEVELOPER OFF CACHE BOOL "CMocka: Build with picky developer flags" FORCE)
-
-    # Download cmocka, and execute its cmakelists.txt
-    FetchContent_MakeAvailable(cmocka)
-
-    if(MSVC AND MSVC_VERSION LESS 1800)
-        target_compile_definitions(cmocka PRIVATE PRIx64="I64x" PRIu64="I64u" PRId64="I64d")
-    endif()
-
-    target_include_directories(
-        "${EXEC_NAME}"
-        PRIVATE
-        "$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/_deps/cmocka-src/include>"
-    )
-
-    set(cmocka_lib "cmocka")
-endif ()
 
 target_link_libraries(
         "${EXEC_NAME}"
         PRIVATE
         "${PROJECT_NAME}_compiler_flags"
         "${PROJECT_NAME}"
-        "${cmocka_lib}"
+        greatest
 )
+
 # if (MSVC)
 #     target_compile_definitions("${EXEC_NAME}" PRIVATE _CRT_SECURE_NO_WARNINGS)
 # endif (MSVC)
