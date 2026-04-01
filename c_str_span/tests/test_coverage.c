@@ -10,7 +10,7 @@
 
 #ifndef AZ_NO_PRECONDITION_CHECKING
 static jmp_buf g_precondition_jmp;
-static bool g_precondition_expected = false;
+static volatile bool g_precondition_expected = false;
 
 static void test_precondition_failed_callback(void) {
   if (g_precondition_expected) {
@@ -23,6 +23,7 @@ static void test_precondition_failed_callback(void) {
     g_precondition_expected = true;                                            \
     if (setjmp(g_precondition_jmp) == 0) {                                     \
       (void)(expr);                                                            \
+      g_precondition_expected = false;                                         \
       FAIL();                                                                  \
     }                                                                          \
     g_precondition_expected = false;                                           \
@@ -80,8 +81,8 @@ TEST test_az_span_atox_empty(void) {
   az_precondition_failed_set_callback(test_precondition_failed_callback);
 
   ASSERT_PRECONDITION_FAIL(az_span_atou32(empty, &val_u32));
-  ASSERT_PRECONDITION_FAIL(az_span_atoi32(empty, &val_i32));
   ASSERT_PRECONDITION_FAIL(az_span_atou64(empty, &val_u64));
+  ASSERT_PRECONDITION_FAIL(az_span_atoi32(empty, &val_i32));
   ASSERT_PRECONDITION_FAIL(az_span_atoi64(empty, &val_i64));
   ASSERT_PRECONDITION_FAIL(az_span_atod(empty, &val_d));
 
@@ -90,8 +91,8 @@ TEST test_az_span_atox_empty(void) {
   ASSERT_EQ(AZ_ERROR_UNEXPECTED_CHAR, az_span_atou32(empty, &val_u32));
   ASSERT_EQ(AZ_ERROR_UNEXPECTED_CHAR,
             az_span_atou32(AZ_SPAN_FROM_STR("+"), &val_u32));
-  ASSERT_EQ(AZ_ERROR_UNEXPECTED_CHAR, az_span_atoi32(empty, &val_i32));
   ASSERT_EQ(AZ_ERROR_UNEXPECTED_CHAR, az_span_atou64(empty, &val_u64));
+  ASSERT_EQ(AZ_ERROR_UNEXPECTED_CHAR, az_span_atoi32(empty, &val_i32));
   ASSERT_EQ(AZ_ERROR_UNEXPECTED_CHAR, az_span_atoi64(empty, &val_i64));
   ASSERT_EQ(AZ_ERROR_UNEXPECTED_CHAR, az_span_atod(empty, &val_d));
 #endif
@@ -162,6 +163,9 @@ TEST test_az_span_dtoa_special_cases(void) {
     /* INF source (triggered precondition) */
     ASSERT_PRECONDITION_FAIL(az_span_dtoa(dest, d_inf, 2, &out));
 
+    /* fractional_digits > 15 (triggered precondition) */
+    ASSERT_PRECONDITION_FAIL(az_span_dtoa(dest, 0.0, 20, &out));
+
     az_precondition_failed_set_callback(original);
   }
 #else
@@ -171,13 +175,13 @@ TEST test_az_span_dtoa_special_cases(void) {
   /* Fractional digits = 0 (processed as 0) */
   ASSERT_EQ(AZ_OK, az_span_dtoa(dest, 1.23, 0, &out));
   ASSERT_EQ('1', buf[0]);
+
+  /* fractional_digits > 15 capped to 15 */
+  ASSERT_EQ(AZ_OK, az_span_dtoa(dest, 0.0, 20, &out));
 #endif
 
   /* Value too small (negative) */
   ASSERT_EQ(AZ_ERROR_NOT_SUPPORTED, az_span_dtoa(dest, -1e17, 2, &out));
-
-  /* fractional_digits > 15 capped to 15 */
-  ASSERT_EQ(AZ_OK, az_span_dtoa(dest, 0.0, 20, &out));
 
   PASS();
 }
@@ -205,18 +209,35 @@ TEST test_az_span_url_encode_all_chars(void) {
   ASSERT_EQ(4, out_len);
   ASSERT_MEM_EQ("-._~", buf, 4);
 
-  /* Test small dest in url_encode */
+  /* Test small dest in url_encode.
+     Destination size (2) is >= source size (2), so it passes precondition.
+     But encoded "  " needs 6 bytes (2 * 3), so it should return
+     AZ_ERROR_NOT_ENOUGH_SPACE. */
   dest = az_span_create(buf, 2);
-  /* "  " needs 6 bytes (2 * 3) */
   ASSERT_EQ(AZ_ERROR_NOT_ENOUGH_SPACE,
             _az_span_url_encode(dest, AZ_SPAN_FROM_STR("  "), &out_len));
-  /* "a" needs 1 byte, so it SHOULD WORK with 2 bytes! */
+
+  /* "a" needs 1 byte, destination is 2 bytes, so it SHOULD WORK. */
   ASSERT_EQ(AZ_OK, _az_span_url_encode(dest, AZ_SPAN_FROM_STR("a"), &out_len));
 
-  /* Let's try 0 byte dest */
+#ifndef AZ_NO_PRECONDITION_CHECKING
+  {
+    az_precondition_failed_fn original = az_precondition_failed_get_callback();
+    az_precondition_failed_set_callback(test_precondition_failed_callback);
+
+    /* Destination size (0) is < source size (1), should trigger precondition.
+     */
+    dest = az_span_create(buf, 0);
+    ASSERT_PRECONDITION_FAIL(
+        _az_span_url_encode(dest, AZ_SPAN_FROM_STR("a"), &out_len));
+
+    az_precondition_failed_set_callback(original);
+  }
+#else
   dest = az_span_create(buf, 0);
   ASSERT_EQ(AZ_ERROR_NOT_ENOUGH_SPACE,
             _az_span_url_encode(dest, AZ_SPAN_FROM_STR("a"), &out_len));
+#endif
   PASS();
 }
 

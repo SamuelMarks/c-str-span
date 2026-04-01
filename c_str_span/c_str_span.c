@@ -793,6 +793,10 @@ AZ_NODISCARD az_result az_span_dtoa(az_span destination, double source,
       return AZ_OK;
     }
 
+    if (after_decimal_part == 0) {
+      return AZ_OK;
+    }
+
     /* Clamp the fractional digits to the supported maximum value of 15. */
     if (fractional_digits > _az_MAX_SUPPORTED_FRACTIONAL_DIGITS) {
       fractional_digits = _az_MAX_SUPPORTED_FRACTIONAL_DIGITS;
@@ -802,6 +806,7 @@ AZ_NODISCARD az_result az_span_dtoa(az_span destination, double source,
       int32_t leading_zeros = 0;
       double shifted_fractional = after_decimal_part;
       int32_t d;
+
       for (d = 0; d < fractional_digits; d++) {
         shifted_fractional *= _az_NUMBER_OF_DECIMAL_VALUES;
 
@@ -811,8 +816,11 @@ AZ_NODISCARD az_result az_span_dtoa(az_span destination, double source,
          * 0.00010, etc. */
         if (shifted_fractional < 1) {
           leading_zeros++;
-          continue;
         }
+      }
+
+      if (shifted_fractional < 1) {
+        return AZ_OK;
       }
 
       {
