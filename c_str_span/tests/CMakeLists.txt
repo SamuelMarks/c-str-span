@@ -40,7 +40,6 @@ source_group("${EXEC_NAME} Source Files" FILES "${Source_Files}")
 
 add_executable("${EXEC_NAME}" "${Header_Files}" "${Source_Files}")
 
-include(GNUInstallDirs)
 target_include_directories(
         "${EXEC_NAME}"
         PRIVATE

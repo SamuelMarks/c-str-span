@@ -54,6 +54,12 @@ configure_file(
         "${PROJECT_NAME}Config.h"
 )
 
+#=========#
+# Install #
+#=========#
+
+include(GNUInstallDirs)
+
 #=============#
 # Sub-targets #
 #=============#
@@ -70,12 +76,6 @@ if (BUILD_TESTING AND C_STR_SPAN_BUILD_TESTING)
 else()
     message(STATUS "TESTS DISABLED: BUILD_TESTING=${BUILD_TESTING} C_STR_SPAN_BUILD_TESTING=${C_STR_SPAN_BUILD_TESTING}")
 endif (BUILD_TESTING AND C_STR_SPAN_BUILD_TESTING)
-
-#=========#
-# Install #
-#=========#
-
-include(GNUInstallDirs)
 
 install(
         FILES "${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.h"
