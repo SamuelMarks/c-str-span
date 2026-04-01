@@ -147,21 +147,26 @@ TEST test_az_span_dtoa_special_cases(void) {
   uint8_t buf[64];
   az_span dest = az_span_create(buf, 64);
   az_span out;
+  uint64_t const inf_bits = 0x7FF0000000000000ULL;
+  double d_inf;
+  memcpy(&d_inf, &inf_bits, sizeof(d_inf));
 
 #ifndef AZ_NO_PRECONDITION_CHECKING
-  az_precondition_failed_fn original = az_precondition_failed_get_callback();
-  az_precondition_failed_set_callback(test_precondition_failed_callback);
+  {
+    az_precondition_failed_fn original = az_precondition_failed_get_callback();
+    az_precondition_failed_set_callback(test_precondition_failed_callback);
 
-  /* Fractional digits = -1 (triggered precondition) */
-  ASSERT_PRECONDITION_FAIL(az_span_dtoa(dest, 1.23, -1, &out));
+    /* Fractional digits = -1 (triggered precondition) */
+    ASSERT_PRECONDITION_FAIL(az_span_dtoa(dest, 1.23, -1, &out));
 
-  /* INF source (triggered precondition) */
-  ASSERT_PRECONDITION_FAIL(az_span_dtoa(dest, INFINITY, 2, &out));
+    /* INF source (triggered precondition) */
+    ASSERT_PRECONDITION_FAIL(az_span_dtoa(dest, d_inf, 2, &out));
 
-  az_precondition_failed_set_callback(original);
+    az_precondition_failed_set_callback(original);
+  }
 #else
   /* INF source returns AZ_ERROR_NOT_SUPPORTED in NO_PRECONDITION mode */
-  ASSERT_EQ(AZ_ERROR_NOT_SUPPORTED, az_span_dtoa(dest, INFINITY, 2, &out));
+  ASSERT_EQ(AZ_ERROR_NOT_SUPPORTED, az_span_dtoa(dest, d_inf, 2, &out));
 
   /* Fractional digits = 0 (processed as 0) */
   ASSERT_EQ(AZ_OK, az_span_dtoa(dest, 1.23, 0, &out));

@@ -14,12 +14,12 @@
 /* clang-format on */
 
 #if defined(_MSC_VER)
-#define FPRINTF fprintf_s
-#define FPRINTF_N(OUT, ap)
+#define FPRINTF_N(OUT, ap) (void)va_arg(ap, int *)
 #else
-#define FPRINTF fprintf
-#define FPRINTF_N(OUT, ap) FPRINTF(OUT, "%n", va_arg(ap, int *))
+#define FPRINTF_N(OUT, ap) fprintf(OUT, "%n", va_arg(ap, int *))
 #endif
+
+#define FPRINTF fprintf
 
 #define AZ_SPAN_FPRINTF(func_name, OUT)                                        \
   void func_name(const uint8_t *format, ...) {                                 \

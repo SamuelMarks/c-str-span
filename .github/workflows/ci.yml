@@ -22,7 +22,7 @@ jobs:
           
       - name: Verify Amalgamation Exists
         run: |
-          if [ ! -f build_amal/c_str_span_amalgamation.h ]; then
+          if [ ! -f build_amal/c_str_span/c_str_span_amalgamation.h ]; then
             echo "Amalgamation header was not created!"
             exit 1
           fi
@@ -31,7 +31,7 @@ jobs:
         run: |
           cat << 'EOF' > test_amal.c
           #define C_STR_SPAN_IMPLEMENTATION
-          #include "build_amal/c_str_span_amalgamation.h"
+          #include "build_amal/c_str_span/c_str_span_amalgamation.h"
           int main(void) {
               az_span s = az_span_empty();
               return (int)az_span_size(s);

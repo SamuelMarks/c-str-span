@@ -126,31 +126,15 @@ _az_span_is_valid(az_span span, size_t min_size, bool null_is_valid) {
   const az_span empty = {{NULL, 0}};
   uint8_t *const default_init_ptr = az_span_ptr(empty);
 
-  if (min_size < 0) {
-    return false;
-  } else if (null_is_valid) {
-    result = (ptr == NULL || ptr == default_init_ptr) ? span_size == 0
-                                                      : span_size >= 0;
+  if (null_is_valid) {
+    result = (ptr == NULL || ptr == default_init_ptr) ? span_size == 0 : true;
   } else {
-    result = (ptr != NULL && ptr != default_init_ptr) && span_size >= 0;
+    result = (ptr != NULL && ptr != default_init_ptr);
   }
 
   /* Can't wrap over the end of the address space. */
-  /* The biggest theoretical pointer value is "(void*)~0" (0xFFFF...), which is
-   * the end of address */
-  /* space. We don't attempt to read/write beyond the end of the address space -
-   * it is unlikely a */
-  /* desired behavior, and it is not defined. So, if the span size is greater
-   * than the addresses */
-  /* left until the theoretical end of the address space, it is not a valid
-   * span. */
-  /* Example: (az_span) { .ptr = (uint8_t*)(~0 - 5), .size = 10 } is not a valid
-   * span, because most */
-  /* likely you end up pointing to 0x0000 at .ptr[6], &.ptr[7] is 0x...0001,
-   * etc. */
-  {
-    uint8_t *const max_ptr = (uint8_t *)~(uint8_t)0;
-    result = result && (span_size <= (size_t)(max_ptr - ptr));
+  if (result) {
+    result = (span_size <= ((size_t)-1 - (uintptr_t)ptr));
   }
 
   return result && min_size <= span_size;
