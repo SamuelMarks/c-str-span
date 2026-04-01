@@ -392,13 +392,8 @@ static bool _is_valid_start_of_double(uint8_t first_byte) {
   return result;
 }
 
-/* Disable the following warning just for this particular use case. */
-/* C4996: 'sscanf': This function or variable may be unsafe. Consider using
- * sscanf_s instead. */
-/* C4710: 'sscanf': function not inlined */
 #ifdef _MSC_VER
 #pragma warning(push)
-#pragma warning(disable : 4996)
 #pragma warning(disable : 4710)
 #endif
 
@@ -433,7 +428,11 @@ AZ_NODISCARD az_result az_span_atod(az_span source, double *out_number) {
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
 #endif
 
+#if defined(_MSC_VER)
+    n = sscanf_s((char *)source_ptr, format, out_number, &chars_consumed);
+#else
     n = sscanf((char *)source_ptr, format, out_number, &chars_consumed);
+#endif
 
 #if defined(__GNUC__) || defined(__clang__)
 #pragma GCC diagnostic pop
@@ -545,7 +544,12 @@ az_span az_span_copy(az_span destination, az_span source) {
       uint8_t *ptr = az_span_ptr(destination);
       /* NOLINTNEXTLINE(clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling)
        */
+#if defined(_MSC_VER)
+      memmove_s((void *)ptr, dest_size, (void const *)az_span_ptr(source),
+                src_size);
+#else
       memmove((void *)ptr, (void const *)az_span_ptr(source), src_size);
+#endif
     }
 
     return az_span_slice_to_end(destination, src_size);
@@ -604,8 +608,13 @@ void az_span_to_str(char *destination, size_t destination_max_size,
 
     /* NOLINTNEXTLINE(clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling)
      */
+#if defined(_MSC_VER)
+    memmove_s((void *)destination, destination_max_size,
+              (void const *)az_span_ptr(source), size_to_write);
+#else
     memmove((void *)destination, (void const *)az_span_ptr(source),
             size_to_write);
+#endif
     destination[size_to_write] = 0;
   }
 }
@@ -959,14 +968,14 @@ AZ_NODISCARD AZ_INLINE bool _az_span_url_should_encode(uint8_t c) {
 }
 
 AZ_NODISCARD size_t _az_span_url_encode_calc_length(az_span source) {
+  size_t const source_size = az_span_size(source);
   _az_PRECONDITION_VALID_SPAN(source, 0, true);
   /* Trying to calculate the number of bytes to encode more than INT32_MAX / 3
    * might overflow an */
   /* int32 and return an erroneous number back. */
-  _az_PRECONDITION_RANGE(0, az_span_size(source), INT32_MAX / 3);
+  _az_PRECONDITION(source_size <= (INT32_MAX / 3));
 
   {
-    size_t const source_size = az_span_size(source);
     uint8_t const *const src_ptr = az_span_ptr(source);
 
     size_t encoded_length = source_size, i;

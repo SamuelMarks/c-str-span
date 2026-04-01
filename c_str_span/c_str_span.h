@@ -154,13 +154,13 @@ extern C_STR_SPAN_EXPORT AZ_NODISCARD az_span az_span_create(uint8_t *ptr,
       (uint8_t *)(BYTE_BUFFER),                                                \
       (sizeof(BYTE_BUFFER) / (_az_IS_BYTE_ARRAY(BYTE_BUFFER) ? 1 : 0)))
 
-    /**
-     * @brief An empty #az_span.
-     *
-     * @remark There is no guarantee that the pointer backing this span will be
-     * `NULL` and the caller shouldn't rely on it. However, the size will be 0.
-     */
-    extern C_STR_SPAN_EXPORT AZ_NODISCARD az_span az_span_empty(void);
+/**
+ * @brief An empty #az_span.
+ *
+ * @remark There is no guarantee that the pointer backing this span will be
+ * `NULL` and the caller shouldn't rely on it. However, the size will be 0.
+ */
+extern C_STR_SPAN_EXPORT AZ_NODISCARD az_span az_span_empty(void);
 
 /**
  * @brief Returns an #az_span from a 0-terminated array of bytes (chars).

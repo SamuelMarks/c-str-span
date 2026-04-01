@@ -57,9 +57,9 @@ target_link_libraries(
         greatest
 )
 
-# if (MSVC)
-#     target_compile_definitions("${EXEC_NAME}" PRIVATE _CRT_SECURE_NO_WARNINGS)
-# endif (MSVC)
+if (MSVC)
+    target_compile_definitions("${EXEC_NAME}" PRIVATE _CRT_SECURE_NO_WARNINGS)
+endif (MSVC)
 
 #=======#
 # CTest #
