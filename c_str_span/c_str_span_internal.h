@@ -94,8 +94,8 @@ AZ_UNUSED AZ_INLINE AZ_NODISCARD size_t _az_span_diff(az_span sliced_span,
  * #AZ_ERROR_NOT_ENOUGH_SPACE.
  * @remark The \p destination and \p source must not overlap.
  */
-AZ_NODISCARD az_result _az_span_url_encode(az_span destination, az_span source,
-                                           ptrdiff_t *out_length);
+extern C_STR_SPAN_EXPORT AZ_NODISCARD az_result
+_az_span_url_encode(az_span destination, az_span source, ptrdiff_t *out_length);
 
 /**
  * @brief Calculates what would be the length of \p source #az_span after
@@ -105,7 +105,8 @@ AZ_NODISCARD az_result _az_span_url_encode(az_span destination, az_span source,
  * @return The length of source if it would be url-encoded.
  *
  */
-AZ_NODISCARD size_t _az_span_url_encode_calc_length(az_span source);
+extern C_STR_SPAN_EXPORT AZ_NODISCARD size_t
+_az_span_url_encode_calc_length(az_span source);
 
 /**
  * @brief String tokenizer for #az_span.

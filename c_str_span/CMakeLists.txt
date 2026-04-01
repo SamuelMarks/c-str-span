@@ -29,6 +29,11 @@ option(C_STR_SPAN_BUILD_AMALGAMATION "Generate header-only amalgamation (STB-sty
 
 add_library("${LIBRARY_NAME}" "${Header_Files}" "${Source_Files}")
 
+get_target_property(LIBRARY_TYPE "${LIBRARY_NAME}" TYPE)
+if (LIBRARY_TYPE STREQUAL "STATIC_LIBRARY")
+    target_compile_definitions("${LIBRARY_NAME}" PUBLIC C_STR_SPAN_STATIC_DEFINE)
+endif ()
+
 if (NOT PRECONDITIONS)
     target_compile_definitions("${LIBRARY_NAME}" PUBLIC AZ_NO_PRECONDITION_CHECKING)
 endif ()
