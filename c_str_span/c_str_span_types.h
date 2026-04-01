@@ -8,13 +8,7 @@
 #include <stdint.h>
 #endif /* defined(_MSC_VER) && _MSC_VER < 1600 */
 
-#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
-#include <stdbool.h>
-#elif defined(_MSC_VER) && _MSC_VER < 1800
 #include "c_str_span_stdbool.h"
-#else
-#include <stdbool.h>
-#endif /* defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L */
 /* clang-format on */
 
 #ifdef __cplusplus

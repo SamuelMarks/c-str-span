@@ -4,6 +4,10 @@
  * This variant is modified from MUSL
  * */
 
+#if (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L) || (defined(_MSC_VER) && _MSC_VER >= 1800)
+#include <stdbool.h>
+#else
+
 #if !defined(_STDBOOL_H) && !defined(HAS_STDBOOL)
 #define _STDBOOL_H
 
@@ -26,3 +30,5 @@ typedef size_t bool;
 #define false (!true)
 
 #endif /* !defined(_STDBOOL_H) && !defined(HAS_STDBOOL) */
+
+#endif /* (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L) || (defined(_MSC_VER) && _MSC_VER >= 1800) */
