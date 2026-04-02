@@ -1124,6 +1124,7 @@ TEST az_span_test_macro_only_allows_byte_buffers(void) {
     ASSERT_EQ(0, _az_IS_ARRAY(p1));
     ASSERT_EQ(0, _az_IS_BYTE_ARRAY(p1));
   }
+  PASS();
 }
 
 TEST az_span_create_from_str_succeeds(void) {

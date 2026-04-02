@@ -1,13 +1,21 @@
+/* clang-format off */
 #include "c_str_precondition_internal.h"
 #include "c_str_span.h"
 #include "c_str_span_internal.h"
 #include "c_str_span_printf.h"
 #include "c_str_span_private.h"
+
+#if defined(__GNUC__) || defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-result"
+#endif
+
 #include <greatest.h>
 #include <math.h>
 #include <setjmp.h>
 #include <stdio.h>
 #include <string.h>
+/* clang-format on */
 
 static jmp_buf g_precondition_jmp;
 static volatile bool g_precondition_expected = false;
@@ -199,8 +207,8 @@ TEST test_az_span_printf_all_specifiers(void) {
   az_span_printf((const uint8_t *)"%c %d %i %o %u %x %X %e %E %f %F %g %G %a "
                                   "%A %p %s %S %Z %% %Q %n\n",
                  'A', 123, -456, 0777, 456u, 0xabc, 0xABC, 1.23e4, 1.23E4, 1.23,
-                 1.23, 1.23, 1.23, 1.23, 1.23, (void *)0xdeadbeef, "str", "STR",
-                 "ZTR", span, &n);
+                 1.23, 1.23, 1.23, 1.23, 1.23, (void *)(size_t)0xdeadbeef,
+                 "str", "STR", "ZTR", span, &n);
 
   /* Test %Q with special characters */
   az_span_printf((const uint8_t *)"%Q\n", AZ_SPAN_FROM_STR("\"\t\n\\\'"));
