@@ -73,8 +73,13 @@ add_subdirectory("${PROJECT_NAME}")
 
 include(CTest)
 option(BUILD_TESTING "Build the tests" ON)
-option(C_STR_SPAN_BUILD_TESTING "Build the tests" ON)
-set(C_STR_SPAN_BUILD_TESTING ON)
+if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
+    option(C_STR_SPAN_BUILD_TESTING "Build the tests" ON)
+    set(C_STR_SPAN_BUILD_TESTING ON)
+else()
+    option(C_STR_SPAN_BUILD_TESTING "Build the tests" OFF)
+    set(C_STR_SPAN_BUILD_TESTING OFF)
+endif()
 if (BUILD_TESTING AND C_STR_SPAN_BUILD_TESTING)
     message(STATUS "TESTS ENABLED")
     add_subdirectory("${PROJECT_NAME}/tests")
@@ -123,3 +128,4 @@ write_basic_package_version_file(
 )
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
         DESTINATION "${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME}")
+
