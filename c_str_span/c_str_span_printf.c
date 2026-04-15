@@ -5,7 +5,7 @@
  */
 
 /* clang-format off */
-#include "log.h"
+#include "c_str_span_log.h"
 #include <ctype.h>
 #include <stdarg.h>
 #include <stdio.h>

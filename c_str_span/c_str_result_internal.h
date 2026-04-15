@@ -21,7 +21,7 @@ extern "C" {
 #endif /* __cplusplus */
 
 /* clang-format off */
-#include "log.h"
+#include "c_str_span_log.h"
 #if defined(_MSC_VER) && _MSC_VER < 1600
 #include "c_str_span_stdint.h"
 #else

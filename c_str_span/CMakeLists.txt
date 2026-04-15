@@ -1,7 +1,7 @@
 get_filename_component(LIBRARY_NAME "${CMAKE_CURRENT_SOURCE_DIR}" NAME)
 
 set(Header_Files
-        "log.h"
+        "c_str_span_log.h"
         "c_str_hex_private.h"
         "c_str_precondition.h"
         "c_str_precondition_internal.h"

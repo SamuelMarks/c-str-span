@@ -39,16 +39,8 @@ extern "C" {
 #ifndef _STDINT_H
 #define _STDINT_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
-
 #ifndef _INTPTR_T_DEFINED
 #define _INTPTR_T_DEFINED
-
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
 
 #ifndef __intptr_t_defined
 #define __intptr_t_defined
@@ -63,10 +55,6 @@ typedef int intptr_t;
 #ifndef _UINTPTR_T_DEFINED
 #define _UINTPTR_T_DEFINED
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
-
 #ifndef __uintptr_t_defined
 #define __uintptr_t_defined
 #undef uintptr_t
@@ -80,16 +68,8 @@ typedef unsigned int uintptr_t;
 #ifndef _PTRDIFF_T_DEFINED
 #define _PTRDIFF_T_DEFINED
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
-
 #ifndef _PTRDIFF_T_
 #define _PTRDIFF_T_
-
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
 
 #undef ptrdiff_t
 #ifdef _WIN64
@@ -102,27 +82,13 @@ typedef int ptrdiff_t;
 #ifndef _WCHAR_T_DEFINED
 #define _WCHAR_T_DEFINED
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
-
-#ifndef __cplusplus
 typedef unsigned short wchar_t;
-#endif /* C++ */
 #endif /* _WCHAR_T_DEFINED */
 #ifndef _WCTYPE_T_DEFINED
 #define _WCTYPE_T_DEFINED
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
-
 #ifndef _WINT_T
 #define _WINT_T
-
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
 
 typedef unsigned short wint_t;
 typedef unsigned short wctype_t;
@@ -273,4 +239,5 @@ typedef unsigned __int64 uintmax_t;
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
+
 #endif /* C_STR_SPAN_STDINT_H */

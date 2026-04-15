@@ -46,6 +46,7 @@ endfunction()
 # -------------------------------------------------------------
 # We start with ALL headers except stdint/stdbool (which get resolved where they are included)
 set(TOP_HEADERS
+    "c_str_span_log.h"
     "c_str_span_types.h"
     "c_str_result.h"
     "c_str_result_internal.h"

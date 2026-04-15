@@ -5,7 +5,9 @@
 extern "C" {
 #endif /* __cplusplus */
 
+/* clang-format off */
 #include <greatest.h>
+/* clang-format on */
 
 SUITE_EXTERN(az_core_span_suite);
 SUITE_EXTERN(az_core_result_suite);
