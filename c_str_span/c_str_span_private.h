@@ -79,7 +79,11 @@ AZ_NODISCARD AZ_INLINE bool _az_isfinite(double value) {
    * re-interpreting it as an uint64_t. */
   /* NOLINTNEXTLINE(clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling)
    */
+#if defined(_MSC_VER) && !defined(__clang__)
+  memcpy_s(&binary_value, sizeof(binary_value), &value, sizeof(value));
+#else
   memcpy(&binary_value, &value, sizeof(binary_value));
+#endif
 
   /* These are the binary representations of the various non-finite value
    * ranges, */

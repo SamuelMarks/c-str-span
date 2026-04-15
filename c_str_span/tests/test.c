@@ -15,8 +15,6 @@ SUITE_EXTERN(coverage_suite);
 GREATEST_MAIN_DEFS();
 
 int main(int argc, char **argv) {
-  int rc = 0;
-
   GREATEST_MAIN_BEGIN();
   RUN_SUITE(lib_suite);
   RUN_SUITE(az_core_span_suite);

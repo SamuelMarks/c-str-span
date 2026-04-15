@@ -11,9 +11,11 @@ extern "C" {
 
 #ifndef LOG_DEBUG
 #ifdef DEBUG
-#define LOG_DEBUG(fmt, ...) fprintf(stderr, "[DEBUG] " fmt, ##__VA_ARGS__)
+void c_str_span_log_debug(const char *fmt, ...);
+#define LOG_DEBUG c_str_span_log_debug
 #else
-#define LOG_DEBUG(fmt, ...)
+void c_str_span_log_debug(const char *fmt, ...);
+#define LOG_DEBUG 1 ? (void)0 : c_str_span_log_debug
 #endif /* DEBUG */
 #endif /* !LOG_DEBUG */
 

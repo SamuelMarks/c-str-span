@@ -394,12 +394,21 @@ TEST az_span_atoi64_test(void) {
   PASS();
 }
 
+#if defined(_MSC_VER) && !defined(__clang__)
+#define TEST_AZ_ISFINITE_HELPER(source, expected)                              \
+  do {                                                                         \
+    double decimal = 0.0;                                                      \
+    memcpy_s(&decimal, sizeof(decimal), &(source), sizeof(source));            \
+    ASSERT_EQ(expected, _az_isfinite(decimal));                                \
+  } while (0)
+#else
 #define TEST_AZ_ISFINITE_HELPER(source, expected)                              \
   do {                                                                         \
     double decimal = 0.0;                                                      \
     memcpy(&decimal, &(source), sizeof(decimal));                              \
     ASSERT_EQ(expected, _az_isfinite(decimal));                                \
   } while (0)
+#endif
 
 TEST test_az_isfinite(void) {
   uint64_t source = 0;

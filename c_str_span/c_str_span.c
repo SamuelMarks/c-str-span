@@ -26,8 +26,21 @@
 #include "c_str_span.h"
 #include "c_str_span_internal.h"
 #include "c_str_span_private.h"
+#include <stdarg.h>
 #include <string.h>
 /* clang-format on */
+
+void c_str_span_log_debug(const char *fmt, ...) {
+#ifdef DEBUG
+  va_list args;
+  va_start(args, fmt);
+  fprintf(stderr, "[DEBUG] ");
+  vfprintf(stderr, fmt, args);
+  va_end(args);
+#else
+  (void)fmt;
+#endif
+}
 
 /*#include <azure/core/_az_cfg.h>*/
 
@@ -890,8 +903,6 @@ static AZ_NODISCARD int _az_span_builder_append_u32toa(az_span destination,
 
 AZ_NODISCARD int az_span_u32toa(az_span destination, uint32_t source,
                                 az_span *out_span) {
-  int rc = 0;
-
   _az_PRECONDITION_VALID_SPAN(destination, 0, false);
   _az_PRECONDITION_NOT_NULL(out_span);
   return _az_span_builder_append_u32toa(destination, source, out_span);

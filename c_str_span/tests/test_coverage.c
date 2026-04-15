@@ -163,7 +163,11 @@ TEST test_az_span_dtoa_special_cases(void) {
   az_span out;
   uint64_t const inf_bits = 0x7FF0000000000000ULL;
   double d_inf;
+#if defined(_MSC_VER) && !defined(__clang__)
+  memcpy_s(&d_inf, sizeof(d_inf), &inf_bits, sizeof(inf_bits));
+#else
   memcpy(&d_inf, &inf_bits, sizeof(d_inf));
+#endif
 
 #ifndef AZ_NO_PRECONDITION_CHECKING
   {
@@ -300,7 +304,11 @@ TEST test_az_span_is_content_equal_all_paths(void) {
 TEST test_az_isfinite_false(void) {
   uint64_t inf = 0x7FF0000000000000ULL;
   double d_inf;
+#if defined(_MSC_VER) && !defined(__clang__)
+  memcpy_s(&d_inf, sizeof(d_inf), &inf, sizeof(inf));
+#else
   memcpy(&d_inf, &inf, sizeof(d_inf));
+#endif
   ASSERT(!_az_isfinite(d_inf));
   PASS();
 }
