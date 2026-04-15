@@ -1,6 +1,10 @@
 #ifndef C_STR_SPAN_PRINTF_H
 #define C_STR_SPAN_PRINTF_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 /* clang-format off */
 #if defined(_MSC_VER) && _MSC_VER < 1600
 #include "c_str_span_stdint.h"
@@ -9,11 +13,6 @@
 #endif /* defined(_MSC_VER) && _MSC_VER < 1600 */
 
 #include "c_str_span_stdbool.h"
-
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
-
 
 #include "c_str_span_export.h"
 /* clang-format on */
@@ -26,8 +25,7 @@ extern "C" {
  * */
 extern C_STR_SPAN_EXPORT void az_span_printf(const uint8_t *format, ...);
 
-#endif /* !C_STR_SPAN_PRINTF_H */
-
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
+#endif /* !C_STR_SPAN_PRINTF_H */

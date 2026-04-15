@@ -5,12 +5,14 @@
  */
 
 /* clang-format off */
+#include "log.h"
 #include <ctype.h>
 #include <stdarg.h>
 #include <stdio.h>
 
 #include "c_str_span.h"
 #include "c_str_span_printf.h"
+#include <string.h>
 /* clang-format on */
 
 #if defined(_MSC_VER)

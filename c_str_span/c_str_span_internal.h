@@ -10,6 +10,10 @@
 #ifndef C_STR_SPAN_SPAN_INTERNAL_H
 #define C_STR_SPAN_SPAN_INTERNAL_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 /* clang-format off */
 #if defined(_MSC_VER) && _MSC_VER < 1600
 #include "c_str_span_stdint.h"
@@ -18,11 +22,6 @@
 #endif /* defined(_MSC_VER) && _MSC_VER < 1600 */
 
 #include "c_str_span_stdbool.h"
-
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
-
 
 #include "c_str_precondition_internal.h"
 #include "c_str_result.h"
@@ -83,7 +82,7 @@ AZ_UNUSED AZ_INLINE AZ_NODISCARD size_t _az_span_diff(az_span sliced_span,
  * @param[in] source The #az_span containing the non-URL-encoded bytes.
  * @param[out] out_length A pointer to an int32_t that is going to be assigned
  * the length of URL-encoding the \p source.
- * @return An #az_result value indicating the result of the operation:
+ * @return An #int value indicating the result of the operation:
  *         - #AZ_OK if successful
  *         - #AZ_ERROR_NOT_ENOUGH_SPACE if the \p destination is not big enough
  * to contain the encoded bytes
@@ -94,7 +93,7 @@ AZ_UNUSED AZ_INLINE AZ_NODISCARD size_t _az_span_diff(az_span sliced_span,
  * #AZ_ERROR_NOT_ENOUGH_SPACE.
  * @remark The \p destination and \p source must not overlap.
  */
-extern C_STR_SPAN_EXPORT AZ_NODISCARD az_result
+extern C_STR_SPAN_EXPORT AZ_NODISCARD int
 _az_span_url_encode(az_span destination, az_span source, ptrdiff_t *out_length);
 
 /**
@@ -135,7 +134,3 @@ extern C_STR_SPAN_EXPORT az_span _az_span_token(az_span source,
 /*#include <azure/core/_az_cfg_suffix.h>*/
 
 #endif /* ! C_STR_SPAN_SPAN_INTERNAL_H */
-
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */

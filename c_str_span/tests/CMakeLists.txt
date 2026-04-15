@@ -6,12 +6,18 @@ set(EXEC_NAME "${PROJECT_NAME}_${EXEC_NAME}")
 #=======================#
 
 include(FetchContent)
+file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/patch_greatest.cmake" "file(READ CMakeLists.txt content)\nstring(REPLACE \"CMAKE_SOURCE_DIR\" \"CMAKE_CURRENT_SOURCE_DIR\" content \"\${content}\")\nfile(WRITE CMakeLists.txt \"\${content}\")")
+
 FetchContent_Declare(
         greatest
         GIT_REPOSITORY https://github.com/SamuelMarks/greatest.git
         GIT_TAG        master
+        PATCH_COMMAND "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/patch_greatest.cmake"
 )
+set(OLD_BUILD_TESTING ${BUILD_TESTING})
+set(BUILD_TESTING OFF)
 FetchContent_MakeAvailable(greatest)
+set(BUILD_TESTING ${OLD_BUILD_TESTING})
 
 if (NOT TARGET greatest)
     add_library(greatest INTERFACE)

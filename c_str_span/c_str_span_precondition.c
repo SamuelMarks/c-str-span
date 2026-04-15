@@ -9,6 +9,8 @@
 
 /* clang-format off */
 #include "c_str_precondition_internal.h"
+#include <string.h>
+#include <stdio.h>
 /* clang-format on */
 
 /*#include <azure/core/_az_cfg.h>*/

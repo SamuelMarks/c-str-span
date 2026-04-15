@@ -7,6 +7,10 @@
 #ifndef C_STR_SPAN_TYPES_H
 #define C_STR_SPAN_TYPES_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 /* clang-format off */
 #if defined(_MSC_VER) && _MSC_VER < 1600
 #include "c_str_span_stdint.h"
@@ -16,10 +20,6 @@
 
 #include "c_str_span_stdbool.h"
 /* clang-format on */
-
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
 
 /* Copyright (c) Microsoft Corporation. All rights reserved.
  * SPDX-License-Identifier: MIT */
@@ -61,5 +61,4 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
-
 #endif /* C_STR_SPAN_TYPES_H */

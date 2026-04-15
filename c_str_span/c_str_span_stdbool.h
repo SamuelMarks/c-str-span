@@ -10,9 +10,21 @@
 #ifndef C_STR_SPAN_STDBOOL_H
 #define C_STR_SPAN_STDBOOL_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
+/* clang-format off */
 #if (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L) ||              \
     (defined(_MSC_VER) && _MSC_VER >= 1800)
 #include <stdbool.h>
+#else
+#include <stdlib.h>
+#endif
+/* clang-format on */
+
+#if (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L) ||              \
+    (defined(_MSC_VER) && _MSC_VER >= 1800)
 #else
 
 #if !defined(_STDBOOL_H) && !defined(HAS_STDBOOL)
@@ -28,10 +40,6 @@
 #undef false
 #endif /* false */
 
-/* clang-format off */
-#include <stdlib.h>
-/* clang-format on */
-
 typedef size_t bool;
 #define true 1
 #define false (!true)
@@ -41,4 +49,7 @@ typedef size_t bool;
 #endif /* (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L) ||        \
           (defined(_MSC_VER) && _MSC_VER >= 1800) */
 
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 #endif /* C_STR_SPAN_STDBOOL_H */

@@ -8,6 +8,7 @@
  * SPDX-License-Identifier: MIT */
 
 /* clang-format off */
+#include "log.h"
 #ifdef __cplusplus
 #include <cctype>
 #include <cmath>
@@ -25,6 +26,7 @@
 #include "c_str_span.h"
 #include "c_str_span_internal.h"
 #include "c_str_span_private.h"
+#include <string.h>
 /* clang-format on */
 
 /*#include <azure/core/_az_cfg.h>*/
@@ -131,7 +133,9 @@ AZ_NODISCARD bool az_span_is_content_equal_ignoring_case(az_span span1,
   return true;
 }
 
-AZ_NODISCARD az_result az_span_atou64(az_span source, uint64_t *out_number) {
+AZ_NODISCARD int az_span_atou64(az_span source, uint64_t *out_number) {
+  int rc = 0;
+
   _az_PRECONDITION_VALID_SPAN(source, 1, false);
   _az_PRECONDITION_NOT_NULL(out_number);
 
@@ -139,7 +143,14 @@ AZ_NODISCARD az_result az_span_atou64(az_span source, uint64_t *out_number) {
     size_t const span_size = az_span_size(source);
 
     if (span_size < 1) {
-      return AZ_ERROR_UNEXPECTED_CHAR;
+      rc = AZ_ERROR_UNEXPECTED_CHAR;
+      if (rc != 0) {
+        char err_buf[256];
+        (void)err_buf;
+        LOG_DEBUG("Error %d: %s\n", rc,
+                  C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+      }
+      return rc;
     }
 
     {
@@ -153,7 +164,14 @@ AZ_NODISCARD az_result az_span_atou64(az_span source, uint64_t *out_number) {
         /* There must be another byte after a sign.
          * The loop below checks that it must be a digit. */
         if (next_byte != '+' || span_size < 2) {
-          return AZ_ERROR_UNEXPECTED_CHAR;
+          rc = AZ_ERROR_UNEXPECTED_CHAR;
+          if (rc != 0) {
+            char err_buf[256];
+            (void)err_buf;
+            LOG_DEBUG("Error %d: %s\n", rc,
+                      C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+          }
+          return rc;
         }
         starting_index++;
       }
@@ -164,7 +182,14 @@ AZ_NODISCARD az_result az_span_atou64(az_span source, uint64_t *out_number) {
         for (i = starting_index; i < span_size; ++i) {
           next_byte = source_ptr[i];
           if (!isdigit(next_byte)) {
-            return AZ_ERROR_UNEXPECTED_CHAR;
+            rc = AZ_ERROR_UNEXPECTED_CHAR;
+            if (rc != 0) {
+              char err_buf[256];
+              (void)err_buf;
+              LOG_DEBUG("Error %d: %s\n", rc,
+                        C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+            }
+            return rc;
           }
           {
             uint64_t const d = (uint64_t)next_byte - '0';
@@ -173,7 +198,14 @@ AZ_NODISCARD az_result az_span_atou64(az_span source, uint64_t *out_number) {
              * Before actually doing the math below, this is checking whether
              * value * 10 + d > UINT64_MAX. */
             if ((UINT64_MAX - d) / _az_NUMBER_OF_DECIMAL_VALUES < value) {
-              return AZ_ERROR_UNEXPECTED_CHAR;
+              rc = AZ_ERROR_UNEXPECTED_CHAR;
+              if (rc != 0) {
+                char err_buf[256];
+                (void)err_buf;
+                LOG_DEBUG("Error %d: %s\n", rc,
+                          C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+              }
+              return rc;
             }
 
             value = value * _az_NUMBER_OF_DECIMAL_VALUES + d;
@@ -184,10 +216,12 @@ AZ_NODISCARD az_result az_span_atou64(az_span source, uint64_t *out_number) {
       }
     }
   }
-  return AZ_OK;
+  return 0;
 }
 
-AZ_NODISCARD az_result az_span_atou32(az_span source, uint32_t *out_number) {
+AZ_NODISCARD int az_span_atou32(az_span source, uint32_t *out_number) {
+  int rc = 0;
+
   _az_PRECONDITION_VALID_SPAN(source, 1, false);
   _az_PRECONDITION_NOT_NULL(out_number);
 
@@ -195,7 +229,14 @@ AZ_NODISCARD az_result az_span_atou32(az_span source, uint32_t *out_number) {
     size_t const span_size = az_span_size(source);
 
     if (span_size < 1) {
-      return AZ_ERROR_UNEXPECTED_CHAR;
+      rc = AZ_ERROR_UNEXPECTED_CHAR;
+      if (rc != 0) {
+        char err_buf[256];
+        (void)err_buf;
+        LOG_DEBUG("Error %d: %s\n", rc,
+                  C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+      }
+      return rc;
     }
 
     {
@@ -209,7 +250,14 @@ AZ_NODISCARD az_result az_span_atou32(az_span source, uint32_t *out_number) {
         /* There must be another byte after a sign.
          * The loop below checks that it must be a digit. */
         if (next_byte != '+' || span_size < 2) {
-          return AZ_ERROR_UNEXPECTED_CHAR;
+          rc = AZ_ERROR_UNEXPECTED_CHAR;
+          if (rc != 0) {
+            char err_buf[256];
+            (void)err_buf;
+            LOG_DEBUG("Error %d: %s\n", rc,
+                      C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+          }
+          return rc;
         }
         starting_index++;
       }
@@ -220,7 +268,14 @@ AZ_NODISCARD az_result az_span_atou32(az_span source, uint32_t *out_number) {
         for (i = starting_index; i < span_size; ++i) {
           next_byte = source_ptr[i];
           if (!isdigit(next_byte)) {
-            return AZ_ERROR_UNEXPECTED_CHAR;
+            rc = AZ_ERROR_UNEXPECTED_CHAR;
+            if (rc != 0) {
+              char err_buf[256];
+              (void)err_buf;
+              LOG_DEBUG("Error %d: %s\n", rc,
+                        C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+            }
+            return rc;
           }
           {
             uint32_t const d = (uint32_t)next_byte - '0';
@@ -229,7 +284,14 @@ AZ_NODISCARD az_result az_span_atou32(az_span source, uint32_t *out_number) {
              * Before actually doing the math below, this is checking whether
              * value * 10 + d > UINT32_MAX. */
             if ((UINT32_MAX - d) / _az_NUMBER_OF_DECIMAL_VALUES < value) {
-              return AZ_ERROR_UNEXPECTED_CHAR;
+              rc = AZ_ERROR_UNEXPECTED_CHAR;
+              if (rc != 0) {
+                char err_buf[256];
+                (void)err_buf;
+                LOG_DEBUG("Error %d: %s\n", rc,
+                          C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+              }
+              return rc;
             }
 
             value = value * _az_NUMBER_OF_DECIMAL_VALUES + d;
@@ -240,10 +302,12 @@ AZ_NODISCARD az_result az_span_atou32(az_span source, uint32_t *out_number) {
       }
     }
   }
-  return AZ_OK;
+  return 0;
 }
 
-AZ_NODISCARD az_result az_span_atoi64(az_span source, int64_t *out_number) {
+AZ_NODISCARD int az_span_atoi64(az_span source, int64_t *out_number) {
+  int rc = 0;
+
   _az_PRECONDITION_VALID_SPAN(source, 1, false);
   _az_PRECONDITION_NOT_NULL(out_number);
 
@@ -251,7 +315,14 @@ AZ_NODISCARD az_result az_span_atoi64(az_span source, int64_t *out_number) {
     size_t const span_size = az_span_size(source);
 
     if (span_size < 1) {
-      return AZ_ERROR_UNEXPECTED_CHAR;
+      rc = AZ_ERROR_UNEXPECTED_CHAR;
+      if (rc != 0) {
+        char err_buf[256];
+        (void)err_buf;
+        LOG_DEBUG("Error %d: %s\n", rc,
+                  C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+      }
+      return rc;
     }
 
     { /* If the first character is not a digit, - sign, or an optional + sign,
@@ -266,12 +337,26 @@ AZ_NODISCARD az_result az_span_atoi64(az_span source, int64_t *out_number) {
          * The loop below checks that it must be a digit. */
         if (next_byte != '+') {
           if (next_byte != '-') {
-            return AZ_ERROR_UNEXPECTED_CHAR;
+            rc = AZ_ERROR_UNEXPECTED_CHAR;
+            if (rc != 0) {
+              char err_buf[256];
+              (void)err_buf;
+              LOG_DEBUG("Error %d: %s\n", rc,
+                        C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+            }
+            return rc;
           }
           sign = -1;
         }
         if (span_size < 2) {
-          return AZ_ERROR_UNEXPECTED_CHAR;
+          rc = AZ_ERROR_UNEXPECTED_CHAR;
+          if (rc != 0) {
+            char err_buf[256];
+            (void)err_buf;
+            LOG_DEBUG("Error %d: %s\n", rc,
+                      C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+          }
+          return rc;
         }
         starting_index++;
       }
@@ -291,7 +376,14 @@ AZ_NODISCARD az_result az_span_atoi64(az_span source, int64_t *out_number) {
           for (i = starting_index; i < span_size; ++i) {
             next_byte = source_ptr[i];
             if (!isdigit(next_byte)) {
-              return AZ_ERROR_UNEXPECTED_CHAR;
+              rc = AZ_ERROR_UNEXPECTED_CHAR;
+              if (rc != 0) {
+                char err_buf[256];
+                (void)err_buf;
+                LOG_DEBUG("Error %d: %s\n", rc,
+                          C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+              }
+              return rc;
             }
             {
               uint64_t const d = (uint64_t)next_byte - '0';
@@ -303,7 +395,14 @@ AZ_NODISCARD az_result az_span_atoi64(az_span source, int64_t *out_number) {
               if ((uint64_t)(INT64_MAX - d + sign_factor) /
                       _az_NUMBER_OF_DECIMAL_VALUES <
                   value) {
-                return AZ_ERROR_UNEXPECTED_CHAR;
+                rc = AZ_ERROR_UNEXPECTED_CHAR;
+                if (rc != 0) {
+                  char err_buf[256];
+                  (void)err_buf;
+                  LOG_DEBUG("Error %d: %s\n", rc,
+                            C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+                }
+                return rc;
               }
 
               value = value * _az_NUMBER_OF_DECIMAL_VALUES + d;
@@ -315,10 +414,12 @@ AZ_NODISCARD az_result az_span_atoi64(az_span source, int64_t *out_number) {
       }
     }
   }
-  return AZ_OK;
+  return 0;
 }
 
-AZ_NODISCARD az_result az_span_atoi32(az_span source, int32_t *out_number) {
+AZ_NODISCARD int az_span_atoi32(az_span source, int32_t *out_number) {
+  int rc = 0;
+
   _az_PRECONDITION_VALID_SPAN(source, 1, false);
   _az_PRECONDITION_NOT_NULL(out_number);
 
@@ -326,7 +427,14 @@ AZ_NODISCARD az_result az_span_atoi32(az_span source, int32_t *out_number) {
     size_t const span_size = az_span_size(source);
 
     if (span_size < 1) {
-      return AZ_ERROR_UNEXPECTED_CHAR;
+      rc = AZ_ERROR_UNEXPECTED_CHAR;
+      if (rc != 0) {
+        char err_buf[256];
+        (void)err_buf;
+        LOG_DEBUG("Error %d: %s\n", rc,
+                  C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+      }
+      return rc;
     }
 
     { /* If the first character is not a digit, - sign, or an optional + sign,
@@ -341,12 +449,26 @@ AZ_NODISCARD az_result az_span_atoi32(az_span source, int32_t *out_number) {
          * The loop below checks that it must be a digit. */
         if (next_byte != '+') {
           if (next_byte != '-') {
-            return AZ_ERROR_UNEXPECTED_CHAR;
+            rc = AZ_ERROR_UNEXPECTED_CHAR;
+            if (rc != 0) {
+              char err_buf[256];
+              (void)err_buf;
+              LOG_DEBUG("Error %d: %s\n", rc,
+                        C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+            }
+            return rc;
           }
           sign = -1;
         }
         if (span_size < 2) {
-          return AZ_ERROR_UNEXPECTED_CHAR;
+          rc = AZ_ERROR_UNEXPECTED_CHAR;
+          if (rc != 0) {
+            char err_buf[256];
+            (void)err_buf;
+            LOG_DEBUG("Error %d: %s\n", rc,
+                      C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+          }
+          return rc;
         }
         starting_index++;
       }
@@ -365,7 +487,14 @@ AZ_NODISCARD az_result az_span_atoi32(az_span source, int32_t *out_number) {
         for (i = starting_index; i < span_size; ++i) {
           next_byte = source_ptr[i];
           if (!isdigit(next_byte)) {
-            return AZ_ERROR_UNEXPECTED_CHAR;
+            rc = AZ_ERROR_UNEXPECTED_CHAR;
+            if (rc != 0) {
+              char err_buf[256];
+              (void)err_buf;
+              LOG_DEBUG("Error %d: %s\n", rc,
+                        C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+            }
+            return rc;
           }
           {
             uint32_t const d = (uint32_t)next_byte - '0';
@@ -377,7 +506,14 @@ AZ_NODISCARD az_result az_span_atoi32(az_span source, int32_t *out_number) {
             if ((uint32_t)(INT32_MAX - d + sign_factor) /
                     _az_NUMBER_OF_DECIMAL_VALUES <
                 value) {
-              return AZ_ERROR_UNEXPECTED_CHAR;
+              rc = AZ_ERROR_UNEXPECTED_CHAR;
+              if (rc != 0) {
+                char err_buf[256];
+                (void)err_buf;
+                LOG_DEBUG("Error %d: %s\n", rc,
+                          C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+              }
+              return rc;
             }
 
             value = value * _az_NUMBER_OF_DECIMAL_VALUES + d;
@@ -388,7 +524,7 @@ AZ_NODISCARD az_result az_span_atoi32(az_span source, int32_t *out_number) {
       }
     }
   }
-  return AZ_OK;
+  return 0;
 }
 
 static bool _is_valid_start_of_double(uint8_t first_byte) {
@@ -403,7 +539,9 @@ static bool _is_valid_start_of_double(uint8_t first_byte) {
 #pragma warning(disable : 4710)
 #endif
 
-AZ_NODISCARD az_result az_span_atod(az_span source, double *out_number) {
+AZ_NODISCARD int az_span_atod(az_span source, double *out_number) {
+  int rc = 0;
+
   _az_PRECONDITION_VALID_SPAN(source, 1, false);
   _az_PRECONDITION_NOT_NULL(out_number);
 
@@ -422,7 +560,14 @@ AZ_NODISCARD az_result az_span_atod(az_span source, double *out_number) {
      * end of the span, when the span might contain whitespace or other
      * invalid bytes at the start. */
     if (size < 1 || !_is_valid_start_of_double(source_ptr[0])) {
-      return AZ_ERROR_UNEXPECTED_CHAR;
+      rc = AZ_ERROR_UNEXPECTED_CHAR;
+      if (rc != 0) {
+        char err_buf[256];
+        (void)err_buf;
+        LOG_DEBUG("Error %d: %s\n", rc,
+                  C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+      }
+      return rc;
     }
 
     /* Starting at 1 to skip the '%' character */
@@ -629,13 +774,15 @@ AZ_INLINE uint8_t _az_decimal_to_ascii(uint8_t d) {
   return (uint8_t)((uint32_t)('0' + d) & (uint8_t)UINT8_MAX);
 }
 
-static AZ_NODISCARD az_result _az_span_builder_append_uint64(az_span *ref_span,
-                                                             uint64_t n) {
+static AZ_NODISCARD int _az_span_builder_append_uint64(az_span *ref_span,
+                                                       uint64_t n) {
+  int rc = 0;
+
   _az_RETURN_IF_NOT_ENOUGH_SIZE(*ref_span, 1);
 
   if (n == 0) {
     *ref_span = az_span_copy_u8(*ref_span, '0');
-    return AZ_OK;
+    return 0;
   }
 
   {
@@ -660,20 +807,31 @@ static AZ_NODISCARD az_result _az_span_builder_append_uint64(az_span *ref_span,
       *ref_span = az_span_copy_u8(*ref_span, value_to_append);
     }
   }
-  return AZ_OK;
+  return 0;
 }
 
-AZ_NODISCARD az_result az_span_u64toa(az_span destination, uint64_t source,
-                                      az_span *out_span) {
+AZ_NODISCARD int az_span_u64toa(az_span destination, uint64_t source,
+                                az_span *out_span) {
+  int rc = 0;
+
   _az_PRECONDITION_VALID_SPAN(destination, 0, false);
   _az_PRECONDITION_NOT_NULL(out_span);
   *out_span = destination;
 
-  return _az_span_builder_append_uint64(out_span, source);
+  rc = _az_span_builder_append_uint64(out_span, source);
+  if (rc != 0) {
+    char err_buf[256];
+    (void)err_buf;
+    LOG_DEBUG("Error %d: %s\n", rc,
+              C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+  }
+  return rc;
 }
 
-AZ_NODISCARD az_result az_span_i64toa(az_span destination, int64_t source,
-                                      az_span *out_span) {
+AZ_NODISCARD int az_span_i64toa(az_span destination, int64_t source,
+                                az_span *out_span) {
+  int rc = 0;
+
   _az_PRECONDITION_VALID_SPAN(destination, 0, false);
   _az_PRECONDITION_NOT_NULL(out_span);
 
@@ -689,13 +847,16 @@ AZ_NODISCARD az_result az_span_i64toa(az_span destination, int64_t source,
   return _az_span_builder_append_uint64(out_span, (uint64_t)source);
 }
 
-static AZ_NODISCARD az_result _az_span_builder_append_u32toa(
-    az_span destination, uint32_t n, az_span *out_span) {
+static AZ_NODISCARD int _az_span_builder_append_u32toa(az_span destination,
+                                                       uint32_t n,
+                                                       az_span *out_span) {
+  int rc = 0;
+
   _az_RETURN_IF_NOT_ENOUGH_SIZE(destination, 1);
 
   if (n == 0) {
     *out_span = az_span_copy_u8(destination, '0');
-    return AZ_OK;
+    return 0;
   }
 
   {
@@ -724,18 +885,22 @@ static AZ_NODISCARD az_result _az_span_builder_append_u32toa(
       *out_span = az_span_copy_u8(*out_span, value_to_append);
     }
   }
-  return AZ_OK;
+  return 0;
 }
 
-AZ_NODISCARD az_result az_span_u32toa(az_span destination, uint32_t source,
-                                      az_span *out_span) {
+AZ_NODISCARD int az_span_u32toa(az_span destination, uint32_t source,
+                                az_span *out_span) {
+  int rc = 0;
+
   _az_PRECONDITION_VALID_SPAN(destination, 0, false);
   _az_PRECONDITION_NOT_NULL(out_span);
   return _az_span_builder_append_u32toa(destination, source, out_span);
 }
 
-AZ_NODISCARD az_result az_span_i32toa(az_span destination, int32_t source,
-                                      az_span *out_span) {
+AZ_NODISCARD int az_span_i32toa(az_span destination, int32_t source,
+                                az_span *out_span) {
+  int rc = 0;
+
   _az_PRECONDITION_VALID_SPAN(destination, 0, false);
   _az_PRECONDITION_NOT_NULL(out_span);
 
@@ -750,9 +915,10 @@ AZ_NODISCARD az_result az_span_i32toa(az_span destination, int32_t source,
   return _az_span_builder_append_u32toa(*out_span, (uint32_t)source, out_span);
 }
 
-AZ_NODISCARD az_result az_span_dtoa(az_span destination, double source,
-                                    int32_t fractional_digits,
-                                    az_span *out_span) {
+AZ_NODISCARD int az_span_dtoa(az_span destination, double source,
+                              int32_t fractional_digits, az_span *out_span) {
+  int rc = 0;
+
   _az_PRECONDITION_VALID_SPAN(destination, 0, false);
   /* Inputs that are either positive or negative infinity, or not a number, are
    * not supported. */
@@ -765,7 +931,14 @@ AZ_NODISCARD az_result az_span_dtoa(az_span destination, double source,
 
   /* The input is either positive or negative infinity, or not a number. */
   if (!_az_isfinite(source)) {
-    return AZ_ERROR_NOT_SUPPORTED;
+    rc = AZ_ERROR_NOT_SUPPORTED;
+    if (rc != 0) {
+      char err_buf[256];
+      (void)err_buf;
+      LOG_DEBUG("Error %d: %s\n", rc,
+                C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+    }
+    return rc;
   }
 
   if (source < 0) {
@@ -779,7 +952,14 @@ AZ_NODISCARD az_result az_span_dtoa(az_span destination, double source,
     double after_decimal_part = modf(source, &integer_part);
 
     if (integer_part > _az_MAX_SAFE_INTEGER) {
-      return AZ_ERROR_NOT_SUPPORTED;
+      rc = AZ_ERROR_NOT_SUPPORTED;
+      if (rc != 0) {
+        char err_buf[256];
+        (void)err_buf;
+        LOG_DEBUG("Error %d: %s\n", rc,
+                  C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+      }
+      return rc;
     }
 
     /* The double to uint64_t cast should be safe without loss of precision.
@@ -790,11 +970,11 @@ AZ_NODISCARD az_result az_span_dtoa(az_span destination, double source,
     /* Only print decimal digits if the user asked for at least one to be
      * printed. Or if the decimal part is non-zero. */
     if (fractional_digits <= 0) {
-      return AZ_OK;
+      return 0;
     }
 
     if (after_decimal_part == 0) {
-      return AZ_OK;
+      return 0;
     }
 
     /* Clamp the fractional digits to the supported maximum value of 15. */
@@ -820,7 +1000,7 @@ AZ_NODISCARD az_result az_span_dtoa(az_span destination, double source,
       }
 
       if (shifted_fractional < 1) {
-        return AZ_OK;
+        return 0;
       }
 
       {
@@ -867,26 +1047,41 @@ AZ_NODISCARD az_result az_span_dtoa(az_span destination, double source,
 }
 
 /* TODO: pass az_span by value */
-AZ_NODISCARD az_result _az_is_expected_span(az_span *ref_span,
-                                            az_span expected) {
+AZ_NODISCARD int _az_is_expected_span(az_span *ref_span, az_span expected) {
+  int rc = 0;
+
   size_t const expected_size = az_span_size(expected);
 
   /* EOF because ref_span is smaller than the expected span */
   if (expected_size > az_span_size(*ref_span)) {
-    return AZ_ERROR_UNEXPECTED_END;
+    rc = AZ_ERROR_UNEXPECTED_END;
+    if (rc != 0) {
+      char err_buf[256];
+      (void)err_buf;
+      LOG_DEBUG("Error %d: %s\n", rc,
+                C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+    }
+    return rc;
   }
 
   {
     const az_span actual_span = az_span_slice(*ref_span, 0, expected_size);
 
     if (!az_span_is_content_equal(actual_span, expected)) {
-      return AZ_ERROR_UNEXPECTED_CHAR;
+      rc = AZ_ERROR_UNEXPECTED_CHAR;
+      if (rc != 0) {
+        char err_buf[256];
+        (void)err_buf;
+        LOG_DEBUG("Error %d: %s\n", rc,
+                  C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+      }
+      return rc;
     }
   }
   /* move reader after the expected span (means it was parsed as expected) */
   *ref_span = az_span_slice_to_end(*ref_span, expected_size);
 
-  return AZ_OK;
+  return 0;
 }
 
 AZ_NODISCARD AZ_INLINE bool _az_is_whitespace(uint8_t c) {
@@ -1004,8 +1199,10 @@ AZ_NODISCARD size_t _az_span_url_encode_calc_length(az_span source) {
   }
 }
 
-AZ_NODISCARD az_result _az_span_url_encode(az_span destination, az_span source,
-                                           ptrdiff_t *out_length) {
+AZ_NODISCARD int _az_span_url_encode(az_span destination, az_span source,
+                                     ptrdiff_t *out_length) {
+  int rc = 0;
+
   _az_PRECONDITION_NOT_NULL(out_length);
   _az_PRECONDITION_VALID_SPAN(source, 0, true);
 
@@ -1029,7 +1226,14 @@ AZ_NODISCARD az_result _az_span_url_encode(az_span destination, az_span source,
         if (!_az_span_url_should_encode(c)) {
           if (dest_ptr >= dest_end) {
             *out_length = 0;
-            return AZ_ERROR_NOT_ENOUGH_SPACE;
+            rc = AZ_ERROR_NOT_ENOUGH_SPACE;
+            if (rc != 0) {
+              char err_buf[256];
+              (void)err_buf;
+              LOG_DEBUG("Error %d: %s\n", rc,
+                        C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+            }
+            return rc;
           }
 
           *dest_ptr = c;
@@ -1037,7 +1241,14 @@ AZ_NODISCARD az_result _az_span_url_encode(az_span destination, az_span source,
         } else {
           if (dest_ptr >= dest_end - 2) {
             *out_length = 0;
-            return AZ_ERROR_NOT_ENOUGH_SPACE;
+            rc = AZ_ERROR_NOT_ENOUGH_SPACE;
+            if (rc != 0) {
+              char err_buf[256];
+              (void)err_buf;
+              LOG_DEBUG("Error %d: %s\n", rc,
+                        C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+            }
+            return rc;
           }
 
           dest_ptr[0] = '%';
@@ -1051,7 +1262,7 @@ AZ_NODISCARD az_result _az_span_url_encode(az_span destination, az_span source,
       *out_length = (ptrdiff_t)(dest_ptr - dest_begin);
     }
   }
-  return AZ_OK;
+  return 0;
 }
 
 az_span _az_span_token(az_span source, az_span delimiter,

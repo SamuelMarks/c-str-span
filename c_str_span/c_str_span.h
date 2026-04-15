@@ -7,6 +7,10 @@
 #ifndef C_STR_SPAN_STR_SPAN_H
 #define C_STR_SPAN_STR_SPAN_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 /* clang-format off */
 #if defined(_MSC_VER) && _MSC_VER < 1600
 #include "c_str_span_stdint.h"
@@ -15,10 +19,6 @@
 #endif /* defined(_MSC_VER) && _MSC_VER < 1600 */
 
 #include "c_str_span_stdbool.h"
-
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
 
 /* Copyright (c) Microsoft Corporation. All rights reserved.
  * SPDX-License-Identifier: MIT
@@ -40,7 +40,7 @@ extern "C" {
  * the SDK which would break your code.
  */
 
-/*#include <azure/core/az_result.h>*/
+/*#include <azure/core/int.h>*/
 
 
 
@@ -375,14 +375,14 @@ AZ_UNUSED AZ_INLINE void az_span_fill(az_span destination, uint8_t value) {
  * @param[out] out_number The pointer to the variable that is to receive the
  * number.
  *
- * @return An #az_result value indicating the result of the operation.
+ * @return An #int value indicating the result of the operation.
  * @retval #AZ_OK Success.
  * @retval #AZ_ERROR_UNEXPECTED_CHAR A non-ASCII digit is found within the span
  * or the \p source contains a number that would overflow or underflow
  * `uint64_t`.
  */
-extern C_STR_SPAN_EXPORT AZ_NODISCARD az_result
-az_span_atou64(az_span source, uint64_t *out_number);
+extern C_STR_SPAN_EXPORT AZ_NODISCARD int az_span_atou64(az_span source,
+                                                         uint64_t *out_number);
 
 /**
  * @brief Parses an #az_span containing ASCII digits into an `int64_t` number.
@@ -391,14 +391,14 @@ az_span_atou64(az_span source, uint64_t *out_number);
  * @param[out] out_number The pointer to the variable that is to receive the
  * number.
  *
- * @return An #az_result value indicating the result of the operation.
+ * @return An #int value indicating the result of the operation.
  * @retval #AZ_OK Success.
  * @retval #AZ_ERROR_UNEXPECTED_CHAR A non-ASCII digit is found within the span
  * or the \p source contains a number that would overflow or underflow
  * `int64_t`.
  */
-extern C_STR_SPAN_EXPORT AZ_NODISCARD az_result
-az_span_atoi64(az_span source, int64_t *out_number);
+extern C_STR_SPAN_EXPORT AZ_NODISCARD int az_span_atoi64(az_span source,
+                                                         int64_t *out_number);
 
 /**
  * @brief Parses an #az_span containing ASCII digits into a `uint32_t` number.
@@ -407,14 +407,14 @@ az_span_atoi64(az_span source, int64_t *out_number);
  * @param[out] out_number The pointer to the variable that is to receive the
  * number.
  *
- * @return An #az_result value indicating the result of the operation.
+ * @return An #int value indicating the result of the operation.
  * @retval #AZ_OK Success.
  * @retval #AZ_ERROR_UNEXPECTED_CHAR A non-ASCII digit is found within the span
  * or the \p source contains a number that would overflow or underflow
  * `uint32_t`.
  */
-extern C_STR_SPAN_EXPORT AZ_NODISCARD az_result
-az_span_atou32(az_span source, uint32_t *out_number);
+extern C_STR_SPAN_EXPORT AZ_NODISCARD int az_span_atou32(az_span source,
+                                                         uint32_t *out_number);
 
 /**
  * @brief Parses an #az_span containing ASCII digits into an `int32_t` number.
@@ -423,14 +423,14 @@ az_span_atou32(az_span source, uint32_t *out_number);
  * @param[out] out_number The pointer to the variable that is to receive the
  * number.
  *
- * @return An #az_result value indicating the result of the operation.
+ * @return An #int value indicating the result of the operation.
  * @retval #AZ_OK Success.
  * @retval #AZ_ERROR_UNEXPECTED_CHAR A non-ASCII digit is found within the span
  * or if the \p source contains a number that would overflow or underflow
  * `int32_t`.
  */
-extern C_STR_SPAN_EXPORT AZ_NODISCARD az_result
-az_span_atoi32(az_span source, int32_t *out_number);
+extern C_STR_SPAN_EXPORT AZ_NODISCARD int az_span_atoi32(az_span source,
+                                                         int32_t *out_number);
 
 /**
  * @brief Parses an #az_span containing ASCII digits into a `double` number.
@@ -439,7 +439,7 @@ az_span_atoi32(az_span source, int32_t *out_number);
  * @param[out] out_number The pointer to the variable that is to receive the
  * number.
  *
- * @return An #az_result value indicating the result of the operation.
+ * @return An #int value indicating the result of the operation.
  * @retval #AZ_OK Success.
  * @retval #AZ_ERROR_UNEXPECTED_CHAR A non-ASCII digit or an invalid character
  * is found within the span, or the resulting \p out_number wouldn't be a finite
@@ -449,8 +449,8 @@ az_span_atoi32(az_span source, int32_t *out_number);
  * Values such as `NaN`, `INFINITY`, and those that would overflow a `double` to
  * `+/-inf` are not allowed.
  */
-extern C_STR_SPAN_EXPORT AZ_NODISCARD az_result
-az_span_atod(az_span source, double *out_number);
+extern C_STR_SPAN_EXPORT AZ_NODISCARD int az_span_atod(az_span source,
+                                                       double *out_number);
 
 /**
  * @brief Converts an `int32_t` into its digit characters (base 10) and copies
@@ -462,12 +462,12 @@ az_span_atod(az_span source, double *out_number);
  * @param[out] out_span A pointer to an #az_span that receives the remainder of
  * the \p destination #az_span after the `int32_t` has been copied.
  *
- * @return An #az_result value indicating the result of the operation.
+ * @return An #int value indicating the result of the operation.
  * @retval #AZ_OK Success.
  * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The \p destination is not big enough to
  * contain the copied bytes.
  */
-extern C_STR_SPAN_EXPORT AZ_NODISCARD az_result
+extern C_STR_SPAN_EXPORT AZ_NODISCARD int
 az_span_i32toa(az_span destination, int32_t source, az_span *out_span);
 
 /**
@@ -480,12 +480,12 @@ az_span_i32toa(az_span destination, int32_t source, az_span *out_span);
  * @param[out] out_span A pointer to an #az_span that receives the remainder of
  * the \p destination #az_span after the `uint32_t` has been copied.
  *
- * @return An #az_result value indicating the result of the operation.
+ * @return An #int value indicating the result of the operation.
  * @retval #AZ_OK Success.
  * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The \p destination is not big enough to
  * contain the copied bytes.
  */
-extern C_STR_SPAN_EXPORT AZ_NODISCARD az_result
+extern C_STR_SPAN_EXPORT AZ_NODISCARD int
 az_span_u32toa(az_span destination, uint32_t source, az_span *out_span);
 
 /**
@@ -498,12 +498,12 @@ az_span_u32toa(az_span destination, uint32_t source, az_span *out_span);
  * @param[out] out_span A pointer to an #az_span that receives the remainder of
  * the \p destination #az_span after the `int64_t` has been copied.
  *
- * @return An #az_result value indicating the result of the operation.
+ * @return An #int value indicating the result of the operation.
  * @retval #AZ_OK Success.
  * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The \p destination is not big enough to
  * contain the copied bytes.
  */
-extern C_STR_SPAN_EXPORT AZ_NODISCARD az_result
+extern C_STR_SPAN_EXPORT AZ_NODISCARD int
 az_span_i64toa(az_span destination, int64_t source, az_span *out_span);
 
 /**
@@ -516,12 +516,12 @@ az_span_i64toa(az_span destination, int64_t source, az_span *out_span);
  * @param[out] out_span A pointer to an #az_span that receives the remainder of
  * the \p destination #az_span after the `uint64_t` has been copied.
  *
- * @return An #az_result value indicating the result of the operation.
+ * @return An #int value indicating the result of the operation.
  * @retval #AZ_OK Success.
  * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The \p destination is not big enough to
  * contain the copied bytes.
  */
-extern C_STR_SPAN_EXPORT AZ_NODISCARD az_result
+extern C_STR_SPAN_EXPORT AZ_NODISCARD int
 az_span_u64toa(az_span destination, uint64_t source, az_span *out_span);
 
 /**
@@ -537,7 +537,7 @@ az_span_u64toa(az_span destination, uint64_t source, az_span *out_span);
  * @param[out] out_span A pointer to an #az_span that receives the remainder of
  * the \p destination #az_span after the `double` has been copied.
  *
- * @return An #az_result value indicating the result of the operation.
+ * @return An #int value indicating the result of the operation.
  * @retval #AZ_OK Success.
  * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The \p destination is not big enough to
  * contain the copied bytes.
@@ -555,7 +555,7 @@ az_span_u64toa(az_span destination, uint64_t source, az_span *out_span);
  * @remark The \p fractional_digits must be between 0 and 15 (inclusive). Any
  * value passed in that is larger will be clamped down to 15.
  */
-extern C_STR_SPAN_EXPORT AZ_NODISCARD az_result
+extern C_STR_SPAN_EXPORT AZ_NODISCARD int
 az_span_dtoa(az_span destination, double source, int32_t fractional_digits,
              az_span *out_span);
 
@@ -992,7 +992,7 @@ typedef struct {
  * a destination to write data into, that is at least the required size
  * specified within the \p allocator_context.
  *
- * @return An #az_result value indicating the result of the operation.
+ * @return An #int value indicating the result of the operation.
  * @retval #AZ_OK Success.
  * @retval other Failure.
  *
@@ -1002,19 +1002,18 @@ typedef struct {
  * @remarks There is no guarantee that successive calls will return the same or
  * same-sized buffer. This function must never return an empty #az_span, unless
  * the requested buffer size is not available. In which case, it must return an
- * error #az_result.
+ * error #int.
  *
  * @remarks The caller must check the return value using #az_result_failed()
  * before continuing to use the \p out_next_destination.
  */
-typedef az_result (*az_span_allocator_fn)(
+typedef int (*az_span_allocator_fn)(
     az_span_allocator_context *allocator_context,
     az_span *out_next_destination);
 
 /*#include <azure/core/_az_cfg_suffix.h>*/
 
-#endif /* !C_STR_SPAN_STR_SPAN_H */
-
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
+#endif /* !C_STR_SPAN_STR_SPAN_H */

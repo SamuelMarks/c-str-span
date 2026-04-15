@@ -7,12 +7,16 @@
 #include "c_str_precondition_internal.h"
 
 SUITE_EXTERN(coverage_suite);
+#include <string.h>
+#include <stdio.h>
 /* clang-format on */
 
 /* Add definitions that need to be in the test runner's main file. */
 GREATEST_MAIN_DEFS();
 
 int main(int argc, char **argv) {
+  int rc = 0;
+
   GREATEST_MAIN_BEGIN();
   RUN_SUITE(lib_suite);
   RUN_SUITE(az_core_span_suite);

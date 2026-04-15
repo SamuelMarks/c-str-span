@@ -1,10 +1,18 @@
+
+#if defined(_MSC_VER)
+#define C_STR_SPAN_STRERROR(rc, buf, size)                                     \
+  (strerror_s((buf), (size), (rc)) == 0 ? (buf) : "Unknown error")
+#else
+#define C_STR_SPAN_STRERROR(rc, buf, size) strerror(rc)
+#endif
+
 /* Copyright (c) Microsoft Corporation. All rights reserved.
  * SPDX-License-Identifier: MIT */
 
 /**
  * @file
  *
- * @brief Definition of #az_result and helper functions.
+ * @brief Definition of #int and helper functions.
  *
  * @note You MUST NOT use any symbols (macros, functions, structures, enums,
  * etc.) prefixed with an underscore ('_') directly in your application code.
@@ -16,6 +24,10 @@
 #ifndef C_STR_SPAN_RESULT_H
 #define C_STR_SPAN_RESULT_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 /* clang-format off */
 #if defined(_MSC_VER) && _MSC_VER < 1600
 #include "c_str_span_stdint.h"
@@ -25,13 +37,8 @@
 
 #include "c_str_span_stdbool.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
-
-
-
 #include "c_str_span_types.h"
+#include <string.h>
 /* clang-format on */
 /*#include <azure/core/_az_cfg_prefix.h>*/
 
@@ -50,72 +57,71 @@ enum { _az_ERROR_FLAG = (int32_t)0x80000000 };
 /**
  * @brief The type represents the various success and error conditions.
  *
- * @note See the following `az_result` values from various headers:
+ * @note See the following `int` values from various headers:
  * - #az_result_core
  * - #az_result_iot
  */
-typedef int32_t az_result;
 
-/* az_result Bits: */
+/* int Bits: */
 /* - 31 Severity (0 - success, 1 - failure). */
 /* - 16..30 Facility. */
 /* - 0..15 Code. */
 
 /**
- * @brief Creates an #az_result error value.
+ * @brief Creates an #int error value.
  *
  * @param[in] facility The facility code for the error.
  * @param[in] code The specific error code.
- * @return An #az_result representing the error.
+ * @return An #int representing the error.
  */
 #define _az_RESULT_MAKE_ERROR(facility, code)                                  \
-  ((az_result)((uint32_t)_az_ERROR_FLAG | ((uint32_t)(facility) << 16U) |      \
-               (uint32_t)(code)))
+  ((int)((uint32_t)_az_ERROR_FLAG | ((uint32_t)(facility) << 16U) |            \
+         (uint32_t)(code)))
 
 /**
- * @brief Creates an #az_result success value.
+ * @brief Creates an #int success value.
  *
  * @param[in] facility The facility code for the success.
  * @param[in] code The specific success code.
- * @return An #az_result representing the success.
+ * @return An #int representing the success.
  */
 #define _az_RESULT_MAKE_SUCCESS(facility, code)                                \
-  ((az_result)(((uint32_t)(facility) << 16U) | (uint32_t)(code)))
+  ((int)(((uint32_t)(facility) << 16U) | (uint32_t)(code)))
 
 /**
- * @brief The type represents the various #az_result success and error
+ * @brief The type represents the various #int success and error
  * conditions specific to SDK Core.
  */
 enum az_result_core {
   /* === Core: Success results ==== */
   /* / Success. */
-  AZ_OK = _az_RESULT_MAKE_SUCCESS(_az_FACILITY_CORE, 0),
+  AZ_OK = 0,
 
   /* === Core: Error results === */
   /* / A context was canceled, and a function had to return before result was
      ready. */
-  AZ_ERROR_CANCELED = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 0),
+  AZ_ERROR_CANCELED = 125,
 
   /* / Input argument does not comply with the expected range of values. */
-  AZ_ERROR_ARG = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 1),
+  AZ_ERROR_ARG = 22,
 
   /* / The destination size is too small for the operation. */
-  AZ_ERROR_NOT_ENOUGH_SPACE = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 2),
+  AZ_ERROR_NOT_ENOUGH_SPACE = 28,
 
   /* / Requested functionality is not implemented. */
-  AZ_ERROR_NOT_IMPLEMENTED = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 3),
+  AZ_ERROR_NOT_IMPLEMENTED = 38,
 
   /* / Requested item was not found. */
-  AZ_ERROR_ITEM_NOT_FOUND = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 4),
+  AZ_ERROR_ITEM_NOT_FOUND = 2,
 
   /* / Input can't be successfully parsed. */
-  AZ_ERROR_UNEXPECTED_CHAR = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 5),
+  AZ_ERROR_UNEXPECTED_CHAR = 84,
 
   /* / Unexpected end of the input data. */
-  AZ_ERROR_UNEXPECTED_END = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 6),
+  AZ_ERROR_UNEXPECTED_END = 61,
 
   /* / Not supported. */
-  AZ_ERROR_NOT_SUPPORTED = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 7),
+  AZ_ERROR_NOT_SUPPORTED = 95,
 
   /* / An external dependency required to perform the operation was not
      provided. The operation needs */
@@ -125,7 +131,7 @@ enum az_result_core {
 
   /* === Platform === */
   /* / Dynamic memory allocation request was not successful. */
-  AZ_ERROR_OUT_OF_MEMORY = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE_PLATFORM, 1),
+  AZ_ERROR_OUT_OF_MEMORY = 12,
 
   /* === JSON error codes === */
   /* / The kind of the token being read is not compatible with the expected type
@@ -186,9 +192,7 @@ enum az_result_core {
  * @return `true` if the operation that returned this \p result failed,
  * otherwise return `false`.
  */
-AZ_NODISCARD AZ_INLINE bool az_result_failed(az_result result) {
-  return ((uint32_t)result & (uint32_t)_az_ERROR_FLAG) != 0;
-}
+AZ_NODISCARD AZ_INLINE bool az_result_failed(int result) { return result != 0; }
 
 /**
  * @brief Checks whether the \p result provided indicates a success.
@@ -198,14 +202,13 @@ AZ_NODISCARD AZ_INLINE bool az_result_failed(az_result result) {
  * @return `true` if the operation that returned this \p result was successful,
  * otherwise return `false`.
  */
-AZ_UNUSED AZ_NODISCARD AZ_INLINE bool az_result_succeeded(az_result result) {
-  return !az_result_failed(result);
+AZ_UNUSED AZ_NODISCARD AZ_INLINE bool az_result_succeeded(int result) {
+  return result == 0;
 }
 
 /*#include <azure/core/_az_cfg_suffix.h>*/
 
-#endif /* C_STR_SPAN_RESULT_H */
-
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
+#endif /* C_STR_SPAN_RESULT_H */

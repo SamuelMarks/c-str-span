@@ -16,7 +16,12 @@
 #ifndef C_STR_SPAN_RESULT_INTERNAL_H
 #define C_STR_SPAN_RESULT_INTERNAL_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 /* clang-format off */
+#include "log.h"
 #if defined(_MSC_VER) && _MSC_VER < 1600
 #include "c_str_span_stdint.h"
 #else
@@ -25,13 +30,10 @@
 
 #include "c_str_span_stdbool.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
-
-
 #include "c_str_result.h"
 #include "c_str_span.h"
+#include <stdio.h>
+#include <string.h>
 /* clang-format on */
 
 /*#include <azure/core/_az_cfg_prefix.h>*/
@@ -41,9 +43,13 @@ extern "C" {
  */
 #define _az_RETURN_IF_FAILED(exp)                                              \
   do {                                                                         \
-    az_result const _az_result = (exp);                                        \
-    if (az_result_failed(_az_result)) {                                        \
-      return _az_result;                                                       \
+    rc = (exp);                                                                \
+    if (rc != 0) {                                                             \
+      char err_buf[256];                                                       \
+      (void)err_buf;                                                           \
+      LOG_DEBUG("Error %d: %s\n", rc,                                          \
+                C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));            \
+      return rc;                                                               \
     }                                                                          \
   } while (0)
 
@@ -53,16 +59,21 @@ extern "C" {
  */
 #define _az_RETURN_IF_NOT_ENOUGH_SIZE(span, required_size)                     \
   do {                                                                         \
-    size_t const _az_req_sz = (required_size);                                 \
-    if (az_span_size(span) < _az_req_sz || _az_req_sz < 0) {                   \
-      return AZ_ERROR_NOT_ENOUGH_SPACE;                                        \
+    if (az_span_size(span) < (required_size)) {                                \
+      rc = AZ_ERROR_NOT_ENOUGH_SPACE;                                          \
+      if (rc != 0) {                                                           \
+        char err_buf[256];                                                     \
+        (void)err_buf;                                                         \
+        LOG_DEBUG("Error %d: %s\n", rc,                                        \
+                  C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));          \
+      }                                                                        \
+      return rc;                                                               \
     }                                                                          \
   } while (0)
 
 /*#include <azure/core/_az_cfg_suffix.h>*/
 
-#endif /* !C_STR_SPAN_RESULT_INTERNAL_H */
-
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
+#endif /* !C_STR_SPAN_RESULT_INTERNAL_H */

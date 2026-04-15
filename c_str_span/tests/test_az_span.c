@@ -9,6 +9,7 @@
 
 #include "c_str_span.h"
 #include "c_str_span_private.h"
+#include "c_str_hex_private.h"
 
 #include "c_str_span_internal.h"
 #include "c_str_span_printf.h"
@@ -46,6 +47,7 @@
 #include <stdio.h>
 
 #include "test_az_span.h"
+#include <string.h>
 /* clang-format on */
 
 #define TEST_EXPECT_SUCCESS(exp) ASSERT(az_result_succeeded(exp))
@@ -2036,8 +2038,6 @@ SUITE(az_core_precondition_suite) {
   RUN_TEST(az_precondition_callback_test);
 #endif
 }
-
-#include "c_str_hex_private.h"
 
 TEST az_hex_helpers_test(void) {
   ASSERT_EQ('0', _az_number_to_upper_hex(0));

@@ -10,6 +10,10 @@
 #ifndef C_STR_SPAN_SPAN_PRIVATE_H
 #define C_STR_SPAN_SPAN_PRIVATE_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 /* clang-format off */
 #if defined(_MSC_VER) && _MSC_VER < 1600
 #include "c_str_span_stdint.h"
@@ -18,12 +22,6 @@
 #endif /* defined(_MSC_VER) && _MSC_VER < 1600 */
 
 #include "c_str_span_stdbool.h"
-
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
-
-
 
 #include "c_str_precondition.h"
 #include "c_str_precondition_internal.h"
@@ -100,7 +98,7 @@ AZ_NODISCARD AZ_INLINE bool _az_isfinite(double value) {
          _az_BINARY_VALUE_OF_POSITIVE_INFINITY;
 }
 
-extern C_STR_SPAN_EXPORT AZ_NODISCARD az_result
+extern C_STR_SPAN_EXPORT AZ_NODISCARD int
 _az_is_expected_span(az_span *ref_span, az_span expected);
 
 /**
@@ -172,8 +170,7 @@ _az_span_trim_whitespace_from_end(az_span source);
 
 /*#include <azure/core/_az_cfg_suffix.h>*/
 
-#endif /* C_STR_SPAN_SPAN_PRIVATE_H */
-
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
+#endif /* C_STR_SPAN_SPAN_PRIVATE_H */
