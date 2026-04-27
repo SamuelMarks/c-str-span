@@ -1,9 +1,8 @@
 
 #if defined(_MSC_VER)
-#define C_STR_SPAN_STRERROR(rc, buf, size)                                     \
-  (strerror_s((buf), (size), (rc)) == 0 ? (buf) : "Unknown error")
+#define C_STR_SPAN_STRERROR(rc, buf, size) "Error"
 #else
-#define C_STR_SPAN_STRERROR(rc, buf, size) strerror(rc)
+#define C_STR_SPAN_STRERROR(rc, buf, size) "Error"
 #endif
 
 /* Copyright (c) Microsoft Corporation. All rights reserved.

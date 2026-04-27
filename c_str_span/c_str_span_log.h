@@ -7,14 +7,15 @@ extern "C" {
 
 /* clang-format off */
 #include <stdio.h>
+#include "c_str_span_export.h"
 /* clang-format on */
 
 #ifndef LOG_DEBUG
 #ifdef DEBUG
-void c_str_span_log_debug(const char *fmt, ...);
+C_STR_SPAN_EXPORT void c_str_span_log_debug(const char *fmt, ...);
 #define LOG_DEBUG c_str_span_log_debug
 #else
-void c_str_span_log_debug(const char *fmt, ...);
+C_STR_SPAN_EXPORT void c_str_span_log_debug(const char *fmt, ...);
 #define LOG_DEBUG 1 ? (void)0 : c_str_span_log_debug
 #endif /* DEBUG */
 #endif /* !LOG_DEBUG */

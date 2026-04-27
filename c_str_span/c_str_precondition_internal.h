@@ -144,9 +144,10 @@ _az_span_is_valid(az_span span, size_t min_size, bool null_is_valid) {
   _az_PRECONDITION(_az_span_is_valid(span, min_size, null_is_valid))
 
 AZ_UNUSED AZ_NODISCARD AZ_INLINE bool _az_span_overlap(az_span a, az_span b) {
-  uint8_t *const a_ptr = az_span_ptr(a);
-  uint8_t *const b_ptr = az_span_ptr(b);
-
+  uintptr_t a_ptr = (uintptr_t)az_span_ptr(a);
+  uintptr_t b_ptr = (uintptr_t)az_span_ptr(b);
+  if (a_ptr == 0 || b_ptr == 0)
+    return false;
   return a_ptr <= b_ptr ? (a_ptr + az_span_size(a) > b_ptr)
                         : (b_ptr + az_span_size(b) > a_ptr);
 }

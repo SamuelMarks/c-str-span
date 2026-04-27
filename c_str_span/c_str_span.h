@@ -99,7 +99,10 @@ AZ_NODISCARD AZ_INLINE size_t az_span_size(az_span span) {
 /* az_span.c file as well, and the _az_ version right below. */
 #ifdef AZ_NO_PRECONDITION_CHECKING
 AZ_NODISCARD AZ_INLINE az_span az_span_create(uint8_t *ptr, size_t size) {
-  return (az_span){._internal = {.ptr = ptr, .size = size}};
+  az_span span;
+  span._internal.ptr = ptr;
+  span._internal.size = size;
+  return span;
 }
 #else
 extern C_STR_SPAN_EXPORT AZ_NODISCARD az_span az_span_create(uint8_t *ptr,
@@ -290,7 +293,7 @@ az_span_is_content_equal_ignoring_case(az_span span1, az_span span2);
  * Content is copied from the \p source buffer and then `\0` is added at the
  end.
  */
-extern C_STR_SPAN_EXPORT void
+extern C_STR_SPAN_EXPORT int
 az_span_to_str(char *destination, size_t destination_max_size, az_span source);
 
 /**
@@ -334,8 +337,8 @@ extern C_STR_SPAN_EXPORT AZ_NODISCARD size_t az_span_find(az_span source,
  * will just return
  * \p destination.
  */
-extern C_STR_SPAN_EXPORT az_span az_span_copy(az_span destination,
-                                              az_span source);
+extern C_STR_SPAN_EXPORT int az_span_copy(az_span destination, az_span source,
+                                          az_span *out_span);
 
 /**
  * @brief Copies the `uint8_t` \p byte to the \p destination at its 0-th index.
@@ -350,8 +353,8 @@ extern C_STR_SPAN_EXPORT az_span az_span_copy(az_span destination,
  * @remarks The function assumes that the \p destination has a large enough size
  * to hold one more byte.
  */
-extern C_STR_SPAN_EXPORT az_span az_span_copy_u8(az_span destination,
-                                                 uint8_t byte);
+extern C_STR_SPAN_EXPORT int az_span_copy_u8(az_span destination, uint8_t byte,
+                                             az_span *out_span);
 
 /**
  * @brief Fills all the bytes of the \p destination #az_span with the specified

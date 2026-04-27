@@ -83,6 +83,12 @@ endif()
 if (BUILD_TESTING AND C_STR_SPAN_BUILD_TESTING)
     message(STATUS "TESTS ENABLED")
     add_subdirectory("${PROJECT_NAME}/tests")
+    file(WRITE "${CMAKE_BINARY_DIR}/CTestCustom.cmake"
+        "set(CTEST_CUSTOM_COVERAGE_EXCLUDE\n"
+        "    \".*tests/.*\"\n"
+        "    \".*test\\\\.c\"\n"
+        ")\n"
+    )
 else()
     message(STATUS "TESTS DISABLED: BUILD_TESTING=${BUILD_TESTING} C_STR_SPAN_BUILD_TESTING=${C_STR_SPAN_BUILD_TESTING}")
 endif (BUILD_TESTING AND C_STR_SPAN_BUILD_TESTING)

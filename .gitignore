@@ -1,3 +1,6 @@
+*.gcov
+*.log
+out.txt
 .DS_Store
 *build*
 .idea

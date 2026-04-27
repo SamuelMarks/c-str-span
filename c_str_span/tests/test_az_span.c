@@ -1152,11 +1152,11 @@ TEST az_span_copy_uint8_succeeds(void) {
   uint8_t raw_buffer[15];
   az_span buffer = AZ_SPAN_FROM_BUFFER(raw_buffer);
 
-  buffer = az_span_copy_u8(buffer, 'a');
+  az_span_copy_u8(buffer, 'a', &buffer);
   ASSERT_EQ(14, az_span_size(buffer));
-  buffer = az_span_copy_u8(buffer, 'b');
+  az_span_copy_u8(buffer, 'b', &buffer);
   ASSERT_EQ(13, az_span_size(buffer));
-  buffer = az_span_copy_u8(buffer, 'c');
+  az_span_copy_u8(buffer, 'c', &buffer);
   ASSERT_EQ(12, az_span_size(buffer));
 
   ASSERT(az_span_is_content_equal(
@@ -1627,7 +1627,9 @@ TEST az_span_dtoa_too_large(void) {
 TEST az_span_copy_empty(void) {
   uint8_t buff[10];
   az_span dst = AZ_SPAN_FROM_BUFFER(buff);
-  ASSERT(az_span_is_content_equal(az_span_copy(dst, az_span_empty()), dst));
+  az_span out;
+  az_span_copy(dst, az_span_empty(), &out);
+  ASSERT(az_span_is_content_equal(out, dst));
 
   PASS();
 }
