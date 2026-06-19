@@ -489,10 +489,10 @@ TEST az_span_atod_test(void) {
   ASSERT(value == -4294967296);
   ASSERT_EQ(AZ_OK,
             az_span_atod(AZ_SPAN_FROM_STR("9223372036854775807"), &value));
-  ASSERT(value == (double)LLONG_MAX);
+  ASSERT(value == 9223372036854775807.0);
   ASSERT_EQ(AZ_OK,
             az_span_atod(AZ_SPAN_FROM_STR("-9223372036854775808"), &value));
-  ASSERT(value == (double)LLONG_MIN);
+  ASSERT(value == -9223372036854775808.0);
   ASSERT_EQ(AZ_OK, az_span_atod(AZ_SPAN_FROM_STR("1.23e3"), &value));
   ASSERT(value == 1.23e3);
   ASSERT_EQ(AZ_OK, az_span_atod(AZ_SPAN_FROM_STR("+001.23e3"), &value));
@@ -508,6 +508,14 @@ TEST az_span_atod_test(void) {
   ASSERT(value == 0);
   ASSERT_EQ(AZ_OK, az_span_atod(AZ_SPAN_FROM_STR("-0"), &value));
   ASSERT(value == 0);
+
+  /* Failure cases to cover branches */
+  ASSERT_EQ(AZ_ERROR_UNEXPECTED_CHAR,
+            az_span_atod(AZ_SPAN_FROM_STR("1.23abc"), &value));
+  ASSERT_EQ(AZ_ERROR_UNEXPECTED_CHAR,
+            az_span_atod(AZ_SPAN_FROM_STR("abc"), &value));
+  ASSERT_EQ(AZ_ERROR_UNEXPECTED_CHAR,
+            az_span_atod(AZ_SPAN_FROM_STR("1e400"), &value)); /* Infinity */
   ASSERT_EQ(AZ_OK, az_span_atod(AZ_SPAN_FROM_STR("0.0"), &value));
   ASSERT(value == 0);
   ASSERT_EQ(AZ_OK, az_span_atod(AZ_SPAN_FROM_STR("1"), &value));
@@ -1625,7 +1633,7 @@ TEST az_span_dtoa_too_large(void) {
 }
 
 TEST az_span_copy_empty(void) {
-  uint8_t buff[10];
+  uint8_t buff[10] = {0};
   az_span dst = AZ_SPAN_FROM_BUFFER(buff);
   az_span out;
   az_span_copy(dst, az_span_empty(), &out);
@@ -1697,52 +1705,66 @@ TEST test_az_span_is_valid(void) {
 }
 
 TEST test_az_span_overlap(void) {
+  volatile uintptr_t ptr0 = 0;
+  volatile uintptr_t ptr5 = 5;
+  volatile uintptr_t ptr10 = 10;
+  volatile uintptr_t ptr12 = 12;
+  volatile uintptr_t ptr15 = 15;
+  volatile uintptr_t ptr20 = 20;
+  volatile uintptr_t ptr30 = 30;
 
-  ASSERT(!(_az_span_overlap(az_span_create((uint8_t *)10, 10),
-                            az_span_create((uint8_t *)30, 10))));
-  ASSERT(!(_az_span_overlap(az_span_create((uint8_t *)30, 10),
-                            az_span_create((uint8_t *)10, 10))));
+  ASSERT(!(_az_span_overlap(az_span_create((uint8_t *)ptr0, 10),
+                            az_span_create((uint8_t *)ptr20, 10))));
+  ASSERT(!(_az_span_overlap(az_span_create((uint8_t *)ptr10, 10),
+                            az_span_create((uint8_t *)ptr0, 10))));
+  ASSERT(!(_az_span_overlap(az_span_create((uint8_t *)ptr0, 10),
+                            az_span_create((uint8_t *)ptr0, 10))));
 
-  ASSERT(!(_az_span_overlap(az_span_create((uint8_t *)10, 10),
-                            az_span_create((uint8_t *)20, 10))));
-  ASSERT(!(_az_span_overlap(az_span_create((uint8_t *)20, 10),
-                            az_span_create((uint8_t *)10, 10))));
+  ASSERT(!(_az_span_overlap(az_span_create((uint8_t *)ptr10, 10),
+                            az_span_create((uint8_t *)ptr30, 10))));
+  ASSERT(!(_az_span_overlap(az_span_create((uint8_t *)ptr30, 10),
+                            az_span_create((uint8_t *)ptr10, 10))));
 
-  ASSERT(!(_az_span_overlap(az_span_create((uint8_t *)10, 0),
-                            az_span_create((uint8_t *)10, 0))));
+  ASSERT(!(_az_span_overlap(az_span_create((uint8_t *)ptr10, 10),
+                            az_span_create((uint8_t *)ptr20, 10))));
+  ASSERT(!(_az_span_overlap(az_span_create((uint8_t *)ptr20, 10),
+                            az_span_create((uint8_t *)ptr10, 10))));
 
-  ASSERT(_az_span_overlap(az_span_create((uint8_t *)10, 10),
-                          az_span_create((uint8_t *)15, 0)));
-  ASSERT(_az_span_overlap(az_span_create((uint8_t *)15, 0),
-                          az_span_create((uint8_t *)10, 10)));
+  ASSERT(!(_az_span_overlap(az_span_create((uint8_t *)ptr10, 0),
+                            az_span_create((uint8_t *)ptr10, 0))));
 
-  ASSERT(_az_span_overlap(az_span_create((uint8_t *)10, 10),
-                          az_span_create((uint8_t *)10, 15)));
-  ASSERT(_az_span_overlap(az_span_create((uint8_t *)10, 15),
-                          az_span_create((uint8_t *)10, 10)));
+  ASSERT(_az_span_overlap(az_span_create((uint8_t *)ptr10, 10),
+                          az_span_create((uint8_t *)ptr15, 0)));
+  ASSERT(_az_span_overlap(az_span_create((uint8_t *)ptr15, 0),
+                          az_span_create((uint8_t *)ptr10, 10)));
 
-  ASSERT(_az_span_overlap(az_span_create((uint8_t *)15, 10),
-                          az_span_create((uint8_t *)10, 15)));
-  ASSERT(_az_span_overlap(az_span_create((uint8_t *)10, 15),
-                          az_span_create((uint8_t *)15, 10)));
+  ASSERT(_az_span_overlap(az_span_create((uint8_t *)ptr10, 10),
+                          az_span_create((uint8_t *)ptr10, 15)));
+  ASSERT(_az_span_overlap(az_span_create((uint8_t *)ptr10, 15),
+                          az_span_create((uint8_t *)ptr10, 10)));
 
-  ASSERT(_az_span_overlap(az_span_create((uint8_t *)10, 10),
-                          az_span_create((uint8_t *)5, 10)));
-  ASSERT(_az_span_overlap(az_span_create((uint8_t *)5, 10),
-                          az_span_create((uint8_t *)10, 10)));
+  ASSERT(_az_span_overlap(az_span_create((uint8_t *)ptr15, 10),
+                          az_span_create((uint8_t *)ptr10, 15)));
+  ASSERT(_az_span_overlap(az_span_create((uint8_t *)ptr10, 15),
+                          az_span_create((uint8_t *)ptr15, 10)));
 
-  ASSERT(_az_span_overlap(az_span_create((uint8_t *)10, 10),
-                          az_span_create((uint8_t *)10, 10)));
+  ASSERT(_az_span_overlap(az_span_create((uint8_t *)ptr10, 10),
+                          az_span_create((uint8_t *)ptr5, 10)));
+  ASSERT(_az_span_overlap(az_span_create((uint8_t *)ptr5, 10),
+                          az_span_create((uint8_t *)ptr10, 10)));
 
-  ASSERT(_az_span_overlap(az_span_create((uint8_t *)10, 10),
-                          az_span_create((uint8_t *)15, 10)));
-  ASSERT(_az_span_overlap(az_span_create((uint8_t *)15, 10),
-                          az_span_create((uint8_t *)10, 10)));
+  ASSERT(_az_span_overlap(az_span_create((uint8_t *)ptr10, 10),
+                          az_span_create((uint8_t *)ptr10, 10)));
 
-  ASSERT(_az_span_overlap(az_span_create((uint8_t *)10, 10),
-                          az_span_create((uint8_t *)12, 5)));
-  ASSERT(_az_span_overlap(az_span_create((uint8_t *)12, 5),
-                          az_span_create((uint8_t *)10, 10)));
+  ASSERT(_az_span_overlap(az_span_create((uint8_t *)ptr10, 10),
+                          az_span_create((uint8_t *)ptr15, 10)));
+  ASSERT(_az_span_overlap(az_span_create((uint8_t *)ptr15, 10),
+                          az_span_create((uint8_t *)ptr10, 10)));
+
+  ASSERT(_az_span_overlap(az_span_create((uint8_t *)ptr10, 10),
+                          az_span_create((uint8_t *)ptr12, 5)));
+  ASSERT(_az_span_overlap(az_span_create((uint8_t *)ptr12, 5),
+                          az_span_create((uint8_t *)ptr10, 10)));
   PASS();
 }
 
@@ -2038,6 +2060,25 @@ TEST az_precondition_callback_test(void) {
 
   _az_PRECONDITION(1 == 1);
   ASSERT_EQ(1, g_precondition_failed_called);
+
+  {
+    char buf[10];
+    az_span src = AZ_SPAN_FROM_STR("test");
+    az_span_to_str(buf, 0, src);
+  }
+
+  /* Trigger the overlap precondition to hit branches in _az_span_overlap */
+  {
+    uint8_t buffer[10] = {0};
+    az_span dest = AZ_SPAN_FROM_BUFFER(buffer);
+    az_span src = az_span_create(buffer + 2, 5);
+    ptrdiff_t out_len;
+    (void)_az_span_url_encode(dest, src, &out_len);
+    printf("called = %d\n", g_precondition_failed_called);
+    ASSERT_EQ(2, g_precondition_failed_called);
+    (void)_az_span_url_encode(src, dest, &out_len);
+    ASSERT_EQ(3, g_precondition_failed_called);
+  }
 
   az_precondition_failed_set_callback(original);
   PASS();

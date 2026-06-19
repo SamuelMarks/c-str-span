@@ -102,9 +102,11 @@ install(FILES ${Header_Files} "${_export_file}"
 #====================#
 
 set(installable_libs "${LIBRARY_NAME}" "${PROJECT_NAME}_compiler_flags")
-if (TARGET "${DEPENDANT_LIBRARY}")
-    list(APPEND installable_libs "${DEPENDANT_LIBRARY}")
-endif (TARGET "${DEPENDANT_LIBRARY}")
+if (DEFINED DEPENDANT_LIBRARY)
+    if (TARGET "${DEPENDANT_LIBRARY}")
+        list(APPEND installable_libs "${DEPENDANT_LIBRARY}")
+    endif ()
+endif ()
 install(TARGETS ${installable_libs}
         EXPORT "${LIBRARY_NAME}Targets"
         ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"

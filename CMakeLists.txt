@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.11..4)
+cmake_minimum_required(VERSION 3.11.4)
 
 project(c_str_span VERSION 0.0.1 LANGUAGES C)
 
@@ -71,27 +71,29 @@ include(GNUInstallDirs)
 
 add_subdirectory("${PROJECT_NAME}")
 
-include(CTest)
-option(BUILD_TESTING "Build the tests" ON)
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
-    option(C_STR_SPAN_BUILD_TESTING "Build the tests" ON)
-    set(C_STR_SPAN_BUILD_TESTING ON)
+    option(C_STR_SPAN_BUILD_TESTING "Build the tests for c_str_span" ON)
 else()
-    option(C_STR_SPAN_BUILD_TESTING "Build the tests" OFF)
-    set(C_STR_SPAN_BUILD_TESTING OFF)
+    option(C_STR_SPAN_BUILD_TESTING "Build the tests for c_str_span" OFF)
 endif()
-if (BUILD_TESTING AND C_STR_SPAN_BUILD_TESTING)
-    message(STATUS "TESTS ENABLED")
-    add_subdirectory("${PROJECT_NAME}/tests")
-    file(WRITE "${CMAKE_BINARY_DIR}/CTestCustom.cmake"
-        "set(CTEST_CUSTOM_COVERAGE_EXCLUDE\n"
-        "    \".*tests/.*\"\n"
-        "    \".*test\\\\.c\"\n"
-        ")\n"
-    )
+
+if (C_STR_SPAN_BUILD_TESTING)
+    include(CTest)
+    if (BUILD_TESTING)
+        message(STATUS "TESTS ENABLED")
+        add_subdirectory("${PROJECT_NAME}/tests")
+        file(WRITE "${CMAKE_BINARY_DIR}/CTestCustom.cmake"
+            "set(CTEST_CUSTOM_COVERAGE_EXCLUDE\n"
+            "    \".*tests/.*\"\n"
+            "    \".*test\\\\.c\"\n"
+            ")\n"
+        )
+    else()
+        message(STATUS "TESTS DISABLED: BUILD_TESTING is OFF")
+    endif()
 else()
-    message(STATUS "TESTS DISABLED: BUILD_TESTING=${BUILD_TESTING} C_STR_SPAN_BUILD_TESTING=${C_STR_SPAN_BUILD_TESTING}")
-endif (BUILD_TESTING AND C_STR_SPAN_BUILD_TESTING)
+    message(STATUS "TESTS DISABLED: C_STR_SPAN_BUILD_TESTING is OFF")
+endif()
 
 install(
         FILES "${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.h"
@@ -101,7 +103,7 @@ include(InstallRequiredSystemLibraries)
 set(CPACK_BUNDLE_NAME "${PROJECT_NAME}")
 set(CPACK_PACKAGE_VENDOR "SamuelMarks")
 set(CPACK_PACKAGE_DESCRIPTION "UTF-8 replacement for C strings, supporting zero-copy use-cases (non-null-terminated).")
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "${CPACK_PACKAGE_DESCRIPTION_SUMMARY}")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "${CPACK_PACKAGE_DESCRIPTION}")
 if (APPLE)
     set(CPACK_BUNDLE_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Info.plist")
     set(CPACK_BUNDLE_ICON "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Info.plist")

@@ -98,59 +98,18 @@ az_precondition_failed_get_callback(void);
 #define _az_PRECONDITION_NOT_NULL(arg) _az_PRECONDITION((arg) != NULL)
 #define _az_PRECONDITION_IS_NULL(arg) _az_PRECONDITION((arg) == NULL)
 
-AZ_UNUSED AZ_NODISCARD AZ_INLINE bool
-_az_span_is_valid(az_span span, size_t min_size, bool null_is_valid) {
-
-  uint8_t *const ptr = az_span_ptr(span);
-  size_t const span_size = az_span_size(span);
-
-  bool result = false;
-
-  /* Span is valid if:
-     The size is greater than or equal to a user defined minimum value AND one
-     of the following:
-        - If null_is_valid is true and the pointer in the span is null, the size
-     must also be 0.
-        - In the case of the pointer not being NULL, the size is greater than or
-     equal to zero.
-  */
-
-  /* On some platforms, in some compilation configurations (Debug), NULL is not
-   * 0x0...0. But if you */
-  /* initialize a span with { 0 } (or if that span is a part of a structure that
-   * is initialized with */
-  /* { 0 }) the ptr is not going to be equal to NULL, however the intent of the
-   * precondition is to */
-  /* disallow default-initialized and null ptrs, so we should treat them the
-   * same. */
-  const az_span empty = {{NULL, 0}};
-  uint8_t *const default_init_ptr = az_span_ptr(empty);
-
-  if (null_is_valid) {
-    result = (ptr == NULL || ptr == default_init_ptr) ? span_size == 0 : true;
-  } else {
-    result = (ptr != NULL && ptr != default_init_ptr);
-  }
-
-  /* Can't wrap over the end of the address space. */
-  if (result) {
-    result = (span_size <= ((size_t)-1 - (uintptr_t)ptr));
-  }
-
-  return result && min_size <= span_size;
-}
+extern C_STR_SPAN_EXPORT AZ_NODISCARD bool
+_az_span_is_valid(az_span span, size_t min_size, bool null_is_valid);
 
 #define _az_PRECONDITION_VALID_SPAN(span, min_size, null_is_valid)             \
   _az_PRECONDITION(_az_span_is_valid(span, min_size, null_is_valid))
 
-AZ_UNUSED AZ_NODISCARD AZ_INLINE bool _az_span_overlap(az_span a, az_span b) {
-  uintptr_t a_ptr = (uintptr_t)az_span_ptr(a);
-  uintptr_t b_ptr = (uintptr_t)az_span_ptr(b);
-  if (a_ptr == 0 || b_ptr == 0)
-    return false;
-  return a_ptr <= b_ptr ? (a_ptr + az_span_size(a) > b_ptr)
-                        : (b_ptr + az_span_size(b) > a_ptr);
-}
+#define _az_span_overlap(a, b)                                                 \
+  (az_span_ptr(a) == 0 || az_span_ptr(b) == 0                                  \
+       ? false                                                                 \
+       : (az_span_ptr(a) <= az_span_ptr(b)                                     \
+              ? (az_span_ptr(a) + az_span_size(a) > az_span_ptr(b))            \
+              : (az_span_ptr(b) + az_span_size(b) > az_span_ptr(a))))
 
 #define _az_PRECONDITION_NO_OVERLAP_SPANS(a, b)                                \
   _az_PRECONDITION(!_az_span_overlap(a, b))

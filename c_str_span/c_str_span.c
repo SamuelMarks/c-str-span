@@ -151,7 +151,7 @@ AZ_NODISCARD int az_span_atou64(az_span source, uint64_t *out_number) {
 
     if (span_size < 1) {
       rc = AZ_ERROR_UNEXPECTED_CHAR;
-      if (rc != 0) {
+      {
         char err_buf[256];
         (void)err_buf;
         LOG_DEBUG("Error %d: %s\n", rc,
@@ -172,7 +172,7 @@ AZ_NODISCARD int az_span_atou64(az_span source, uint64_t *out_number) {
          * The loop below checks that it must be a digit. */
         if (next_byte != '+' || span_size < 2) {
           rc = AZ_ERROR_UNEXPECTED_CHAR;
-          if (rc != 0) {
+          {
             char err_buf[256];
             (void)err_buf;
             LOG_DEBUG("Error %d: %s\n", rc,
@@ -190,7 +190,7 @@ AZ_NODISCARD int az_span_atou64(az_span source, uint64_t *out_number) {
           next_byte = source_ptr[i];
           if (!isdigit(next_byte)) {
             rc = AZ_ERROR_UNEXPECTED_CHAR;
-            if (rc != 0) {
+            {
               char err_buf[256];
               (void)err_buf;
               LOG_DEBUG("Error %d: %s\n", rc,
@@ -206,7 +206,7 @@ AZ_NODISCARD int az_span_atou64(az_span source, uint64_t *out_number) {
              * value * 10 + d > UINT64_MAX. */
             if ((UINT64_MAX - d) / _az_NUMBER_OF_DECIMAL_VALUES < value) {
               rc = AZ_ERROR_UNEXPECTED_CHAR;
-              if (rc != 0) {
+              {
                 char err_buf[256];
                 (void)err_buf;
                 LOG_DEBUG("Error %d: %s\n", rc,
@@ -237,7 +237,7 @@ AZ_NODISCARD int az_span_atou32(az_span source, uint32_t *out_number) {
 
     if (span_size < 1) {
       rc = AZ_ERROR_UNEXPECTED_CHAR;
-      if (rc != 0) {
+      {
         char err_buf[256];
         (void)err_buf;
         LOG_DEBUG("Error %d: %s\n", rc,
@@ -258,7 +258,7 @@ AZ_NODISCARD int az_span_atou32(az_span source, uint32_t *out_number) {
          * The loop below checks that it must be a digit. */
         if (next_byte != '+' || span_size < 2) {
           rc = AZ_ERROR_UNEXPECTED_CHAR;
-          if (rc != 0) {
+          {
             char err_buf[256];
             (void)err_buf;
             LOG_DEBUG("Error %d: %s\n", rc,
@@ -276,7 +276,7 @@ AZ_NODISCARD int az_span_atou32(az_span source, uint32_t *out_number) {
           next_byte = source_ptr[i];
           if (!isdigit(next_byte)) {
             rc = AZ_ERROR_UNEXPECTED_CHAR;
-            if (rc != 0) {
+            {
               char err_buf[256];
               (void)err_buf;
               LOG_DEBUG("Error %d: %s\n", rc,
@@ -292,7 +292,7 @@ AZ_NODISCARD int az_span_atou32(az_span source, uint32_t *out_number) {
              * value * 10 + d > UINT32_MAX. */
             if ((UINT32_MAX - d) / _az_NUMBER_OF_DECIMAL_VALUES < value) {
               rc = AZ_ERROR_UNEXPECTED_CHAR;
-              if (rc != 0) {
+              {
                 char err_buf[256];
                 (void)err_buf;
                 LOG_DEBUG("Error %d: %s\n", rc,
@@ -323,7 +323,7 @@ AZ_NODISCARD int az_span_atoi64(az_span source, int64_t *out_number) {
 
     if (span_size < 1) {
       rc = AZ_ERROR_UNEXPECTED_CHAR;
-      if (rc != 0) {
+      {
         char err_buf[256];
         (void)err_buf;
         LOG_DEBUG("Error %d: %s\n", rc,
@@ -345,7 +345,7 @@ AZ_NODISCARD int az_span_atoi64(az_span source, int64_t *out_number) {
         if (next_byte != '+') {
           if (next_byte != '-') {
             rc = AZ_ERROR_UNEXPECTED_CHAR;
-            if (rc != 0) {
+            {
               char err_buf[256];
               (void)err_buf;
               LOG_DEBUG("Error %d: %s\n", rc,
@@ -357,7 +357,7 @@ AZ_NODISCARD int az_span_atoi64(az_span source, int64_t *out_number) {
         }
         if (span_size < 2) {
           rc = AZ_ERROR_UNEXPECTED_CHAR;
-          if (rc != 0) {
+          {
             char err_buf[256];
             (void)err_buf;
             LOG_DEBUG("Error %d: %s\n", rc,
@@ -384,7 +384,7 @@ AZ_NODISCARD int az_span_atoi64(az_span source, int64_t *out_number) {
             next_byte = source_ptr[i];
             if (!isdigit(next_byte)) {
               rc = AZ_ERROR_UNEXPECTED_CHAR;
-              if (rc != 0) {
+              {
                 char err_buf[256];
                 (void)err_buf;
                 LOG_DEBUG("Error %d: %s\n", rc,
@@ -403,7 +403,7 @@ AZ_NODISCARD int az_span_atoi64(az_span source, int64_t *out_number) {
                       _az_NUMBER_OF_DECIMAL_VALUES <
                   value) {
                 rc = AZ_ERROR_UNEXPECTED_CHAR;
-                if (rc != 0) {
+                {
                   char err_buf[256];
                   (void)err_buf;
                   LOG_DEBUG("Error %d: %s\n", rc,
@@ -435,7 +435,7 @@ AZ_NODISCARD int az_span_atoi32(az_span source, int32_t *out_number) {
 
     if (span_size < 1) {
       rc = AZ_ERROR_UNEXPECTED_CHAR;
-      if (rc != 0) {
+      {
         char err_buf[256];
         (void)err_buf;
         LOG_DEBUG("Error %d: %s\n", rc,
@@ -457,7 +457,7 @@ AZ_NODISCARD int az_span_atoi32(az_span source, int32_t *out_number) {
         if (next_byte != '+') {
           if (next_byte != '-') {
             rc = AZ_ERROR_UNEXPECTED_CHAR;
-            if (rc != 0) {
+            {
               char err_buf[256];
               (void)err_buf;
               LOG_DEBUG("Error %d: %s\n", rc,
@@ -469,7 +469,7 @@ AZ_NODISCARD int az_span_atoi32(az_span source, int32_t *out_number) {
         }
         if (span_size < 2) {
           rc = AZ_ERROR_UNEXPECTED_CHAR;
-          if (rc != 0) {
+          {
             char err_buf[256];
             (void)err_buf;
             LOG_DEBUG("Error %d: %s\n", rc,
@@ -495,7 +495,7 @@ AZ_NODISCARD int az_span_atoi32(az_span source, int32_t *out_number) {
           next_byte = source_ptr[i];
           if (!isdigit(next_byte)) {
             rc = AZ_ERROR_UNEXPECTED_CHAR;
-            if (rc != 0) {
+            {
               char err_buf[256];
               (void)err_buf;
               LOG_DEBUG("Error %d: %s\n", rc,
@@ -514,7 +514,7 @@ AZ_NODISCARD int az_span_atoi32(az_span source, int32_t *out_number) {
                     _az_NUMBER_OF_DECIMAL_VALUES <
                 value) {
               rc = AZ_ERROR_UNEXPECTED_CHAR;
-              if (rc != 0) {
+              {
                 char err_buf[256];
                 (void)err_buf;
                 LOG_DEBUG("Error %d: %s\n", rc,
@@ -568,7 +568,7 @@ AZ_NODISCARD int az_span_atod(az_span source, double *out_number) {
      * invalid bytes at the start. */
     if (size < 1 || !_is_valid_start_of_double(source_ptr[0])) {
       rc = AZ_ERROR_UNEXPECTED_CHAR;
-      if (rc != 0) {
+      {
         char err_buf[256];
         (void)err_buf;
         LOG_DEBUG("Error %d: %s\n", rc,
@@ -806,17 +806,13 @@ static AZ_NODISCARD int _az_span_builder_append_uint64(az_span *ref_span,
 
     while (div > 1) {
       uint8_t value_to_append = _az_decimal_to_ascii((uint8_t)(nn / div));
-      rc = az_span_copy_u8(*ref_span, value_to_append, ref_span);
-      if (rc != 0)
-        return rc;
+      az_span_copy_u8(*ref_span, value_to_append, ref_span);
       nn %= div;
       div /= _az_NUMBER_OF_DECIMAL_VALUES;
     }
     {
       uint8_t value_to_append = _az_decimal_to_ascii((uint8_t)nn);
-      rc = az_span_copy_u8(*ref_span, value_to_append, ref_span);
-      if (rc != 0)
-        return rc;
+      az_span_copy_u8(*ref_span, value_to_append, ref_span);
     }
   }
   return 0;
@@ -886,9 +882,7 @@ static AZ_NODISCARD int _az_span_builder_append_u32toa(az_span destination,
 
     while (div > 1) {
       uint8_t value_to_append = _az_decimal_to_ascii((uint8_t)(nn / div));
-      rc = az_span_copy_u8(*out_span, value_to_append, out_span);
-      if (rc != 0)
-        return rc;
+      az_span_copy_u8(*out_span, value_to_append, out_span);
 
       nn %= div;
       div /= _az_NUMBER_OF_DECIMAL_VALUES;
@@ -896,9 +890,7 @@ static AZ_NODISCARD int _az_span_builder_append_u32toa(az_span destination,
 
     {
       uint8_t value_to_append = _az_decimal_to_ascii((uint8_t)nn);
-      rc = az_span_copy_u8(*out_span, value_to_append, out_span);
-      if (rc != 0)
-        return rc;
+      az_span_copy_u8(*out_span, value_to_append, out_span);
     }
   }
   return 0;
@@ -946,7 +938,7 @@ AZ_NODISCARD int az_span_dtoa(az_span destination, double source,
   /* The input is either positive or negative infinity, or not a number. */
   if (!_az_isfinite(source)) {
     rc = AZ_ERROR_NOT_SUPPORTED;
-    if (rc != 0) {
+    {
       char err_buf[256];
       (void)err_buf;
       LOG_DEBUG("Error %d: %s\n", rc,
@@ -967,7 +959,7 @@ AZ_NODISCARD int az_span_dtoa(az_span destination, double source,
 
     if (integer_part > _az_MAX_SAFE_INTEGER) {
       rc = AZ_ERROR_NOT_SUPPORTED;
-      if (rc != 0) {
+      {
         char err_buf[256];
         (void)err_buf;
         LOG_DEBUG("Error %d: %s\n", rc,
@@ -1075,7 +1067,7 @@ AZ_NODISCARD int _az_is_expected_span(az_span *ref_span, az_span expected) {
   /* EOF because ref_span is smaller than the expected span */
   if (expected_size > az_span_size(*ref_span)) {
     rc = AZ_ERROR_UNEXPECTED_END;
-    if (rc != 0) {
+    {
       char err_buf[256];
       (void)err_buf;
       LOG_DEBUG("Error %d: %s\n", rc,
@@ -1089,7 +1081,7 @@ AZ_NODISCARD int _az_is_expected_span(az_span *ref_span, az_span expected) {
 
     if (!az_span_is_content_equal(actual_span, expected)) {
       rc = AZ_ERROR_UNEXPECTED_CHAR;
-      if (rc != 0) {
+      {
         char err_buf[256];
         (void)err_buf;
         LOG_DEBUG("Error %d: %s\n", rc,
@@ -1246,7 +1238,7 @@ AZ_NODISCARD int _az_span_url_encode(az_span destination, az_span source,
           if (dest_ptr >= dest_end) {
             *out_length = 0;
             rc = AZ_ERROR_NOT_ENOUGH_SPACE;
-            if (rc != 0) {
+            {
               char err_buf[256];
               (void)err_buf;
               LOG_DEBUG("Error %d: %s\n", rc,
@@ -1261,7 +1253,7 @@ AZ_NODISCARD int _az_span_url_encode(az_span destination, az_span source,
           if (dest_ptr >= dest_end - 2) {
             *out_length = 0;
             rc = AZ_ERROR_NOT_ENOUGH_SPACE;
-            if (rc != 0) {
+            {
               char err_buf[256];
               (void)err_buf;
               LOG_DEBUG("Error %d: %s\n", rc,
