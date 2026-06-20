@@ -16,12 +16,12 @@
 
 #if defined(_WIN32) || defined(__WIN32__) || defined(__WINDOWS__)
 #ifdef _WIN64
-#define FAIL_SIZE_T_VAL (-1)
+#define FAIL_SIZE_T_VAL ((size_t)-1)
 #else
 #define FAIL_SIZE_T_VAL UINT_MAX
 #endif /* _WIN64 */
 #else
-#define FAIL_SIZE_T_VAL (-1)
+#define FAIL_SIZE_T_VAL ((size_t)-1)
 #endif /* defined(_WIN32) || defined(__WIN32__) || defined(__WINDOWS__) */
 
 #ifdef __cplusplus
@@ -1056,7 +1056,7 @@ TEST az_span_i64toa_test(void) {
   /* convert back */
   reverse = 0;
   ASSERT_EQ(AZ_OK, az_span_atou64(b_span, &reverse));
-  ASSERT_EQ(number, reverse);
+  ASSERT_EQ((uint64_t)number, reverse);
 
   PASS();
 }
@@ -2073,10 +2073,14 @@ TEST az_precondition_callback_test(void) {
     az_span dest = AZ_SPAN_FROM_BUFFER(buffer);
     az_span src = az_span_create(buffer + 2, 5);
     ptrdiff_t out_len;
-    (void)_az_span_url_encode(dest, src, &out_len);
+    int res1;
+    int res2;
+    res1 = _az_span_url_encode(dest, src, &out_len);
+    (void)res1;
     printf("called = %d\n", g_precondition_failed_called);
     ASSERT_EQ(2, g_precondition_failed_called);
-    (void)_az_span_url_encode(src, dest, &out_len);
+    res2 = _az_span_url_encode(src, dest, &out_len);
+    (void)res2;
     ASSERT_EQ(3, g_precondition_failed_called);
   }
 

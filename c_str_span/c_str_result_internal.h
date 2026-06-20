@@ -59,7 +59,7 @@ extern "C" {
  */
 #define _az_RETURN_IF_NOT_ENOUGH_SIZE(span, required_size)                     \
   do {                                                                         \
-    if (az_span_size(span) < (required_size)) {                                \
+    if (az_span_size(span) < (size_t)(required_size)) {                        \
       rc = AZ_ERROR_NOT_ENOUGH_SPACE;                                          \
       if (rc != 0) {                                                           \
         char err_buf[256];                                                     \

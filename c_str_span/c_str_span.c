@@ -60,7 +60,7 @@ AZ_NODISCARD az_span az_span_create(uint8_t *ptr, size_t size) {
    * size >= 0
    * Otherwise, if ptr is null, then:
    * size == 0 */
-  _az_PRECONDITION((ptr != NULL && size >= 0) || (ptr + (uint32_t)size == 0));
+  _az_PRECONDITION(ptr != NULL || size == 0);
 
   span._internal.size = size;
   span._internal.ptr = ptr;
@@ -103,7 +103,7 @@ AZ_NODISCARD az_span az_span_slice(az_span span, size_t start_index,
    * 0 <= end_index <= span.size
    * And
    * 0 <= start_index <= end_index */
-  _az_PRECONDITION_RANGE(0, end_index, az_span_size(span));
+  _az_PRECONDITION(end_index <= az_span_size(span));
   _az_PRECONDITION(start_index <= end_index);
 
   return az_span_create(az_span_ptr(span) + start_index,
@@ -565,7 +565,7 @@ AZ_NODISCARD int az_span_atod(az_span source, double *out_number) {
     int n = 0;
     int32_t chars_consumed = 0;
 
-    _az_PRECONDITION_RANGE(0, size, _az_MAX_SIZE_FOR_PARSING_DOUBLE);
+    _az_PRECONDITION(size <= _az_MAX_SIZE_FOR_PARSING_DOUBLE);
 
     /* This check is necessary to prevent sscanf from reading bytes past the
      * end of the span, when the span might contain whitespace or other
@@ -1294,7 +1294,7 @@ az_span _az_span_token(az_span source, az_span delimiter,
 
   *out_index = az_span_find(source, delimiter);
 
-  if (*out_index != -1) {
+  if (*out_index != (size_t)-1) {
     *out_remainder = az_span_slice(source, *out_index + az_span_size(delimiter),
                                    az_span_size(source));
 
