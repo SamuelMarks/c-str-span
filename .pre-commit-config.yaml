@@ -1,0 +1,42 @@
+repos:
+  - repo: https://github.com/pre-commit/mirrors-clang-format
+    rev: v18.1.5
+    hooks:
+      - id: clang-format
+        args: [--style=LLVM]
+        types_or: [c, c++]
+  - repo: https://github.com/pocc/pre-commit-hooks
+    rev: v1.3.5
+    hooks:
+      - id: cppcheck
+        args:
+          - --error-exitcode=1
+          - --inline-suppr
+          - --suppress=missingInclude
+          - --suppress=duplicateExpression
+          - --suppress=constVariablePointer
+          - --suppress=redundantInitialization
+          - --suppress=toomanyconfigs
+          - --suppress=unmatchedSuppression
+          - --suppress=missingIncludeSystem
+          - --suppress=unusedFunction
+          - --suppress=pointerAdditionResultNotNull
+          - --suppress=knownConditionTrueFalse
+          - --suppress=variableScope
+          - --suppress=unsignedPositive
+          - --suppress=unreadVariable
+          - --suppress=unassignedVariable
+          - -Ibuild
+        exclude: ^c_str_span/tests/
+  - repo: local
+    hooks:
+      - id: build-test-valgrind
+        name: Build, Test, and Valgrind
+        entry: bash -c "mkdir -p build && cd build && cmake .. -DCMAKE_BUILD_TYPE=Debug -DC_STR_SPAN_BUILD_TESTING=ON && make && ctest --output-on-failure && if [ \"$(uname -s)\" = \"Linux\" ]; then valgrind --error-exitcode=1 --leak-check=full --show-leak-kinds=all ./bin/c_str_span_tests; fi"
+        language: system
+        pass_filenames: false
+      - id: generate-badges
+        name: Generate Coverage Badges
+        entry: bash -c "./generate_badges.sh && git add reports/doc_coverage.svg reports/test_coverage.svg"
+        language: system
+        pass_filenames: false

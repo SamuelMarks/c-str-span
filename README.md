@@ -2,9 +2,9 @@ c-str-span
 ==========
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-[![CI](https://github.com/SamuelMarks/c-str-span/actions/workflows/ci.yml/badge.svg)](https://github.com/SamuelMarks/c-str-span/actions/workflows/ci.yml)
-![test coverage](reports/test_coverage.svg)
 ![doc coverage](reports/doc_coverage.svg)
+![test coverage](reports/test_coverage.svg)
+[![CI](https://github.com/SamuelMarks/c-str-span/actions/workflows/ci.yml/badge.svg)](https://github.com/SamuelMarks/c-str-span/actions/workflows/ci.yml)
 [![C89](https://img.shields.io/badge/C-89-blue)](https://en.wikipedia.org/wiki/C89_(C_version))
 
 UTF-8 replacement for C strings, supporting zero-copy use-cases (non-null-terminated).

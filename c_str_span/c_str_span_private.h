@@ -34,6 +34,7 @@ extern "C" {
 /* In IEEE 754, +inf is represented as 0 for the sign bit, all 1s for the biased
  * exponent, and 0s */
 /* for the fraction bits. */
+/** @brief Internal doc. */
 #define _az_BINARY_VALUE_OF_POSITIVE_INFINITY 0x7FF0000000000000ULL
 
 enum {
@@ -103,6 +104,7 @@ AZ_NODISCARD AZ_INLINE bool _az_isfinite(double value) {
 }
 
 extern C_STR_SPAN_EXPORT AZ_NODISCARD int
+/** @brief Internal doc. */
 _az_is_expected_span(az_span *ref_span, az_span expected);
 
 /**

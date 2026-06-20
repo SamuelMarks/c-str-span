@@ -30,6 +30,7 @@
 #include <string.h>
 /* clang-format on */
 
+/** @brief Internal doc. */
 C_STR_SPAN_EXPORT void c_str_span_log_debug(const char *fmt, ...) {
 #ifdef DEBUG
   va_list args;
@@ -44,8 +45,10 @@ C_STR_SPAN_EXPORT void c_str_span_log_debug(const char *fmt, ...) {
 
 /*#include <azure/core/_az_cfg.h>*/
 
-/* The maximum integer value that can be stored in a double without losing
- * precision (2^53 - 1) An IEEE 64-bit double has 52 bits of mantissa */
+/**
+ * @brief The maximum integer value that can be stored in a double without
+ * losing precision (2^53 - 1) An IEEE 64-bit double has 52 bits of mantissa
+ */
 #define _az_MAX_SAFE_INTEGER 9007199254740991
 
 #ifndef AZ_NO_PRECONDITION_CHECKING
@@ -111,6 +114,7 @@ AZ_NODISCARD az_span az_span_slice_to_end(az_span span, size_t start_index) {
   return az_span_slice(span, start_index, az_span_size(span));
 }
 
+/** @brief Internal doc. */
 AZ_NODISCARD AZ_INLINE uint8_t _az_tolower(uint8_t value) {
   /* This is equivalent to the following but with fewer conditions.
    * return 'A' <= value && value <= 'Z' ? value + AZ_ASCII_LOWER_DIF : value;
@@ -778,6 +782,7 @@ int az_span_to_str(char *destination, size_t destination_max_size,
   return 0;
 }
 
+/** @brief Internal doc. */
 AZ_INLINE uint8_t _az_decimal_to_ascii(uint8_t d) {
   return (uint8_t)((uint32_t)('0' + d) & (uint8_t)UINT8_MAX);
 }
@@ -1096,6 +1101,7 @@ AZ_NODISCARD int _az_is_expected_span(az_span *ref_span, az_span expected) {
   return 0;
 }
 
+/** @brief Internal doc. */
 AZ_NODISCARD AZ_INLINE bool _az_is_whitespace(uint8_t c) {
   switch (c) {
   case ' ':
@@ -1108,6 +1114,7 @@ AZ_NODISCARD AZ_INLINE bool _az_is_whitespace(uint8_t c) {
   }
 }
 
+/** @brief Internal doc. */
 typedef enum { LEFT = 0, RIGHT = 1 } az_span_trim_side;
 
 /* Return a trim az_span. Depending on arg side, function will trim left of
@@ -1160,11 +1167,13 @@ AZ_NODISCARD az_span _az_span_trim_whitespace(az_span source) {
 }
 
 /* [0-9] */
+/** @brief Internal doc. */
 AZ_NODISCARD AZ_INLINE bool _az_span_is_byte_digit(uint8_t c) {
   return '0' <= c && c <= '9';
 }
 
 /* [A-Za-z] */
+/** @brief Internal doc. */
 AZ_NODISCARD AZ_INLINE bool _az_span_is_byte_letter(uint8_t c) {
   /* This is equivalent to ('A' <= c && c <= 'Z') || ('a' <= c && c <= 'z') */
   /* This works because upper case and lower case letters are 0x20 away from
@@ -1173,6 +1182,7 @@ AZ_NODISCARD AZ_INLINE bool _az_span_is_byte_letter(uint8_t c) {
          'Z' - 'A';
 }
 
+/** @brief Internal doc. */
 AZ_NODISCARD AZ_INLINE bool _az_span_url_should_encode(uint8_t c) {
   switch (c) {
   case '-':

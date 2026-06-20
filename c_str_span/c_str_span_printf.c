@@ -18,11 +18,14 @@
 #if defined(_MSC_VER)
 #define FPRINTF_N(OUT, ap) (void)va_arg(ap, int *)
 #else
+/** @brief Internal doc. */
 #define FPRINTF_N(OUT, ap) fprintf(OUT, "%n", va_arg(ap, int *))
 #endif
 
+/** @brief Internal doc. */
 #define FPRINTF fprintf
 
+/** @brief Internal doc. */
 #define AZ_SPAN_FPRINTF(func_name, OUT)                                        \
   void func_name(const uint8_t *format, ...) {                                 \
     va_list ap;                                                                \

@@ -10,8 +10,7 @@ file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/patch_greatest.cmake" "file(READ CMakeLi
 
 FetchContent_Declare(
         greatest
-        GIT_REPOSITORY https://github.com/SamuelMarks/greatest.git
-        GIT_TAG        master
+        URL https://github.com/SamuelMarks/greatest/archive/refs/heads/master.tar.gz
         PATCH_COMMAND "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/patch_greatest.cmake"
 )
 set(OLD_BUILD_TESTING ${BUILD_TESTING})

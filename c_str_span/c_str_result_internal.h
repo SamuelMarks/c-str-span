@@ -4,7 +4,7 @@
 /**
  * @file
  *
- * @brief Definition of #az_result related internal helper functions.
+ * @brief Definition of az_result related internal helper functions.
  *
  * @note You MUST NOT use any symbols (macros, functions, structures, enums,
  * etc.) prefixed with an underscore ('_') directly in your application code.

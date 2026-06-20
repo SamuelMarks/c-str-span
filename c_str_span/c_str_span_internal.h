@@ -33,6 +33,7 @@ extern "C" {
 
 /* The smallest number that has the same number of digits as
  * _az_MAX_SIZE_FOR_UINT64 (i.e. 10^19). */
+/** @brief Internal doc. */
 #define _az_SMALLEST_20_DIGIT_NUMBER 10000000000000000000ULL
 
 enum {
@@ -82,7 +83,7 @@ AZ_UNUSED AZ_INLINE AZ_NODISCARD size_t _az_span_diff(az_span sliced_span,
  * @param[in] source The #az_span containing the non-URL-encoded bytes.
  * @param[out] out_length A pointer to an int32_t that is going to be assigned
  * the length of URL-encoding the \p source.
- * @return An #int value indicating the result of the operation:
+ * @return An int value indicating the result of the operation:
  *         - #AZ_OK if successful
  *         - #AZ_ERROR_NOT_ENOUGH_SPACE if the \p destination is not big enough
  * to contain the encoded bytes

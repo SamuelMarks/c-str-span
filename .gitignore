@@ -31,3 +31,16 @@ bld/
 
 # Compiler commands
 compile_commands.json
+
+# Doxygen output
+html/
+latex/
+
+# Testing output
+Testing/
+
+# Temporary files
+test_amal*
+warnings.txt
+*.py
+Doxyfile

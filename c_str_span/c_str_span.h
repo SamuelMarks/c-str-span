@@ -58,6 +58,9 @@ extern "C" {
  * the buffer's size.
  */
 typedef struct {
+  /**
+   * @brief Internal implementation details.
+   */
   struct {
     uint8_t *ptr;
     size_t size; /* size must be >= 0 */
@@ -113,6 +116,7 @@ extern C_STR_SPAN_EXPORT AZ_NODISCARD az_span az_span_create(uint8_t *ptr,
 /* Note: Concatenating "" to S produces a compiler error if S is not a literal
  * string */
 /* The stored string's length does not include the \0 terminator. */
+/** @brief Internal doc. */
 #define _az_STRING_LITERAL_LEN(S) (sizeof(S "") - 1)
 
 /**
@@ -135,12 +139,14 @@ extern C_STR_SPAN_EXPORT AZ_NODISCARD az_span az_span_create(uint8_t *ptr,
  * element. */
 /* Returns 0 for anything that is not an array (for example any arbitrary
  * pointer). */
+/** @brief Internal doc. */
 #define _az_IS_ARRAY(array) (((void *)&(array)) == ((void *)(&(array)[0])))
 
 /* Returns 1 if the element size of the array is 1 (which is only true for byte
  * arrays such as */
 /* uint8_t[] and char[]). */
 /* Returns 0 for any other element size (for example int32_t[]). */
+/** @brief Internal doc. */
 #define _az_IS_BYTE_ARRAY(array)                                               \
   ((sizeof((array)[0]) == 1) && _az_IS_ARRAY(array))
 
@@ -324,6 +330,8 @@ extern C_STR_SPAN_EXPORT AZ_NODISCARD size_t az_span_find(az_span source,
  * from \p source.
  * @param[in] source The #az_span containing the bytes to copy to the
  * destination.
+ * @param[out] out_span The #az_span representing the remaining portion of \p
+ * destination after the copy.
  *
  * @return An #az_span that is a slice of the \p destination #az_span (i.e. the
  * remainder) after the source bytes have been copied.
@@ -345,6 +353,8 @@ extern C_STR_SPAN_EXPORT int az_span_copy(az_span destination, az_span source,
  *
  * @param destination The #az_span where the byte should be copied to.
  * @param[in] byte The `uint8_t` to copy into the \p destination span.
+ * @param[out] out_span The #az_span representing the remaining portion of \p
+ * destination after the copy.
  *
  * @return An #az_span that is a slice of the \p destination #az_span (i.e. the
  * remainder) after the
@@ -378,7 +388,7 @@ AZ_UNUSED AZ_INLINE void az_span_fill(az_span destination, uint8_t value) {
  * @param[out] out_number The pointer to the variable that is to receive the
  * number.
  *
- * @return An #int value indicating the result of the operation.
+ * @return An int value indicating the result of the operation.
  * @retval #AZ_OK Success.
  * @retval #AZ_ERROR_UNEXPECTED_CHAR A non-ASCII digit is found within the span
  * or the \p source contains a number that would overflow or underflow
@@ -394,7 +404,7 @@ extern C_STR_SPAN_EXPORT AZ_NODISCARD int az_span_atou64(az_span source,
  * @param[out] out_number The pointer to the variable that is to receive the
  * number.
  *
- * @return An #int value indicating the result of the operation.
+ * @return An int value indicating the result of the operation.
  * @retval #AZ_OK Success.
  * @retval #AZ_ERROR_UNEXPECTED_CHAR A non-ASCII digit is found within the span
  * or the \p source contains a number that would overflow or underflow
@@ -410,7 +420,7 @@ extern C_STR_SPAN_EXPORT AZ_NODISCARD int az_span_atoi64(az_span source,
  * @param[out] out_number The pointer to the variable that is to receive the
  * number.
  *
- * @return An #int value indicating the result of the operation.
+ * @return An int value indicating the result of the operation.
  * @retval #AZ_OK Success.
  * @retval #AZ_ERROR_UNEXPECTED_CHAR A non-ASCII digit is found within the span
  * or the \p source contains a number that would overflow or underflow
@@ -426,7 +436,7 @@ extern C_STR_SPAN_EXPORT AZ_NODISCARD int az_span_atou32(az_span source,
  * @param[out] out_number The pointer to the variable that is to receive the
  * number.
  *
- * @return An #int value indicating the result of the operation.
+ * @return An int value indicating the result of the operation.
  * @retval #AZ_OK Success.
  * @retval #AZ_ERROR_UNEXPECTED_CHAR A non-ASCII digit is found within the span
  * or if the \p source contains a number that would overflow or underflow
@@ -442,7 +452,7 @@ extern C_STR_SPAN_EXPORT AZ_NODISCARD int az_span_atoi32(az_span source,
  * @param[out] out_number The pointer to the variable that is to receive the
  * number.
  *
- * @return An #int value indicating the result of the operation.
+ * @return An int value indicating the result of the operation.
  * @retval #AZ_OK Success.
  * @retval #AZ_ERROR_UNEXPECTED_CHAR A non-ASCII digit or an invalid character
  * is found within the span, or the resulting \p out_number wouldn't be a finite
@@ -465,7 +475,7 @@ extern C_STR_SPAN_EXPORT AZ_NODISCARD int az_span_atod(az_span source,
  * @param[out] out_span A pointer to an #az_span that receives the remainder of
  * the \p destination #az_span after the `int32_t` has been copied.
  *
- * @return An #int value indicating the result of the operation.
+ * @return An int value indicating the result of the operation.
  * @retval #AZ_OK Success.
  * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The \p destination is not big enough to
  * contain the copied bytes.
@@ -483,7 +493,7 @@ az_span_i32toa(az_span destination, int32_t source, az_span *out_span);
  * @param[out] out_span A pointer to an #az_span that receives the remainder of
  * the \p destination #az_span after the `uint32_t` has been copied.
  *
- * @return An #int value indicating the result of the operation.
+ * @return An int value indicating the result of the operation.
  * @retval #AZ_OK Success.
  * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The \p destination is not big enough to
  * contain the copied bytes.
@@ -501,7 +511,7 @@ az_span_u32toa(az_span destination, uint32_t source, az_span *out_span);
  * @param[out] out_span A pointer to an #az_span that receives the remainder of
  * the \p destination #az_span after the `int64_t` has been copied.
  *
- * @return An #int value indicating the result of the operation.
+ * @return An int value indicating the result of the operation.
  * @retval #AZ_OK Success.
  * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The \p destination is not big enough to
  * contain the copied bytes.
@@ -519,7 +529,7 @@ az_span_i64toa(az_span destination, int64_t source, az_span *out_span);
  * @param[out] out_span A pointer to an #az_span that receives the remainder of
  * the \p destination #az_span after the `uint64_t` has been copied.
  *
- * @return An #int value indicating the result of the operation.
+ * @return An int value indicating the result of the operation.
  * @retval #AZ_OK Success.
  * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The \p destination is not big enough to
  * contain the copied bytes.
@@ -540,7 +550,7 @@ az_span_u64toa(az_span destination, uint64_t source, az_span *out_span);
  * @param[out] out_span A pointer to an #az_span that receives the remainder of
  * the \p destination #az_span after the `double` has been copied.
  *
- * @return An #int value indicating the result of the operation.
+ * @return An int value indicating the result of the operation.
  * @retval #AZ_OK Success.
  * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The \p destination is not big enough to
  * contain the copied bytes.
@@ -966,20 +976,24 @@ AZ_NODISCARD AZ_INLINE bool az_span_isupper(const az_span span) {
  * #az_span_allocator_fn callback.
  */
 typedef struct {
-  /* / Any struct that was provided by the user for their specific
-   * implementation, passed through to */
-  /* / the #az_span_allocator_fn. */
+  /**
+   * @brief Any struct that was provided by the user for their specific
+   * implementation, passed through to the #az_span_allocator_fn.
+   */
   void *user_context;
 
-  /* / The amount of space consumed (i.e. written into) within the previously
-   * provided destination, */
-  /* / which can be used to infer the remaining number of bytes of the #az_span
-   * that are leftover. */
+  /**
+   * @brief The amount of space consumed (i.e. written into) within the
+   * previously provided destination, which can be used to infer the remaining
+   * number of bytes of the #az_span that are leftover.
+   */
   int32_t bytes_used;
 
-  /* / The minimum length of the destination #az_span required to be provided by
-   * the callback. If 0, */
-  /* / any non-empty sized buffer must be returned. */
+  /**
+   * @brief The minimum length of the destination #az_span required to be
+   * provided by the callback. If 0, any non-empty sized buffer must be
+   * returned.
+   */
   size_t minimum_required_size;
 } az_span_allocator_context;
 
@@ -995,7 +1009,7 @@ typedef struct {
  * a destination to write data into, that is at least the required size
  * specified within the \p allocator_context.
  *
- * @return An #int value indicating the result of the operation.
+ * @return An int value indicating the result of the operation.
  * @retval #AZ_OK Success.
  * @retval other Failure.
  *
@@ -1005,9 +1019,9 @@ typedef struct {
  * @remarks There is no guarantee that successive calls will return the same or
  * same-sized buffer. This function must never return an empty #az_span, unless
  * the requested buffer size is not available. In which case, it must return an
- * error #int.
+ * error int.
  *
- * @remarks The caller must check the return value using #az_result_failed()
+ * @remarks The caller must check the return value using az_result_failed()
  * before continuing to use the \p out_next_destination.
  */
 typedef int (*az_span_allocator_fn)(

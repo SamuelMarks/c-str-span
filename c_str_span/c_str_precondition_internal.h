@@ -2,7 +2,7 @@
  * SPDX-License-Identifier: MIT */
 
 /**
- * @file az_precondition_internal.h
+ * @file c_str_precondition_internal.h
  *
  * @brief This header defines the types and functions your application uses
  *        to override the default precondition failure behavior.
@@ -75,14 +75,18 @@ az_precondition_failed_get_callback(void);
 /* https://docs.microsoft.com/windows-hardware/drivers/devtest/using-the--analysis-assume-function-to-suppress-false-defects
  */
 #if _MSC_VER >= 1920
+/** @brief Internal doc. */
 #define _az_ANALYSIS_ASSUME(statement) __analysis_assume(statement)
 #else
+/** @brief Internal doc. */
 #define _az_ANALYSIS_ASSUME(statement)
 #endif
 
 #ifdef AZ_NO_PRECONDITION_CHECKING
+/** @brief Internal doc. */
 #define _az_PRECONDITION(condition)
 #else
+/** @brief Internal doc. */
 #define _az_PRECONDITION(condition)                                            \
   do {                                                                         \
     if (!(condition)) {                                                        \
@@ -92,18 +96,23 @@ az_precondition_failed_get_callback(void);
   } while (0)
 #endif /* AZ_NO_PRECONDITION_CHECKING */
 
+/** @brief Internal doc. */
 #define _az_PRECONDITION_RANGE(low, arg, max)                                  \
   _az_PRECONDITION((low) <= (arg) && (arg) <= (max))
 
+/** @brief Internal doc. */
 #define _az_PRECONDITION_NOT_NULL(arg) _az_PRECONDITION((arg) != NULL)
+/** @brief Internal doc. */
 #define _az_PRECONDITION_IS_NULL(arg) _az_PRECONDITION((arg) == NULL)
 
 extern C_STR_SPAN_EXPORT AZ_NODISCARD bool
 _az_span_is_valid(az_span span, size_t min_size, bool null_is_valid);
 
+/** @brief Internal doc. */
 #define _az_PRECONDITION_VALID_SPAN(span, min_size, null_is_valid)             \
   _az_PRECONDITION(_az_span_is_valid(span, min_size, null_is_valid))
 
+/** @brief Internal doc. */
 #define _az_span_overlap(a, b)                                                 \
   (az_span_ptr(a) == 0 || az_span_ptr(b) == 0                                  \
        ? false                                                                 \
@@ -111,6 +120,7 @@ _az_span_is_valid(az_span span, size_t min_size, bool null_is_valid);
               ? (az_span_ptr(a) + az_span_size(a) > az_span_ptr(b))            \
               : (az_span_ptr(b) + az_span_size(b) > az_span_ptr(a))))
 
+/** @brief Internal doc. */
 #define _az_PRECONDITION_NO_OVERLAP_SPANS(a, b)                                \
   _az_PRECONDITION(!_az_span_overlap(a, b))
 

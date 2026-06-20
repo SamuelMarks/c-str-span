@@ -21,6 +21,7 @@ static void az_precondition_failed_default(void) {
   c_str_span_log_debug("Precondition failed!\n");
 }
 
+/** @brief Internal doc. */
 az_precondition_failed_fn _az_precondition_failed_callback =
     az_precondition_failed_default;
 
@@ -29,10 +30,12 @@ void az_precondition_failed_set_callback(
   _az_precondition_failed_callback = az_precondition_failed_callback;
 }
 
+/** @brief Internal doc. */
 az_precondition_failed_fn az_precondition_failed_get_callback(void) {
   return _az_precondition_failed_callback;
 }
 
+/** @brief Internal doc. */
 bool _az_span_is_valid(az_span span, size_t min_size, bool null_is_valid) {
   uint8_t *const ptr = az_span_ptr(span);
   size_t const span_size = az_span_size(span);

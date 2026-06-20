@@ -28,6 +28,7 @@ extern "C" {
 #else
 
 #if !defined(_STDBOOL_H) && !defined(HAS_STDBOOL)
+/** @brief Internal doc. */
 #define _STDBOOL_H
 
 #ifdef bool
@@ -40,8 +41,11 @@ extern "C" {
 #undef false
 #endif /* false */
 
+/** @brief Internal doc. */
 typedef size_t bool;
+/** @brief Internal doc. */
 #define true 1
+/** @brief Internal doc. */
 #define false (!true)
 
 #endif /* !defined(_STDBOOL_H) && !defined(HAS_STDBOOL) */

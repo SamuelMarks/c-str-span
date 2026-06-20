@@ -1,4 +1,11 @@
 
+/**
+ * @brief Macro to get the string representation of an error code.
+ *
+ * @param rc The error code.
+ * @param buf The buffer to store the error string.
+ * @param size The size of the buffer.
+ */
 #if defined(_MSC_VER)
 #define C_STR_SPAN_STRERROR(rc, buf, size) "Error"
 #else
@@ -11,7 +18,7 @@
 /**
  * @file
  *
- * @brief Definition of #int and helper functions.
+ * @brief Definition of int and helper functions.
  *
  * @note You MUST NOT use any symbols (macros, functions, structures, enums,
  * etc.) prefixed with an underscore ('_') directly in your application code.
@@ -57,8 +64,8 @@ enum { _az_ERROR_FLAG = (int32_t)0x80000000 };
  * @brief The type represents the various success and error conditions.
  *
  * @note See the following `int` values from various headers:
- * - #az_result_core
- * - #az_result_iot
+ * - az_result_core
+ * - az_result_iot
  */
 
 /* int Bits: */
@@ -67,28 +74,28 @@ enum { _az_ERROR_FLAG = (int32_t)0x80000000 };
 /* - 0..15 Code. */
 
 /**
- * @brief Creates an #int error value.
+ * @brief Creates an int error value.
  *
  * @param[in] facility The facility code for the error.
  * @param[in] code The specific error code.
- * @return An #int representing the error.
+ * @return An int representing the error.
  */
 #define _az_RESULT_MAKE_ERROR(facility, code)                                  \
   ((int)((uint32_t)_az_ERROR_FLAG | ((uint32_t)(facility) << 16U) |            \
          (uint32_t)(code)))
 
 /**
- * @brief Creates an #int success value.
+ * @brief Creates an int success value.
  *
  * @param[in] facility The facility code for the success.
  * @param[in] code The specific success code.
- * @return An #int representing the success.
+ * @return An int representing the success.
  */
 #define _az_RESULT_MAKE_SUCCESS(facility, code)                                \
   ((int)(((uint32_t)(facility) << 16U) | (uint32_t)(code)))
 
 /**
- * @brief The type represents the various #int success and error
+ * @brief The type represents the various int success and error
  * conditions specific to SDK Core.
  */
 enum az_result_core {
