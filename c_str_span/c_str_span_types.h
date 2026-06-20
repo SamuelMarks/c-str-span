@@ -29,6 +29,7 @@ extern "C" {
  * compilers).
  */
 #if defined(_MSC_VER)
+#define AZ_UNUSED
 #if _MSC_VER >= 1700
 /** @brief Required to use return value. */
 #define AZ_NODISCARD _Check_return_
