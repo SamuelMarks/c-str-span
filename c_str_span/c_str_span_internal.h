@@ -94,7 +94,7 @@ AZ_UNUSED AZ_INLINE AZ_NODISCARD size_t _az_span_diff(az_span sliced_span,
  * #AZ_ERROR_NOT_ENOUGH_SPACE.
  * @remark The \p destination and \p source must not overlap.
  */
-extern C_STR_SPAN_EXPORT AZ_NODISCARD int
+extern C_STR_SPAN_EXPORT AZ_NODISCARD enum az_result_core
 _az_span_url_encode(az_span destination, az_span source, ptrdiff_t *out_length);
 
 /**

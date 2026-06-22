@@ -10,7 +10,7 @@ WORKDIR /c_str_span
 
 RUN cmake -DCMAKE_BUILD_TYPE='Debug' \
           -DBUILD_TESTING='1' \
-          -DC_STR_SPAN_BUILD_TESTING='1' \
+          -DBUILD_TESTING_c_str_span='1' \
           -S . -B 'build' && \
     cmake --build 'build'
 

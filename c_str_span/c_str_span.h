@@ -299,7 +299,7 @@ az_span_is_content_equal_ignoring_case(az_span span1, az_span span2);
  * Content is copied from the \p source buffer and then `\0` is added at the
  end.
  */
-extern C_STR_SPAN_EXPORT int
+extern C_STR_SPAN_EXPORT enum az_result_core
 az_span_to_str(char *destination, size_t destination_max_size, az_span source);
 
 /**
@@ -480,7 +480,7 @@ az_span_atod(az_span source, double *out_number);
  * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The \p destination is not big enough to
  * contain the copied bytes.
  */
-extern C_STR_SPAN_EXPORT AZ_NODISCARD int
+extern C_STR_SPAN_EXPORT AZ_NODISCARD enum az_result_core
 az_span_i32toa(az_span destination, int32_t source, az_span *out_span);
 
 /**
@@ -498,7 +498,7 @@ az_span_i32toa(az_span destination, int32_t source, az_span *out_span);
  * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The \p destination is not big enough to
  * contain the copied bytes.
  */
-extern C_STR_SPAN_EXPORT AZ_NODISCARD int
+extern C_STR_SPAN_EXPORT AZ_NODISCARD enum az_result_core
 az_span_u32toa(az_span destination, uint32_t source, az_span *out_span);
 
 /**
@@ -516,7 +516,7 @@ az_span_u32toa(az_span destination, uint32_t source, az_span *out_span);
  * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The \p destination is not big enough to
  * contain the copied bytes.
  */
-extern C_STR_SPAN_EXPORT AZ_NODISCARD int
+extern C_STR_SPAN_EXPORT AZ_NODISCARD enum az_result_core
 az_span_i64toa(az_span destination, int64_t source, az_span *out_span);
 
 /**
@@ -534,7 +534,7 @@ az_span_i64toa(az_span destination, int64_t source, az_span *out_span);
  * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The \p destination is not big enough to
  * contain the copied bytes.
  */
-extern C_STR_SPAN_EXPORT AZ_NODISCARD int
+extern C_STR_SPAN_EXPORT AZ_NODISCARD enum az_result_core
 az_span_u64toa(az_span destination, uint64_t source, az_span *out_span);
 
 /**
@@ -568,7 +568,7 @@ az_span_u64toa(az_span destination, uint64_t source, az_span *out_span);
  * @remark The \p fractional_digits must be between 0 and 15 (inclusive). Any
  * value passed in that is larger will be clamped down to 15.
  */
-extern C_STR_SPAN_EXPORT AZ_NODISCARD int
+extern C_STR_SPAN_EXPORT AZ_NODISCARD enum az_result_core
 az_span_dtoa(az_span destination, double source, int32_t fractional_digits,
              az_span *out_span);
 
