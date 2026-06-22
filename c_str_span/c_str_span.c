@@ -144,8 +144,9 @@ AZ_NODISCARD bool az_span_is_content_equal_ignoring_case(az_span span1,
   return true;
 }
 
-AZ_NODISCARD int az_span_atou64(az_span source, uint64_t *out_number) {
-  int rc = 0;
+AZ_NODISCARD enum az_result_core az_span_atou64(az_span source,
+                                                uint64_t *out_number) {
+  enum az_result_core rc = AZ_OK;
 
   _az_PRECONDITION_VALID_SPAN(source, 0, true);
   _az_PRECONDITION_NOT_NULL(out_number);
@@ -230,8 +231,9 @@ AZ_NODISCARD int az_span_atou64(az_span source, uint64_t *out_number) {
   return 0;
 }
 
-AZ_NODISCARD int az_span_atou32(az_span source, uint32_t *out_number) {
-  int rc = 0;
+AZ_NODISCARD enum az_result_core az_span_atou32(az_span source,
+                                                uint32_t *out_number) {
+  enum az_result_core rc = AZ_OK;
 
   _az_PRECONDITION_VALID_SPAN(source, 0, true);
   _az_PRECONDITION_NOT_NULL(out_number);
@@ -316,8 +318,9 @@ AZ_NODISCARD int az_span_atou32(az_span source, uint32_t *out_number) {
   return 0;
 }
 
-AZ_NODISCARD int az_span_atoi64(az_span source, int64_t *out_number) {
-  int rc = 0;
+AZ_NODISCARD enum az_result_core az_span_atoi64(az_span source,
+                                                int64_t *out_number) {
+  enum az_result_core rc = AZ_OK;
 
   _az_PRECONDITION_VALID_SPAN(source, 0, true);
   _az_PRECONDITION_NOT_NULL(out_number);
@@ -428,8 +431,9 @@ AZ_NODISCARD int az_span_atoi64(az_span source, int64_t *out_number) {
   return 0;
 }
 
-AZ_NODISCARD int az_span_atoi32(az_span source, int32_t *out_number) {
-  int rc = 0;
+AZ_NODISCARD enum az_result_core az_span_atoi32(az_span source,
+                                                int32_t *out_number) {
+  enum az_result_core rc = AZ_OK;
 
   _az_PRECONDITION_VALID_SPAN(source, 0, true);
   _az_PRECONDITION_NOT_NULL(out_number);
@@ -550,8 +554,9 @@ static bool _is_valid_start_of_double(uint8_t first_byte) {
 #pragma warning(disable : 4710)
 #endif
 
-AZ_NODISCARD int az_span_atod(az_span source, double *out_number) {
-  int rc = 0;
+AZ_NODISCARD enum az_result_core az_span_atod(az_span source,
+                                              double *out_number) {
+  enum az_result_core rc = AZ_OK;
 
   _az_PRECONDITION_VALID_SPAN(source, 0, true);
   _az_PRECONDITION_NOT_NULL(out_number);
@@ -685,7 +690,8 @@ AZ_NODISCARD size_t az_span_find(az_span source, az_span target) {
   return target_not_found;
 }
 
-int az_span_copy(az_span destination, az_span source, az_span *out_span) {
+enum az_result_core az_span_copy(az_span destination, az_span source,
+                                 az_span *out_span) {
   size_t src_size = az_span_size(source);
 
   _az_PRECONDITION_VALID_SPAN(destination, 0, true);
@@ -721,7 +727,8 @@ int az_span_copy(az_span destination, az_span source, az_span *out_span) {
   }
 }
 
-int az_span_copy_u8(az_span destination, uint8_t byte, az_span *out_span) {
+enum az_result_core az_span_copy_u8(az_span destination, uint8_t byte,
+                                    az_span *out_span) {
   _az_PRECONDITION_VALID_SPAN(destination, 0, true);
   _az_PRECONDITION_NOT_NULL(out_span);
 
@@ -743,8 +750,8 @@ int az_span_copy_u8(az_span destination, uint8_t byte, az_span *out_span) {
   }
 }
 
-int az_span_to_str(char *destination, size_t destination_max_size,
-                   az_span source) {
+enum az_result_core
+az_span_to_str(char *destination, size_t destination_max_size, az_span source) {
   _az_PRECONDITION_NOT_NULL(destination);
 
   if (destination_max_size == 0)
@@ -789,7 +796,7 @@ AZ_INLINE uint8_t _az_decimal_to_ascii(uint8_t d) {
 
 static AZ_NODISCARD int _az_span_builder_append_uint64(az_span *ref_span,
                                                        uint64_t n) {
-  int rc = 0;
+  enum az_result_core rc = AZ_OK;
 
   _az_RETURN_IF_NOT_ENOUGH_SIZE(*ref_span, 1);
 
@@ -823,16 +830,16 @@ static AZ_NODISCARD int _az_span_builder_append_uint64(az_span *ref_span,
   return 0;
 }
 
-AZ_NODISCARD int az_span_u64toa(az_span destination, uint64_t source,
-                                az_span *out_span) {
-  int rc = 0;
+AZ_NODISCARD enum az_result_core
+az_span_u64toa(az_span destination, uint64_t source, az_span *out_span) {
+  enum az_result_core rc = AZ_OK;
 
   _az_PRECONDITION_VALID_SPAN(destination, 0, true);
   _az_PRECONDITION_NOT_NULL(out_span);
   *out_span = destination;
 
   rc = _az_span_builder_append_uint64(out_span, source);
-  if (rc != 0) {
+  if (rc != AZ_OK) {
     char err_buf[256];
     (void)err_buf;
     LOG_DEBUG("Error %d: %s\n", rc,
@@ -841,9 +848,9 @@ AZ_NODISCARD int az_span_u64toa(az_span destination, uint64_t source,
   return rc;
 }
 
-AZ_NODISCARD int az_span_i64toa(az_span destination, int64_t source,
-                                az_span *out_span) {
-  int rc = 0;
+AZ_NODISCARD enum az_result_core
+az_span_i64toa(az_span destination, int64_t source, az_span *out_span) {
+  enum az_result_core rc = AZ_OK;
 
   _az_PRECONDITION_VALID_SPAN(destination, 0, true);
   _az_PRECONDITION_NOT_NULL(out_span);
@@ -863,7 +870,7 @@ AZ_NODISCARD int az_span_i64toa(az_span destination, int64_t source,
 static AZ_NODISCARD int _az_span_builder_append_u32toa(az_span destination,
                                                        uint32_t n,
                                                        az_span *out_span) {
-  int rc = 0;
+  enum az_result_core rc = AZ_OK;
 
   _az_RETURN_IF_NOT_ENOUGH_SIZE(destination, 1);
 
@@ -901,16 +908,16 @@ static AZ_NODISCARD int _az_span_builder_append_u32toa(az_span destination,
   return 0;
 }
 
-AZ_NODISCARD int az_span_u32toa(az_span destination, uint32_t source,
-                                az_span *out_span) {
+AZ_NODISCARD enum az_result_core
+az_span_u32toa(az_span destination, uint32_t source, az_span *out_span) {
   _az_PRECONDITION_VALID_SPAN(destination, 0, true);
   _az_PRECONDITION_NOT_NULL(out_span);
   return _az_span_builder_append_u32toa(destination, source, out_span);
 }
 
-AZ_NODISCARD int az_span_i32toa(az_span destination, int32_t source,
-                                az_span *out_span) {
-  int rc = 0;
+AZ_NODISCARD enum az_result_core
+az_span_i32toa(az_span destination, int32_t source, az_span *out_span) {
+  enum az_result_core rc = AZ_OK;
 
   _az_PRECONDITION_VALID_SPAN(destination, 0, true);
   _az_PRECONDITION_NOT_NULL(out_span);
@@ -926,9 +933,11 @@ AZ_NODISCARD int az_span_i32toa(az_span destination, int32_t source,
   return _az_span_builder_append_u32toa(*out_span, (uint32_t)source, out_span);
 }
 
-AZ_NODISCARD int az_span_dtoa(az_span destination, double source,
-                              int32_t fractional_digits, az_span *out_span) {
-  int rc = 0;
+AZ_NODISCARD enum az_result_core az_span_dtoa(az_span destination,
+                                              double source,
+                                              int32_t fractional_digits,
+                                              az_span *out_span) {
+  enum az_result_core rc = AZ_OK;
 
   _az_PRECONDITION_VALID_SPAN(destination, 0, true);
   /* Inputs that are either positive or negative infinity, or not a number, are
@@ -976,7 +985,7 @@ AZ_NODISCARD int az_span_dtoa(az_span destination, double source,
     /* The double to uint64_t cast should be safe without loss of precision.
      * Append the integer part. */
     rc = _az_span_builder_append_uint64(out_span, (uint64_t)integer_part);
-    if (rc != 0) {
+    if (rc != AZ_OK) {
       char err_buf[256];
       (void)err_buf;
       LOG_DEBUG("Error %d: %s\n", rc,
@@ -1065,7 +1074,7 @@ AZ_NODISCARD int az_span_dtoa(az_span destination, double source,
 
 /* TODO: pass az_span by value */
 AZ_NODISCARD int _az_is_expected_span(az_span *ref_span, az_span expected) {
-  int rc = 0;
+  enum az_result_core rc = AZ_OK;
 
   size_t const expected_size = az_span_size(expected);
 
@@ -1221,9 +1230,10 @@ AZ_NODISCARD size_t _az_span_url_encode_calc_length(az_span source) {
   }
 }
 
-AZ_NODISCARD int _az_span_url_encode(az_span destination, az_span source,
-                                     ptrdiff_t *out_length) {
-  int rc = 0;
+AZ_NODISCARD enum az_result_core _az_span_url_encode(az_span destination,
+                                                     az_span source,
+                                                     ptrdiff_t *out_length) {
+  enum az_result_core rc = AZ_OK;
 
   _az_PRECONDITION_NOT_NULL(out_length);
   _az_PRECONDITION_VALID_SPAN(source, 0, true);

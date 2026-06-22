@@ -134,4 +134,8 @@ extern C_STR_SPAN_EXPORT az_span _az_span_token(az_span source,
 
 /*#include <azure/core/_az_cfg_suffix.h>*/
 
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
+
 #endif /* ! C_STR_SPAN_SPAN_INTERNAL_H */

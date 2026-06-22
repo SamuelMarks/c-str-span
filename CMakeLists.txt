@@ -2,6 +2,14 @@ cmake_minimum_required(VERSION 3.11.4)
 
 project(c_str_span VERSION 0.0.1 LANGUAGES C)
 
+if(MSVC AND CMAKE_CROSSCOMPILING)
+    if(POLICY CMP0091)
+        cmake_policy(SET CMP0091 NEW)
+    endif()
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+endif()
+
+
 option(PRECONDITIONS "Enable precondition checking" ON)
 if (NOT PRECONDITIONS)
     add_compile_definitions(AZ_NO_PRECONDITION_CHECKING)
@@ -99,7 +107,9 @@ install(
         FILES "${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.h"
         TYPE "INCLUDE"
 )
-include(InstallRequiredSystemLibraries)
+if (NOT CMAKE_CROSSCOMPILING)
+    include(InstallRequiredSystemLibraries)
+endif()
 set(CPACK_BUNDLE_NAME "${PROJECT_NAME}")
 set(CPACK_PACKAGE_VENDOR "SamuelMarks")
 set(CPACK_PACKAGE_DESCRIPTION "UTF-8 replacement for C strings, supporting zero-copy use-cases (non-null-terminated).")

@@ -345,8 +345,8 @@ extern C_STR_SPAN_EXPORT AZ_NODISCARD size_t az_span_find(az_span source,
  * will just return
  * \p destination.
  */
-extern C_STR_SPAN_EXPORT int az_span_copy(az_span destination, az_span source,
-                                          az_span *out_span);
+extern C_STR_SPAN_EXPORT enum az_result_core
+az_span_copy(az_span destination, az_span source, az_span *out_span);
 
 /**
  * @brief Copies the `uint8_t` \p byte to the \p destination at its 0-th index.
@@ -363,8 +363,8 @@ extern C_STR_SPAN_EXPORT int az_span_copy(az_span destination, az_span source,
  * @remarks The function assumes that the \p destination has a large enough size
  * to hold one more byte.
  */
-extern C_STR_SPAN_EXPORT int az_span_copy_u8(az_span destination, uint8_t byte,
-                                             az_span *out_span);
+extern C_STR_SPAN_EXPORT enum az_result_core
+az_span_copy_u8(az_span destination, uint8_t byte, az_span *out_span);
 
 /**
  * @brief Fills all the bytes of the \p destination #az_span with the specified
@@ -394,8 +394,8 @@ AZ_UNUSED AZ_INLINE void az_span_fill(az_span destination, uint8_t value) {
  * or the \p source contains a number that would overflow or underflow
  * `uint64_t`.
  */
-extern C_STR_SPAN_EXPORT AZ_NODISCARD int az_span_atou64(az_span source,
-                                                         uint64_t *out_number);
+extern C_STR_SPAN_EXPORT AZ_NODISCARD enum az_result_core
+az_span_atou64(az_span source, uint64_t *out_number);
 
 /**
  * @brief Parses an #az_span containing ASCII digits into an `int64_t` number.
@@ -410,8 +410,8 @@ extern C_STR_SPAN_EXPORT AZ_NODISCARD int az_span_atou64(az_span source,
  * or the \p source contains a number that would overflow or underflow
  * `int64_t`.
  */
-extern C_STR_SPAN_EXPORT AZ_NODISCARD int az_span_atoi64(az_span source,
-                                                         int64_t *out_number);
+extern C_STR_SPAN_EXPORT AZ_NODISCARD enum az_result_core
+az_span_atoi64(az_span source, int64_t *out_number);
 
 /**
  * @brief Parses an #az_span containing ASCII digits into a `uint32_t` number.
@@ -426,8 +426,8 @@ extern C_STR_SPAN_EXPORT AZ_NODISCARD int az_span_atoi64(az_span source,
  * or the \p source contains a number that would overflow or underflow
  * `uint32_t`.
  */
-extern C_STR_SPAN_EXPORT AZ_NODISCARD int az_span_atou32(az_span source,
-                                                         uint32_t *out_number);
+extern C_STR_SPAN_EXPORT AZ_NODISCARD enum az_result_core
+az_span_atou32(az_span source, uint32_t *out_number);
 
 /**
  * @brief Parses an #az_span containing ASCII digits into an `int32_t` number.
@@ -442,8 +442,8 @@ extern C_STR_SPAN_EXPORT AZ_NODISCARD int az_span_atou32(az_span source,
  * or if the \p source contains a number that would overflow or underflow
  * `int32_t`.
  */
-extern C_STR_SPAN_EXPORT AZ_NODISCARD int az_span_atoi32(az_span source,
-                                                         int32_t *out_number);
+extern C_STR_SPAN_EXPORT AZ_NODISCARD enum az_result_core
+az_span_atoi32(az_span source, int32_t *out_number);
 
 /**
  * @brief Parses an #az_span containing ASCII digits into a `double` number.
@@ -462,8 +462,8 @@ extern C_STR_SPAN_EXPORT AZ_NODISCARD int az_span_atoi32(az_span source,
  * Values such as `NaN`, `INFINITY`, and those that would overflow a `double` to
  * `+/-inf` are not allowed.
  */
-extern C_STR_SPAN_EXPORT AZ_NODISCARD int az_span_atod(az_span source,
-                                                       double *out_number);
+extern C_STR_SPAN_EXPORT AZ_NODISCARD enum az_result_core
+az_span_atod(az_span source, double *out_number);
 
 /**
  * @brief Converts an `int32_t` into its digit characters (base 10) and copies
