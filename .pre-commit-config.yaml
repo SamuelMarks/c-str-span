@@ -1,42 +1,77 @@
 repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: mixed-line-ending
   - repo: https://github.com/pre-commit/mirrors-clang-format
-    rev: v18.1.5
+    rev: v18.1.8
     hooks:
       - id: clang-format
-        args: [--style=LLVM]
+        args: ['-style=LLVM']
         types_or: [c, c++]
-  - repo: https://github.com/pocc/pre-commit-hooks
-    rev: v1.3.5
-    hooks:
-      - id: cppcheck
-        args:
-          - --error-exitcode=1
-          - --inline-suppr
-          - --suppress=missingInclude
-          - --suppress=duplicateExpression
-          - --suppress=constVariablePointer
-          - --suppress=redundantInitialization
-          - --suppress=toomanyconfigs
-          - --suppress=unmatchedSuppression
-          - --suppress=missingIncludeSystem
-          - --suppress=unusedFunction
-          - --suppress=pointerAdditionResultNotNull
-          - --suppress=knownConditionTrueFalse
-          - --suppress=variableScope
-          - --suppress=unsignedPositive
-          - --suppress=unreadVariable
-          - --suppress=unassignedVariable
-          - -Ibuild
-        exclude: ^c_str_span/tests/
   - repo: local
     hooks:
-      - id: build-test-valgrind
-        name: Build, Test, and Valgrind
-        entry: bash -c "mkdir -p build && cd build && cmake .. -DCMAKE_BUILD_TYPE=Debug -DC_STR_SPAN_BUILD_TESTING=ON && make && ctest --output-on-failure && if [ \"$(uname -s)\" = \"Linux\" ]; then valgrind --error-exitcode=1 --leak-check=full --show-leak-kinds=all ./bin/c_str_span_tests; fi"
+      - id: cppcheck
+        name: Cppcheck
+        entry: python3 scripts/precommit_matrix.py cppcheck
+        language: python
+        pass_filenames: false
+        types_or: [c, c++]
+      - id: build-gcc
+        name: Build (GCC)
+        entry: python3 scripts/precommit_matrix.py build gcc
+        language: python
+        pass_filenames: false
+      - id: test-gcc
+        name: Test (GCC)
+        entry: python3 scripts/precommit_matrix.py test gcc
+        language: python
+        pass_filenames: false
+      - id: build-clang
+        name: Build (Clang)
+        entry: python3 scripts/precommit_matrix.py build clang
+        language: python
+        pass_filenames: false
+      - id: test-clang
+        name: Test (Clang)
+        entry: python3 scripts/precommit_matrix.py test clang
+        language: python
+        pass_filenames: false
+      - id: test-msvc-wine
+        name: Test (MSVC Wine)
+        entry: bash -c "curl -fsSL https://raw.githubusercontent.com/SamuelMarks/c-ci/master/build_msvc_wine.sh | bash"
         language: system
         pass_filenames: false
-      - id: generate-badges
-        name: Generate Coverage Badges
-        entry: bash -c "./generate_badges.sh && git add reports/doc_coverage.svg reports/test_coverage.svg"
-        language: system
+      - id: build-msvc
+        name: Build (MSVC)
+        entry: python3 scripts/precommit_matrix.py build msvc
+        language: python
+        pass_filenames: false
+      - id: test-msvc
+        name: Test (MSVC)
+        entry: python3 scripts/precommit_matrix.py test msvc
+        language: python
+        pass_filenames: false
+      - id: build-mingw
+        name: Build (MinGW)
+        entry: python3 scripts/precommit_matrix.py build mingw
+        language: python
+        pass_filenames: false
+      - id: test-mingw
+        name: Test (MinGW)
+        entry: python3 scripts/precommit_matrix.py test mingw
+        language: python
+        pass_filenames: false
+      - id: valgrind
+        name: Valgrind (GCC)
+        entry: python3 scripts/precommit_matrix.py valgrind gcc
+        language: python
+        pass_filenames: false
+      - id: update-shields
+        name: Update README Shields
+        entry: python3 scripts/precommit_matrix.py shields
+        language: python
+        additional_dependencies: [gcovr]
         pass_filenames: false

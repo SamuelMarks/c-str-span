@@ -13,12 +13,12 @@ function(resolve_includes FILE_PATH OUTPUT_VAR)
         set(${OUTPUT_VAR} "/* already included: ${FILE_NAME} */\n" PARENT_SCOPE)
         return()
     endif()
-    
+
     list(APPEND PROCESSED_FILES "${FILE_NAME}")
     set(PROCESSED_FILES "${PROCESSED_FILES}" PARENT_SCOPE)
 
     file(READ "${FILE_PATH}" file_content)
-    
+
     string(REGEX MATCHALL "#include[ \t]+\"c_str_[^\"]+\"" matches "${file_content}")
     # We must deduplicate matches to avoid string(REPLACE) messing up if we replace a duplicate later
     if (matches)
@@ -29,7 +29,7 @@ function(resolve_includes FILE_PATH OUTPUT_VAR)
         # Extract the filename
         string(REGEX MATCH "\"c_str_[^\"]+\"" file_name_match "${match}")
         string(REPLACE "\"" "" inc_file "${file_name_match}")
-        
+
         if(EXISTS "${C_STR_SPAN_DIR}/${inc_file}")
             resolve_includes("${C_STR_SPAN_DIR}/${inc_file}" sub_content)
             string(REPLACE "${match}" "${sub_content}" file_content "${file_content}")
@@ -37,7 +37,7 @@ function(resolve_includes FILE_PATH OUTPUT_VAR)
             string(REPLACE "${match}" "/* stripped: ${inc_file} */" file_content "${file_content}")
         endif()
     endforeach()
-    
+
     set(${OUTPUT_VAR} "/* ========================================================================= */\n/* Begin: ${FILE_NAME} */\n/* ========================================================================= */\n${file_content}\n" PARENT_SCOPE)
 endfunction()
 
@@ -77,7 +77,7 @@ set(SOURCES
 set(ALL_SOURCES_CONTENT "")
 foreach(src IN LISTS SOURCES)
     file(READ "${C_STR_SPAN_DIR}/${src}" file_content)
-    
+
     string(REGEX MATCHALL "#include[ \t]+\"c_str_[^\"]+\"" matches "${file_content}")
     if (matches)
         list(REMOVE_DUPLICATES matches)
@@ -87,7 +87,7 @@ foreach(src IN LISTS SOURCES)
         string(REPLACE "\"" "" inc_file "${file_name_match}")
         string(REPLACE "${match}" "/* amalgamated: ${inc_file} */" file_content "${file_content}")
     endforeach()
-    
+
     string(APPEND ALL_SOURCES_CONTENT "/* ========================================================================= */\n/* Begin: ${src} */\n/* ========================================================================= */\n${file_content}\n")
 endforeach()
 
@@ -96,7 +96,7 @@ endforeach()
 # -------------------------------------------------------------
 file(WRITE "${OUT_FILE}" "/*
  * c-str-span Amalgamation (STB Style)
- * 
+ *
  * To use this library, do this in *one* C or C++ file:
  *   #define C_STR_SPAN_IMPLEMENTATION
  *   #include \"c_str_span_amalgamation.h\"

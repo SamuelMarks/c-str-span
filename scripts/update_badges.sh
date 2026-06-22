@@ -14,7 +14,7 @@ elif [ ! -z "${ZSH_VERSION+x}" ]; then
 else
   this_file="${0}"
 fi
-ROOT="$( cd "$( dirname -- "${this_file}" )" && pwd )"
+ROOT="$( cd "$( dirname -- "${this_file}" )/.." && pwd )"
 
 # 1. Test Coverage
 BUILD_DIRS=($(find "${ROOT}" -maxdepth 2 -type d \( -name "build*" -o -name "cmake-build-*" \)))
@@ -72,10 +72,10 @@ for header in "${PUBLIC_HEADERS[@]}"; do
     # - Macro definitions (#define AZ_... or #define az_...)
     # - Typedefs (typedef ... az_... or typedef struct ... az_...)
     # Excluding internal ones starting with _az_
-    
+
     SYMBOLS=$(grep -E "^(extern|typedef|#define (AZ_|az_))" "${header}" | grep -vE "_az_|extern \"C\"" | wc -l)
     TOTAL_SYMBOLS=$((TOTAL_SYMBOLS + SYMBOLS))
-    
+
     # Heuristic for documented symbols: count how many of these symbols have a /** block above them.
     # This is hard with grep, so we'll just use the /** vs symbols ratio as a proxy if it's less than 1.
     DOCS=$(grep -c "/\*\*" "${header}")
@@ -104,14 +104,14 @@ generate_badge() {
     local value=$2
     local filename=$3
     local color="#97ca00" # green
-    
+
     # Simple color heuristic
     local val_num=$(echo "${value}" | tr -dc '0-9.')
     if [ -z "${val_num}" ]; then val_num=0; fi
-    
+
     local val_int=${val_num%.*}
     if [ -z "${val_int}" ]; then val_int=0; fi
-    
+
     if [ "${val_int}" -lt 50 ]; then
         color="#e05d44" # red
     elif [ "${val_int}" -lt 80 ]; then
@@ -121,7 +121,7 @@ generate_badge() {
     local label_width=95 # Increased for "test coverage"
     local value_width=45
     if [ "${#value}" -gt 4 ]; then value_width=55; fi
-    
+
     local total_width=$((label_width + value_width))
     local label_x=$((label_width * 5))
     local value_x=$((label_width * 10 + value_width * 5))

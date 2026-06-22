@@ -9,24 +9,24 @@ on:
 jobs:
   build:
     uses: SamuelMarks/c-ci/.github/workflows/c-cmake-ci.yml@master
-  
+
   build-amalgamation:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Build Amalgamation
         run: |
           cmake -B build_amal -S . -DC_STR_SPAN_BUILD_AMALGAMATION=ON
           cmake --build build_amal --target c_str_span_amalgamation
-          
+
       - name: Verify Amalgamation Exists
         run: |
           if [ ! -f build_amal/c_str_span/c_str_span_amalgamation.h ]; then
             echo "Amalgamation header was not created!"
             exit 1
           fi
-          
+
       - name: Test Amalgamation Compilation
         run: |
           cat << 'EOF' > test_amal.c

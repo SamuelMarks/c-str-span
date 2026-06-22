@@ -2,6 +2,8 @@ c-str-span
 ==========
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![Doc Coverage](https://img.shields.io/badge/docs-0%25-red.svg)](#)
+[![Test Coverage](https://img.shields.io/badge/coverage-98%25-brightgreen.svg)](#)
 ![doc coverage](reports/doc_coverage.svg)
 ![test coverage](reports/test_coverage.svg)
 [![CI](https://github.com/SamuelMarks/c-str-span/actions/workflows/ci.yml/badge.svg)](https://github.com/SamuelMarks/c-str-span/actions/workflows/ci.yml)
