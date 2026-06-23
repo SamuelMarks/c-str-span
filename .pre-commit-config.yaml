@@ -39,6 +39,11 @@ repos:
         entry: python3 scripts/precommit_matrix.py test clang
         language: python
         pass_filenames: false
+      - id: build-msvc-2005-wine
+        name: Build and Test (MSVC 2005 Wine)
+        entry: python3 scripts/precommit_matrix.py build msvc_2005_wine
+        language: python
+        pass_filenames: false
       - id: test-msvc-wine
         name: Test (MSVC Wine)
         entry: bash -c "curl -fsSL https://raw.githubusercontent.com/SamuelMarks/c-ci/master/build_msvc_wine.sh | bash"
