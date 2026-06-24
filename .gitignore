@@ -43,4 +43,5 @@ Testing/
 test_amal*
 warnings.txt
 *.py
+!scripts/*.py
 Doxyfile

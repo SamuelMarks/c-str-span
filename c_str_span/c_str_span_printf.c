@@ -23,7 +23,11 @@
 #endif
 
 /** @brief Internal doc. */
+#if defined(_MSC_VER)
+#define FPRINTF fprintf_s
+#else
 #define FPRINTF fprintf
+#endif
 
 /** @brief Internal doc. */
 #define AZ_SPAN_FPRINTF(func_name, OUT)                                        \

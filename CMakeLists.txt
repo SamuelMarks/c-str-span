@@ -35,7 +35,7 @@ if (NOT DEFINED MSVC_VERSION
                 "${PROJECT_NAME}_compiler_flags"
                 INTERFACE
                 "$<$<AND:${gcc_like},$<CONFIG:Debug>>:$<BUILD_INTERFACE:-Wshadow;-Wformat=2;-Wall;-Wno-missing-braces;-Wno-long-long;-pedantic;-fprofile-arcs;-ftest-coverage>>"
-                "$<${msvc}:$<BUILD_INTERFACE:-W3;-WX;-Zi;-permissive->>"
+                "$<${msvc}:$<BUILD_INTERFACE:-W4;-WX;-Zi;-permissive->>"
         )
         target_link_options(
                 "${PROJECT_NAME}_compiler_flags"

@@ -1649,22 +1649,22 @@ TEST test_az_span_is_valid(void) {
   ASSERT(!(_az_span_is_valid(empty_span, 0, false)));
   ASSERT(!(_az_span_is_valid(empty_span, 1, true)));
   ASSERT(!(_az_span_is_valid(empty_span, 1, false)));
-  ASSERT(!(_az_span_is_valid(empty_span, -1, true)));
-  ASSERT(!(_az_span_is_valid(empty_span, -1, false)));
+  ASSERT(!(_az_span_is_valid(empty_span, (size_t)-1, true)));
+  ASSERT(!(_az_span_is_valid(empty_span, (size_t)-1, false)));
 
   ASSERT(_az_span_is_valid(empty_span, 0, true));
   ASSERT(!(_az_span_is_valid(empty_span, 0, false)));
   ASSERT(!(_az_span_is_valid(empty_span, 1, true)));
   ASSERT(!(_az_span_is_valid(empty_span, 1, false)));
-  ASSERT(!(_az_span_is_valid(empty_span, -1, true)));
-  ASSERT(!(_az_span_is_valid(empty_span, -1, false)));
+  ASSERT(!(_az_span_is_valid(empty_span, (size_t)-1, true)));
+  ASSERT(!(_az_span_is_valid(empty_span, (size_t)-1, false)));
 
   ASSERT(_az_span_is_valid(AZ_SPAN_FROM_STR(""), 0, true));
   ASSERT(_az_span_is_valid(AZ_SPAN_FROM_STR(""), 0, false));
   ASSERT(!(_az_span_is_valid(AZ_SPAN_FROM_STR(""), 1, true)));
   ASSERT(!(_az_span_is_valid(AZ_SPAN_FROM_STR(""), 1, false)));
-  ASSERT(!(_az_span_is_valid(AZ_SPAN_FROM_STR(""), -1, true)));
-  ASSERT(!(_az_span_is_valid(AZ_SPAN_FROM_STR(""), -1, false)));
+  ASSERT(!(_az_span_is_valid(AZ_SPAN_FROM_STR(""), (size_t)-1, true)));
+  ASSERT(!(_az_span_is_valid(AZ_SPAN_FROM_STR(""), (size_t)-1, false)));
 
   ASSERT(_az_span_is_valid(AZ_SPAN_FROM_STR("Hello"), 0, true));
   ASSERT(_az_span_is_valid(AZ_SPAN_FROM_STR("Hello"), 0, false));
@@ -1674,8 +1674,8 @@ TEST test_az_span_is_valid(void) {
   ASSERT(_az_span_is_valid(AZ_SPAN_FROM_STR("Hello"), 5, false));
   ASSERT(!(_az_span_is_valid(AZ_SPAN_FROM_STR("Hello"), 6, true)));
   ASSERT(!(_az_span_is_valid(AZ_SPAN_FROM_STR("Hello"), 6, false)));
-  ASSERT(!(_az_span_is_valid(AZ_SPAN_FROM_STR("Hello"), -1, true)));
-  ASSERT(!(_az_span_is_valid(AZ_SPAN_FROM_STR("Hello"), -1, false)));
+  ASSERT(!(_az_span_is_valid(AZ_SPAN_FROM_STR("Hello"), (size_t)-1, true)));
+  ASSERT(!(_az_span_is_valid(AZ_SPAN_FROM_STR("Hello"), (size_t)-1, false)));
 
   {
     uint8_t *const max_ptr = (uint8_t *)~0;
