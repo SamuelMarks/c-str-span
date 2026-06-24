@@ -11,6 +11,7 @@ file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/patch_greatest.cmake" "file(READ CMakeLi
 FetchContent_Declare(
         greatest
         URL https://github.com/SamuelMarks/greatest/archive/refs/heads/master.tar.gz
+        DOWNLOAD_EXTRACT_TIMESTAMP TRUE
         PATCH_COMMAND "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/patch_greatest.cmake"
 )
 set(OLD_BUILD_TESTING ${BUILD_TESTING})

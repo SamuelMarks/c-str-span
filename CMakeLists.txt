@@ -2,18 +2,78 @@ cmake_minimum_required(VERSION 3.11.4)
 
 project(c_str_span VERSION 0.0.1 LANGUAGES C)
 
-if(MSVC AND CMAKE_CROSSCOMPILING)
-    if(POLICY CMP0091)
-        cmake_policy(SET CMP0091 NEW)
-    endif()
-    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-endif()
-
-
 option(PRECONDITIONS "Enable precondition checking" ON)
 if (NOT PRECONDITIONS)
     add_compile_definitions(AZ_NO_PRECONDITION_CHECKING)
 endif ()
+
+#=============#
+# CMake Toggles #
+#=============#
+
+# LTO toggle
+option(ENABLE_LTO "Enable Link-Time Optimization (LTO)" OFF)
+if(ENABLE_LTO)
+    include(CheckIPOSupported)
+    check_ipo_supported(RESULT ipo_supported)
+    if(ipo_supported)
+        set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
+    endif()
+endif()
+
+# Charsets toggle
+option(ENABLE_UNICODE "Enable UNICODE support" ON)
+if(ENABLE_UNICODE)
+    add_compile_definitions(UNICODE _UNICODE)
+endif()
+
+# MSVC specific toggles
+if(MSVC)
+    # Threading toggle
+    option(ENABLE_MULTITHREADING "Enable Multi-threading (MSVC)" ON)
+
+    # CRT Linkage toggle
+    option(USE_STATIC_CRT "Use static CRT (/MT, /MTd)" OFF)
+
+    # RTC toggles
+    option(ENABLE_RTC1 "Enable Basic Runtime Checks (/RTC1)" OFF)
+    option(ENABLE_RTCS "Enable Stack Frame Runtime Checks (/RTCs)" OFF)
+    option(ENABLE_RTCU "Enable Uninitialized Variable Runtime Checks (/RTCu)" OFF)
+
+    # Use CMake's built-in CMP0091 for CRT linkage
+    if(POLICY CMP0091)
+        cmake_policy(SET CMP0091 NEW)
+        if(USE_STATIC_CRT)
+            if(ENABLE_MULTITHREADING)
+                set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+            else()
+                # CMake CMP0091 doesn't have SingleThreaded, MSVC removed it.
+                set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+            endif()
+        else()
+            set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
+        endif()
+    endif()
+
+    # Configure RTC flags
+    set(RTC_FLAGS "")
+    if(ENABLE_RTC1)
+        list(APPEND RTC_FLAGS "/RTC1")
+    endif()
+    if(ENABLE_RTCS AND NOT ENABLE_RTC1)
+        list(APPEND RTC_FLAGS "/RTCs")
+    endif()
+    if(ENABLE_RTCU AND NOT ENABLE_RTC1)
+        list(APPEND RTC_FLAGS "/RTCu")
+    endif()
+    if(RTC_FLAGS)
+        add_compile_options("$<$<CONFIG:Debug>:${RTC_FLAGS}>")
+    endif()
+
+    if(NOT ENABLE_MULTITHREADING AND NOT USE_STATIC_CRT)
+        # Note: Single-threaded CRT (/ML) was removed in VS 2005, but we provide option as requested
+    endif()
+endif()
 
 #===============#
 # Compiler args #
