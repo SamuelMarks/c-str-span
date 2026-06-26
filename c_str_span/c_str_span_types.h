@@ -18,7 +18,6 @@ extern "C" {
 #include <stdint.h>
 #endif /* defined(_MSC_VER) && _MSC_VER < 1600 */
 
-#include <stddef.h>
 #include "c_str_span_stdbool.h"
 /* clang-format on */
 

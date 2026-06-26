@@ -1104,15 +1104,11 @@ TEST az_span_slice_to_end_test(void) {
 }
 
 TEST az_span_test_macro_only_allows_byte_buffers(void) {
-  int is_arr;
-  int is_byte_arr;
 
   {
     uint8_t uint8_buffer[2];
-    is_arr = _az_IS_ARRAY(uint8_buffer);
-    is_byte_arr = _az_IS_BYTE_ARRAY(uint8_buffer);
-    ASSERT_EQ(1, is_arr);
-    ASSERT_EQ(1, is_byte_arr);
+    ASSERT_EQ(1, _az_IS_ARRAY(uint8_buffer));
+    ASSERT_EQ(1, _az_IS_BYTE_ARRAY(uint8_buffer));
     {
       az_span valid = AZ_SPAN_FROM_BUFFER(uint8_buffer);
       ASSERT_EQ(2, az_span_size(valid));
@@ -1121,10 +1117,8 @@ TEST az_span_test_macro_only_allows_byte_buffers(void) {
 
   {
     char char_buffer[2];
-    is_arr = _az_IS_ARRAY(char_buffer);
-    is_byte_arr = _az_IS_BYTE_ARRAY(char_buffer);
-    ASSERT_EQ(1, is_arr);
-    ASSERT_EQ(1, is_byte_arr);
+    ASSERT_EQ(1, _az_IS_ARRAY(char_buffer));
+    ASSERT_EQ(1, _az_IS_BYTE_ARRAY(char_buffer));
     {
       az_span valid = AZ_SPAN_FROM_BUFFER(char_buffer);
       ASSERT_EQ(2, az_span_size(valid));
@@ -1133,27 +1127,21 @@ TEST az_span_test_macro_only_allows_byte_buffers(void) {
 
   {
     uint32_t uint32_buffer[2];
-    is_arr = _az_IS_ARRAY(uint32_buffer);
-    is_byte_arr = _az_IS_BYTE_ARRAY(uint32_buffer);
-    ASSERT_EQ(1, is_arr);
-    ASSERT_EQ(0, is_byte_arr);
+    ASSERT_EQ(1, _az_IS_ARRAY(uint32_buffer));
+    ASSERT_EQ(0, _az_IS_BYTE_ARRAY(uint32_buffer));
   }
 
   {
     uint8_t x = 1;
     uint8_t *p1 = &x;
-    is_arr = _az_IS_ARRAY(p1);
-    is_byte_arr = _az_IS_BYTE_ARRAY(p1);
-    ASSERT_EQ(0, is_arr);
-    ASSERT_EQ(0, is_byte_arr);
+    ASSERT_EQ(0, _az_IS_ARRAY(p1));
+    ASSERT_EQ(0, _az_IS_BYTE_ARRAY(p1));
   }
 
   {
     char *p1 = "HELLO";
-    is_arr = _az_IS_ARRAY(p1);
-    is_byte_arr = _az_IS_BYTE_ARRAY(p1);
-    ASSERT_EQ(0, is_arr);
-    ASSERT_EQ(0, is_byte_arr);
+    ASSERT_EQ(0, _az_IS_ARRAY(p1));
+    ASSERT_EQ(0, _az_IS_BYTE_ARRAY(p1));
   }
   PASS();
 }
@@ -1661,22 +1649,22 @@ TEST test_az_span_is_valid(void) {
   ASSERT(!(_az_span_is_valid(empty_span, 0, false)));
   ASSERT(!(_az_span_is_valid(empty_span, 1, true)));
   ASSERT(!(_az_span_is_valid(empty_span, 1, false)));
-  ASSERT(!(_az_span_is_valid(empty_span, (size_t)-1, true)));
-  ASSERT(!(_az_span_is_valid(empty_span, (size_t)-1, false)));
+  ASSERT(!(_az_span_is_valid(empty_span, -1, true)));
+  ASSERT(!(_az_span_is_valid(empty_span, -1, false)));
 
   ASSERT(_az_span_is_valid(empty_span, 0, true));
   ASSERT(!(_az_span_is_valid(empty_span, 0, false)));
   ASSERT(!(_az_span_is_valid(empty_span, 1, true)));
   ASSERT(!(_az_span_is_valid(empty_span, 1, false)));
-  ASSERT(!(_az_span_is_valid(empty_span, (size_t)-1, true)));
-  ASSERT(!(_az_span_is_valid(empty_span, (size_t)-1, false)));
+  ASSERT(!(_az_span_is_valid(empty_span, -1, true)));
+  ASSERT(!(_az_span_is_valid(empty_span, -1, false)));
 
   ASSERT(_az_span_is_valid(AZ_SPAN_FROM_STR(""), 0, true));
   ASSERT(_az_span_is_valid(AZ_SPAN_FROM_STR(""), 0, false));
   ASSERT(!(_az_span_is_valid(AZ_SPAN_FROM_STR(""), 1, true)));
   ASSERT(!(_az_span_is_valid(AZ_SPAN_FROM_STR(""), 1, false)));
-  ASSERT(!(_az_span_is_valid(AZ_SPAN_FROM_STR(""), (size_t)-1, true)));
-  ASSERT(!(_az_span_is_valid(AZ_SPAN_FROM_STR(""), (size_t)-1, false)));
+  ASSERT(!(_az_span_is_valid(AZ_SPAN_FROM_STR(""), -1, true)));
+  ASSERT(!(_az_span_is_valid(AZ_SPAN_FROM_STR(""), -1, false)));
 
   ASSERT(_az_span_is_valid(AZ_SPAN_FROM_STR("Hello"), 0, true));
   ASSERT(_az_span_is_valid(AZ_SPAN_FROM_STR("Hello"), 0, false));
@@ -1686,8 +1674,8 @@ TEST test_az_span_is_valid(void) {
   ASSERT(_az_span_is_valid(AZ_SPAN_FROM_STR("Hello"), 5, false));
   ASSERT(!(_az_span_is_valid(AZ_SPAN_FROM_STR("Hello"), 6, true)));
   ASSERT(!(_az_span_is_valid(AZ_SPAN_FROM_STR("Hello"), 6, false)));
-  ASSERT(!(_az_span_is_valid(AZ_SPAN_FROM_STR("Hello"), (size_t)-1, true)));
-  ASSERT(!(_az_span_is_valid(AZ_SPAN_FROM_STR("Hello"), (size_t)-1, false)));
+  ASSERT(!(_az_span_is_valid(AZ_SPAN_FROM_STR("Hello"), -1, true)));
+  ASSERT(!(_az_span_is_valid(AZ_SPAN_FROM_STR("Hello"), -1, false)));
 
   {
     uint8_t *const max_ptr = (uint8_t *)~0;
@@ -2066,14 +2054,11 @@ TEST az_precondition_callback_test(void) {
   az_precondition_failed_fn original = az_precondition_failed_get_callback();
   az_precondition_failed_set_callback(test_precondition_failed_callback);
 
-  int zero = 0;
-  int one = 1;
-
   g_precondition_failed_called = 0;
-  _az_PRECONDITION(one == zero);
+  _az_PRECONDITION(1 == 0);
   ASSERT_EQ(1, g_precondition_failed_called);
 
-  _az_PRECONDITION(one == one);
+  _az_PRECONDITION(1 == 1);
   ASSERT_EQ(1, g_precondition_failed_called);
 
   {

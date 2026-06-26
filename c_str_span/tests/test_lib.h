@@ -8,10 +8,6 @@
 #include <c_str_span.h>
 /* clang-format on */
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
-
 TEST x_lib_should_be(void) {
   /* TODO: Actually test things */
   az_span s = az_span_empty();
@@ -22,7 +18,3 @@ TEST x_lib_should_be(void) {
 
 /* Suites can group multiple tests with common setup. */
 SUITE(lib_suite) { RUN_TEST(x_lib_should_be); }
-
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */

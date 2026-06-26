@@ -15,73 +15,73 @@ repos:
     hooks:
       - id: cppcheck
         name: Cppcheck
-        entry: python -c "import urllib.request; exec(urllib.request.urlopen('https://raw.githubusercontent.com/SamuelMarks/c-ci/master/precommit_matrix.py').read().replace(b'[\"ctest\", \"--output-on-failure\"]', b'[\"ctest\", \"-C\", \"Debug\", \"--output-on-failure\"]'))" cppcheck
+        entry: python3 scripts/precommit_matrix.py cppcheck
         language: python
         pass_filenames: false
         types_or: [c, c++]
       - id: build-gcc
         name: Build (GCC)
-        entry: python -c "import urllib.request; exec(urllib.request.urlopen('https://raw.githubusercontent.com/SamuelMarks/c-ci/master/precommit_matrix.py').read().replace(b'[\"ctest\", \"--output-on-failure\"]', b'[\"ctest\", \"-C\", \"Debug\", \"--output-on-failure\"]'))" build gcc
+        entry: python3 scripts/precommit_matrix.py build gcc
         language: python
         pass_filenames: false
       - id: test-gcc
         name: Test (GCC)
-        entry: python -c "import urllib.request; exec(urllib.request.urlopen('https://raw.githubusercontent.com/SamuelMarks/c-ci/master/precommit_matrix.py').read().replace(b'[\"ctest\", \"--output-on-failure\"]', b'[\"ctest\", \"-C\", \"Debug\", \"--output-on-failure\"]'))" test gcc
+        entry: python3 scripts/precommit_matrix.py test gcc
         language: python
         pass_filenames: false
       - id: build-clang
         name: Build (Clang)
-        entry: python -c "import urllib.request; exec(urllib.request.urlopen('https://raw.githubusercontent.com/SamuelMarks/c-ci/master/precommit_matrix.py').read().replace(b'[\"ctest\", \"--output-on-failure\"]', b'[\"ctest\", \"-C\", \"Debug\", \"--output-on-failure\"]'))" build clang
+        entry: python3 scripts/precommit_matrix.py build clang
         language: python
         pass_filenames: false
       - id: test-clang
         name: Test (Clang)
-        entry: python -c "import urllib.request; exec(urllib.request.urlopen('https://raw.githubusercontent.com/SamuelMarks/c-ci/master/precommit_matrix.py').read().replace(b'[\"ctest\", \"--output-on-failure\"]', b'[\"ctest\", \"-C\", \"Debug\", \"--output-on-failure\"]'))" test clang
-        language: python
-        pass_filenames: false
-      - id: build-msvc-2005-wine
-        name: Build and Test (MSVC 2005 Wine)
-        entry: python -c "import urllib.request; exec(urllib.request.urlopen('https://raw.githubusercontent.com/SamuelMarks/c-ci/master/precommit_matrix.py').read().replace(b'[\"ctest\", \"--output-on-failure\"]', b'[\"ctest\", \"-C\", \"Debug\", \"--output-on-failure\"]'))" build msvc_2005_wine
-        language: python
-        pass_filenames: false
-      - id: build-msvc-wine
-        name: Build (MSVC Wine)
-        entry: python -c "import urllib.request; exec(urllib.request.urlopen('https://raw.githubusercontent.com/SamuelMarks/c-ci/master/precommit_matrix.py').read().replace(b'[\"ctest\", \"--output-on-failure\"]', b'[\"ctest\", \"-C\", \"Debug\", \"--output-on-failure\"]'))" build msvc_wine
+        entry: python3 scripts/precommit_matrix.py test clang
         language: python
         pass_filenames: false
       - id: test-msvc-wine
         name: Test (MSVC Wine)
-        entry: python -c "import urllib.request; exec(urllib.request.urlopen('https://raw.githubusercontent.com/SamuelMarks/c-ci/master/precommit_matrix.py').read().replace(b'[\"ctest\", \"--output-on-failure\"]', b'[\"ctest\", \"-C\", \"Debug\", \"--output-on-failure\"]'))" test msvc_wine
+        entry: bash -c "curl -fsSL https://raw.githubusercontent.com/SamuelMarks/c-ci/master/build_msvc_wine.sh | bash"
+        language: system
+        pass_filenames: false
+      - id: build-msvc-2005-wine
+        name: Build and Test (MSVC 2005 Wine)
+        entry: python -c "import urllib.request; exec(urllib.request.urlopen('https://raw.githubusercontent.com/SamuelMarks/c-ci/master/precommit_matrix.py').read())" build msvc_2005_wine
+        language: python
+        pass_filenames: false
+      - id: build-msvc-2026-wine
+        name: Build and Test (MSVC 2026 Wine)
+        entry: python -c "import urllib.request; exec(urllib.request.urlopen('https://raw.githubusercontent.com/SamuelMarks/c-ci/master/precommit_matrix.py').read())" build msvc_2026_wine
         language: python
         pass_filenames: false
       - id: build-msvc
         name: Build (MSVC)
-        entry: python -c "import urllib.request; exec(urllib.request.urlopen('https://raw.githubusercontent.com/SamuelMarks/c-ci/master/precommit_matrix.py').read().replace(b'[\"ctest\", \"--output-on-failure\"]', b'[\"ctest\", \"-C\", \"Debug\", \"--output-on-failure\"]'))" build msvc
+        entry: python3 scripts/precommit_matrix.py build msvc
         language: python
         pass_filenames: false
       - id: test-msvc
         name: Test (MSVC)
-        entry: python -c "import urllib.request; exec(urllib.request.urlopen('https://raw.githubusercontent.com/SamuelMarks/c-ci/master/precommit_matrix.py').read().replace(b'[\"ctest\", \"--output-on-failure\"]', b'[\"ctest\", \"-C\", \"Debug\", \"--output-on-failure\"]'))" test msvc
+        entry: python3 scripts/precommit_matrix.py test msvc
         language: python
         pass_filenames: false
       - id: build-mingw
         name: Build (MinGW)
-        entry: python -c "import urllib.request; exec(urllib.request.urlopen('https://raw.githubusercontent.com/SamuelMarks/c-ci/master/precommit_matrix.py').read().replace(b'[\"ctest\", \"--output-on-failure\"]', b'[\"ctest\", \"-C\", \"Debug\", \"--output-on-failure\"]'))" build mingw
+        entry: python3 scripts/precommit_matrix.py build mingw
         language: python
         pass_filenames: false
       - id: test-mingw
         name: Test (MinGW)
-        entry: python -c "import urllib.request; exec(urllib.request.urlopen('https://raw.githubusercontent.com/SamuelMarks/c-ci/master/precommit_matrix.py').read().replace(b'[\"ctest\", \"--output-on-failure\"]', b'[\"ctest\", \"-C\", \"Debug\", \"--output-on-failure\"]'))" test mingw
+        entry: python3 scripts/precommit_matrix.py test mingw
         language: python
         pass_filenames: false
       - id: valgrind
         name: Valgrind (GCC)
-        entry: python -c "import urllib.request; exec(urllib.request.urlopen('https://raw.githubusercontent.com/SamuelMarks/c-ci/master/precommit_matrix.py').read().replace(b'[\"ctest\", \"--output-on-failure\"]', b'[\"ctest\", \"-C\", \"Debug\", \"--output-on-failure\"]'))" valgrind gcc
+        entry: python3 scripts/precommit_matrix.py valgrind gcc
         language: python
         pass_filenames: false
       - id: update-shields
         name: Update README Shields
-        entry: python -c "import urllib.request; exec(urllib.request.urlopen('https://raw.githubusercontent.com/SamuelMarks/c-ci/master/precommit_matrix.py').read().replace(b'[\"ctest\", \"--output-on-failure\"]', b'[\"ctest\", \"-C\", \"Debug\", \"--output-on-failure\"]'))" shields
+        entry: python3 scripts/precommit_matrix.py shields
         language: python
         additional_dependencies: [gcovr]
         pass_filenames: false
