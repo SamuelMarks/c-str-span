@@ -105,8 +105,8 @@ _az_span_url_encode(az_span destination, az_span source, ptrdiff_t *out_length);
  * @return The length of source if it would be url-encoded.
  *
  */
-extern C_STR_SPAN_EXPORT AZ_NODISCARD size_t
-_az_span_url_encode_calc_length(az_span source);
+extern C_STR_SPAN_EXPORT AZ_NODISCARD enum az_result_core
+_az_span_url_encode_calc_length(az_span source, size_t *out_length);
 
 /**
  * @brief String tokenizer for #az_span.
@@ -127,10 +127,9 @@ _az_span_url_encode_calc_length(az_span source);
  * or the end of `source` if `delimiter` is not found. If `source` is empty,
  * #az_span_empty() is returned instead.
  */
-extern C_STR_SPAN_EXPORT az_span _az_span_token(az_span source,
-                                                az_span delimiter,
-                                                az_span *out_remainder,
-                                                size_t *out_index);
+extern C_STR_SPAN_EXPORT enum az_result_core
+_az_span_token(az_span source, az_span delimiter, az_span *out_remainder,
+               size_t *out_index, az_span *out_token);
 
 /*#include <azure/core/_az_cfg_suffix.h>*/
 

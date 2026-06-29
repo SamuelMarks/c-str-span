@@ -904,7 +904,8 @@ TEST az_span_to_str_test(void) {
   az_span sample = AZ_SPAN_FROM_STR("hello World!");
   char str[20];
 
-  az_span_to_str(str, 20, sample);
+  enum az_result_core rc = az_span_to_str(str, 20, sample);
+  ASSERT_EQ(AZ_OK, rc);
   ASSERT_STR_EQ("hello World!", str);
   PASS();
 }
@@ -913,7 +914,11 @@ TEST az_span_find_beginning_success(void) {
   az_span span = AZ_SPAN_FROM_STR("abcdefgabcdefg");
   az_span target = AZ_SPAN_FROM_STR("abc");
 
-  ASSERT_EQ(0, az_span_find(span, target));
+  {
+    size_t out_index;
+    ASSERT_EQ(AZ_OK, az_span_find(span, target, &out_index));
+    ASSERT_EQ(0, out_index);
+  }
   PASS();
 }
 
@@ -921,7 +926,11 @@ TEST az_span_find_middle_success(void) {
   az_span span = AZ_SPAN_FROM_STR("abcdefgabcdefg");
   az_span target = AZ_SPAN_FROM_STR("gab");
 
-  ASSERT_EQ(6, az_span_find(span, target));
+  {
+    size_t out_index;
+    ASSERT_EQ(AZ_OK, az_span_find(span, target, &out_index));
+    ASSERT_EQ(6, out_index);
+  }
   PASS();
 }
 
@@ -929,7 +938,11 @@ TEST az_span_find_end_success(void) {
   az_span span = AZ_SPAN_FROM_STR("abcdefgabcdefgh");
   az_span target = AZ_SPAN_FROM_STR("efgh");
 
-  ASSERT_EQ(11, az_span_find(span, target));
+  {
+    size_t out_index;
+    ASSERT_EQ(AZ_OK, az_span_find(span, target, &out_index));
+    ASSERT_EQ(11, out_index);
+  }
   PASS();
 }
 
@@ -937,7 +950,11 @@ TEST az_span_find_source_target_identical_success(void) {
   az_span span = AZ_SPAN_FROM_STR("abcdefgabcdefg");
   az_span target = AZ_SPAN_FROM_STR("abcdefgabcdefg");
 
-  ASSERT_EQ(0, az_span_find(span, target));
+  {
+    size_t out_index;
+    ASSERT_EQ(AZ_OK, az_span_find(span, target, &out_index));
+    ASSERT_EQ(0, out_index);
+  }
   PASS();
 }
 
@@ -945,7 +962,10 @@ TEST az_span_find_not_found_fail(void) {
   az_span span = AZ_SPAN_FROM_STR("abcdefgabcdefg");
   az_span target = AZ_SPAN_FROM_STR("abd");
 
-  ASSERT_EQ(FAIL_SIZE_T_VAL, az_span_find(span, target));
+  {
+    size_t out_index;
+    ASSERT_EQ(AZ_ERROR_ITEM_NOT_FOUND, az_span_find(span, target, &out_index));
+  }
   PASS();
 }
 
@@ -953,9 +973,22 @@ TEST az_span_find_error_cases_fail(void) {
   az_span span = AZ_SPAN_FROM_STR("abcdefgabcdefg");
   az_span target = AZ_SPAN_FROM_STR("abd");
 
-  ASSERT_EQ(0, az_span_find(az_span_empty(), az_span_empty()));
-  ASSERT_EQ(0, az_span_find(span, az_span_empty()));
-  ASSERT_EQ(FAIL_SIZE_T_VAL, az_span_find(az_span_empty(), target));
+  {
+    size_t out_index;
+    ASSERT_EQ(AZ_OK,
+              az_span_find(az_span_empty(), az_span_empty(), &out_index));
+    ASSERT_EQ(0, out_index);
+  }
+  {
+    size_t out_index;
+    ASSERT_EQ(AZ_OK, az_span_find(span, az_span_empty(), &out_index));
+    ASSERT_EQ(0, out_index);
+  }
+  {
+    size_t out_index;
+    ASSERT_EQ(AZ_ERROR_ITEM_NOT_FOUND,
+              az_span_find(az_span_empty(), target, &out_index));
+  }
   PASS();
 }
 
@@ -963,7 +996,10 @@ TEST az_span_find_target_longer_than_source_fails(void) {
   az_span span = AZ_SPAN_FROM_STR("aa");
   az_span target = AZ_SPAN_FROM_STR("aaa");
 
-  ASSERT_EQ(FAIL_SIZE_T_VAL, az_span_find(span, target));
+  {
+    size_t out_index;
+    ASSERT_EQ(AZ_ERROR_ITEM_NOT_FOUND, az_span_find(span, target, &out_index));
+  }
   PASS();
 }
 
@@ -971,7 +1007,10 @@ TEST az_span_find_target_overlap_continuation_of_source_fails(void) {
   az_span span = AZ_SPAN_FROM_STR("abcd");
   az_span target = AZ_SPAN_FROM_STR("cde");
 
-  ASSERT_EQ(FAIL_SIZE_T_VAL, az_span_find(span, target));
+  {
+    size_t out_index;
+    ASSERT_EQ(AZ_ERROR_ITEM_NOT_FOUND, az_span_find(span, target, &out_index));
+  }
   PASS();
 }
 
@@ -979,7 +1018,10 @@ TEST az_span_find_target_more_chars_than_prefix_of_source_fails(void) {
   az_span span = AZ_SPAN_FROM_STR("abcd");
   az_span target = AZ_SPAN_FROM_STR("zab");
 
-  ASSERT_EQ(FAIL_SIZE_T_VAL, az_span_find(span, target));
+  {
+    size_t out_index;
+    ASSERT_EQ(AZ_ERROR_ITEM_NOT_FOUND, az_span_find(span, target, &out_index));
+  }
   PASS();
 }
 
@@ -987,7 +1029,11 @@ TEST az_span_find_overlapping_target_success(void) {
   az_span span = AZ_SPAN_FROM_STR("abcdefghij");
   az_span target = az_span_slice(span, 6, 9);
 
-  ASSERT_EQ(6, az_span_find(span, target));
+  {
+    size_t out_index;
+    ASSERT_EQ(AZ_OK, az_span_find(span, target, &out_index));
+    ASSERT_EQ(6, out_index);
+  }
   PASS();
 }
 
@@ -995,30 +1041,66 @@ TEST az_span_find_embedded_NULLs_success(void) {
   az_span span = AZ_SPAN_FROM_STR("abcd\0\0fghij");
   az_span target = AZ_SPAN_FROM_STR("\0\0");
 
-  ASSERT_EQ(4, az_span_find(span, target));
+  {
+    size_t out_index;
+    ASSERT_EQ(AZ_OK, az_span_find(span, target, &out_index));
+    ASSERT_EQ(4, out_index);
+  }
   PASS();
 }
 
 TEST az_span_find_capacity_checks_success(void) {
   uint8_t *buffer = (uint8_t *)"aaaa";
 
-  ASSERT_EQ(0,
-            az_span_find(az_span_create(buffer, 2), az_span_create(buffer, 2)));
-  ASSERT_EQ(0,
-            az_span_find(az_span_create(buffer, 2), az_span_create(buffer, 0)));
-  ASSERT_EQ(0,
-            az_span_find(az_span_create(buffer, 0), az_span_create(buffer, 0)));
+  {
+    size_t out_index;
+    ASSERT_EQ(AZ_OK, az_span_find(az_span_create(buffer, 2),
+                                  az_span_create(buffer, 2), &out_index));
+    ASSERT_EQ(0, out_index);
+  }
+  {
+    size_t out_index;
+    ASSERT_EQ(AZ_OK, az_span_find(az_span_create(buffer, 2),
+                                  az_span_create(buffer, 0), &out_index));
+    ASSERT_EQ(0, out_index);
+  }
+  {
+    size_t out_index;
+    ASSERT_EQ(AZ_OK, az_span_find(az_span_create(buffer, 0),
+                                  az_span_create(buffer, 0), &out_index));
+    ASSERT_EQ(0, out_index);
+  }
 
-  ASSERT_EQ(0, az_span_find(az_span_create(buffer, 2),
-                            az_span_create(buffer + 1, 2)));
-  ASSERT_EQ(0, az_span_find(az_span_create(buffer + 1, 2),
-                            az_span_create(buffer, 2)));
-  ASSERT_EQ(0, az_span_find(az_span_create(buffer + 1, 2),
-                            az_span_create(buffer + 1, 2)));
-  ASSERT_EQ(0, az_span_find(az_span_create(buffer, 2),
-                            az_span_create(buffer + 2, 2)));
-  ASSERT_EQ(0, az_span_find(az_span_create(buffer + 2, 2),
-                            az_span_create(buffer, 2)));
+  {
+    size_t out_index;
+    ASSERT_EQ(AZ_OK, az_span_find(az_span_create(buffer, 2),
+                                  az_span_create(buffer + 1, 2), &out_index));
+    ASSERT_EQ(0, out_index);
+  }
+  {
+    size_t out_index;
+    ASSERT_EQ(AZ_OK, az_span_find(az_span_create(buffer + 1, 2),
+                                  az_span_create(buffer, 2), &out_index));
+    ASSERT_EQ(0, out_index);
+  }
+  {
+    size_t out_index;
+    ASSERT_EQ(AZ_OK, az_span_find(az_span_create(buffer + 1, 2),
+                                  az_span_create(buffer + 1, 2), &out_index));
+    ASSERT_EQ(0, out_index);
+  }
+  {
+    size_t out_index;
+    ASSERT_EQ(AZ_OK, az_span_find(az_span_create(buffer, 2),
+                                  az_span_create(buffer + 2, 2), &out_index));
+    ASSERT_EQ(0, out_index);
+  }
+  {
+    size_t out_index;
+    ASSERT_EQ(AZ_OK, az_span_find(az_span_create(buffer + 2, 2),
+                                  az_span_create(buffer, 2), &out_index));
+    ASSERT_EQ(0, out_index);
+  }
   PASS();
 }
 
@@ -1026,9 +1108,22 @@ TEST az_span_find_overlapping_checks_success(void) {
   az_span span = AZ_SPAN_FROM_STR("abcdefghij");
   az_span source = az_span_slice(span, 1, 4);
   az_span target = az_span_slice(span, 6, 9);
-  ASSERT_EQ(FAIL_SIZE_T_VAL, az_span_find(source, target));
-  ASSERT_EQ(FAIL_SIZE_T_VAL, az_span_find(source, az_span_slice(span, 1, 5)));
-  ASSERT_EQ(1, az_span_find(source, az_span_slice(span, 2, 4)));
+  {
+    size_t out_index;
+    ASSERT_EQ(AZ_ERROR_ITEM_NOT_FOUND,
+              az_span_find(source, target, &out_index));
+  }
+  {
+    size_t out_index;
+    ASSERT_EQ(AZ_ERROR_ITEM_NOT_FOUND,
+              az_span_find(source, az_span_slice(span, 1, 5), &out_index));
+  }
+  {
+    size_t out_index;
+    ASSERT_EQ(AZ_OK,
+              az_span_find(source, az_span_slice(span, 2, 4), &out_index));
+    ASSERT_EQ(1, out_index);
+  }
 
   PASS();
 }
@@ -1160,11 +1255,14 @@ TEST az_span_copy_uint8_succeeds(void) {
   uint8_t raw_buffer[15];
   az_span buffer = AZ_SPAN_FROM_BUFFER(raw_buffer);
 
-  az_span_copy_u8(buffer, 'a', &buffer);
+  enum az_result_core rc = az_span_copy_u8(buffer, 'a', &buffer);
+  ASSERT_EQ(AZ_OK, rc);
   ASSERT_EQ(14, az_span_size(buffer));
-  az_span_copy_u8(buffer, 'b', &buffer);
+  rc = az_span_copy_u8(buffer, 'b', &buffer);
+  ASSERT_EQ(AZ_OK, rc);
   ASSERT_EQ(13, az_span_size(buffer));
-  az_span_copy_u8(buffer, 'c', &buffer);
+  rc = az_span_copy_u8(buffer, 'c', &buffer);
+  ASSERT_EQ(AZ_OK, rc);
   ASSERT_EQ(12, az_span_size(buffer));
 
   ASSERT(az_span_is_content_equal(
@@ -1636,7 +1734,8 @@ TEST az_span_copy_empty(void) {
   uint8_t buff[10] = {0};
   az_span dst = AZ_SPAN_FROM_BUFFER(buff);
   az_span out;
-  az_span_copy(dst, az_span_empty(), &out);
+  enum az_result_core rc = az_span_copy(dst, az_span_empty(), &out);
+  ASSERT_EQ(AZ_OK, rc);
   ASSERT(az_span_is_content_equal(out, dst));
 
   PASS();
@@ -1890,7 +1989,7 @@ TEST test_az_span_token_success(void) {
   size_t index = 0;
 
   /* token: "" */
-  token = _az_span_token(span, delim, &out_span, &index);
+  ASSERT_EQ(AZ_OK, _az_span_token(span, delim, &out_span, &index, &token));
   ASSERT_EQ(0, index);
   ASSERT(NULL != az_span_ptr(token));
   ASSERT(az_span_size(token) == 0);
@@ -1900,7 +1999,7 @@ TEST test_az_span_token_success(void) {
   /* token: "defg" (span+3) */
   span = out_span;
 
-  token = _az_span_token(span, delim, &out_span, &index);
+  ASSERT_EQ(AZ_OK, _az_span_token(span, delim, &out_span, &index, &token));
   ASSERT_EQ(4, index);
   ASSERT(az_span_ptr(token) == az_span_ptr(span));
   ASSERT_EQ(4, az_span_size(token));
@@ -1912,7 +2011,7 @@ TEST test_az_span_token_success(void) {
   /* token: "defg" (span+10) */
   span = out_span;
 
-  token = _az_span_token(span, delim, &out_span, &index);
+  ASSERT_EQ(AZ_OK, _az_span_token(span, delim, &out_span, &index, &token));
   ASSERT_EQ(4, index);
   ASSERT(az_span_ptr(token) == az_span_ptr(span));
   ASSERT_EQ(4, az_span_size(token));
@@ -1924,7 +2023,7 @@ TEST test_az_span_token_success(void) {
   /* token: "defg" (span+17) */
   span = out_span;
 
-  token = _az_span_token(span, delim, &out_span, &index);
+  ASSERT_EQ(AZ_OK, _az_span_token(span, delim, &out_span, &index, &token));
   ASSERT_EQ(FAIL_SIZE_T_VAL, index);
   ASSERT(az_span_ptr(token) == az_span_ptr(span));
   ASSERT_EQ(4, az_span_size(token));
@@ -2008,10 +2107,14 @@ TEST az_span_char_checks_test(void) {
 
 TEST az_span_url_encode_test(void) {
   az_span const source = AZ_SPAN_FROM_STR("Hello World! & @");
-  size_t const encoded_len = _az_span_url_encode_calc_length(source);
+  size_t encoded_len;
+  enum az_result_core rc;
   uint8_t buffer[100];
   az_span const destination = az_span_create(buffer, sizeof(buffer));
   ptrdiff_t out_len = 0;
+
+  rc = _az_span_url_encode_calc_length(source, &encoded_len);
+  ASSERT_EQ(AZ_OK, rc);
 
   ASSERT_EQ(AZ_OK, _az_span_url_encode(destination, source, &out_len));
   ASSERT_EQ((ptrdiff_t)encoded_len, out_len);
@@ -2064,7 +2167,8 @@ TEST az_precondition_callback_test(void) {
   {
     char buf[10];
     az_span src = AZ_SPAN_FROM_STR("test");
-    az_span_to_str(buf, 0, src);
+    enum az_result_core rc = az_span_to_str(buf, 0, src);
+    (void)rc;
   }
 
   /* Trigger the overlap precondition to hit branches in _az_span_overlap */

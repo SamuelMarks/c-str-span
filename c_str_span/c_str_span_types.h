@@ -65,4 +65,14 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
+#if defined(_MSC_VER) || defined(__MINGW32__)
+#define C_STR_SPAN_PRId64 "I64d"
+#define C_STR_SPAN_PRIu64 "I64u"
+#define C_STR_SPAN_PRIx64 "I64x"
+#else
+#define C_STR_SPAN_PRId64 "lld"
+#define C_STR_SPAN_PRIu64 "llu"
+#define C_STR_SPAN_PRIx64 "llx"
+#endif
+
 #endif /* C_STR_SPAN_TYPES_H */

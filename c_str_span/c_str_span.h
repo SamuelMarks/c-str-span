@@ -317,8 +317,8 @@ az_span_to_str(char *destination, size_t destination_max_size, az_span source);
  * size is zero) and \p target is non-empty.
  * @retval >=0 The position of \p target in \p source.
  */
-extern C_STR_SPAN_EXPORT AZ_NODISCARD size_t az_span_find(az_span source,
-                                                          az_span target);
+extern C_STR_SPAN_EXPORT AZ_NODISCARD enum az_result_core
+az_span_find(az_span source, az_span target, size_t *out_index);
 
 /******************************  SPAN COPYING */
 

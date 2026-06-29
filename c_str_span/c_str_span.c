@@ -618,7 +618,8 @@ AZ_NODISCARD enum az_result_core az_span_atod(az_span source,
 #pragma warning(pop)
 #endif
 
-AZ_NODISCARD size_t az_span_find(az_span source, az_span target) {
+AZ_NODISCARD enum az_result_core az_span_find(az_span source, az_span target,
+                                              size_t *out_index) {
   /* This function implements the Naive string-search algorithm.
    * The rationale to use this algorithm instead of other potentially more
    * performant ones (Rabin-Karp, e.g.) is due to no additional space needed.
@@ -642,14 +643,13 @@ AZ_NODISCARD size_t az_span_find(az_span source, az_span target) {
 
   size_t const source_size = az_span_size(source);
   size_t const target_size = az_span_size(target);
-  int32_t const target_not_found = -1;
-
   if (target_size == 0) {
-    return 0;
+    *out_index = 0;
+    return AZ_OK;
   }
 
   if (source_size < target_size) {
-    return target_not_found;
+    return AZ_ERROR_ITEM_NOT_FOUND;
   }
 
   {
@@ -679,7 +679,8 @@ AZ_NODISCARD size_t az_span_find(az_span source, az_span target) {
            * is indeed an instance of `target` in that position of `source`
            * (step 4.). */
 
-          return i;
+          *out_index = i;
+          return AZ_OK;
         }
       }
     }
@@ -687,7 +688,7 @@ AZ_NODISCARD size_t az_span_find(az_span source, az_span target) {
 
   /* If the function hasn't returned before, all positions
    * of `source` have been evaluated but `target` could not be found. */
-  return target_not_found;
+  return AZ_ERROR_ITEM_NOT_FOUND;
 }
 
 enum az_result_core az_span_copy(az_span destination, az_span source,
@@ -801,7 +802,9 @@ static AZ_NODISCARD int _az_span_builder_append_uint64(az_span *ref_span,
   _az_RETURN_IF_NOT_ENOUGH_SIZE(*ref_span, 1);
 
   if (n == 0) {
-    az_span_copy_u8(*ref_span, '0', ref_span);
+    rc = az_span_copy_u8(*ref_span, '0', ref_span);
+    if (rc != AZ_OK)
+      return rc;
     return 0;
   }
 
@@ -818,13 +821,17 @@ static AZ_NODISCARD int _az_span_builder_append_uint64(az_span *ref_span,
 
     while (div > 1) {
       uint8_t value_to_append = _az_decimal_to_ascii((uint8_t)(nn / div));
-      az_span_copy_u8(*ref_span, value_to_append, ref_span);
+      rc = az_span_copy_u8(*ref_span, value_to_append, ref_span);
+      if (rc != AZ_OK)
+        return rc;
       nn %= div;
       div /= _az_NUMBER_OF_DECIMAL_VALUES;
     }
     {
       uint8_t value_to_append = _az_decimal_to_ascii((uint8_t)nn);
-      az_span_copy_u8(*ref_span, value_to_append, ref_span);
+      rc = az_span_copy_u8(*ref_span, value_to_append, ref_span);
+      if (rc != AZ_OK)
+        return rc;
     }
   }
   return 0;
@@ -857,8 +864,22 @@ az_span_i64toa(az_span destination, int64_t source, az_span *out_span) {
 
   if (source < 0) {
     _az_RETURN_IF_NOT_ENOUGH_SIZE(destination, 1);
-    az_span_copy_u8(destination, '-', out_span);
-    return _az_span_builder_append_uint64(out_span, (uint64_t)-source);
+    rc = az_span_copy_u8(destination, '-', out_span);
+    if (rc != AZ_OK) {
+      char err_buf[256];
+      (void)err_buf;
+      LOG_DEBUG("Error %d: %s\n", rc,
+                C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+      return rc;
+    }
+    rc = _az_span_builder_append_uint64(out_span, (uint64_t)-source);
+    if (rc != AZ_OK) {
+      char err_buf[256];
+      (void)err_buf;
+      LOG_DEBUG("Error %d: %s\n", rc,
+                C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+    }
+    return rc;
   }
 
   /* make out_span point to destination before trying to write on it (might be
@@ -875,7 +896,9 @@ static AZ_NODISCARD int _az_span_builder_append_u32toa(az_span destination,
   _az_RETURN_IF_NOT_ENOUGH_SIZE(destination, 1);
 
   if (n == 0) {
-    az_span_copy_u8(destination, '0', out_span);
+    rc = az_span_copy_u8(destination, '0', out_span);
+    if (rc != AZ_OK)
+      return rc;
     return 0;
   }
 
@@ -894,7 +917,9 @@ static AZ_NODISCARD int _az_span_builder_append_u32toa(az_span destination,
 
     while (div > 1) {
       uint8_t value_to_append = _az_decimal_to_ascii((uint8_t)(nn / div));
-      az_span_copy_u8(*out_span, value_to_append, out_span);
+      rc = az_span_copy_u8(*out_span, value_to_append, out_span);
+      if (rc != AZ_OK)
+        return rc;
 
       nn %= div;
       div /= _az_NUMBER_OF_DECIMAL_VALUES;
@@ -902,7 +927,9 @@ static AZ_NODISCARD int _az_span_builder_append_u32toa(az_span destination,
 
     {
       uint8_t value_to_append = _az_decimal_to_ascii((uint8_t)nn);
-      az_span_copy_u8(*out_span, value_to_append, out_span);
+      rc = az_span_copy_u8(*out_span, value_to_append, out_span);
+      if (rc != AZ_OK)
+        return rc;
     }
   }
   return 0;
@@ -926,7 +953,14 @@ az_span_i32toa(az_span destination, int32_t source, az_span *out_span) {
 
   if (source < 0) {
     _az_RETURN_IF_NOT_ENOUGH_SIZE(*out_span, 1);
-    az_span_copy_u8(*out_span, '-', out_span);
+    rc = az_span_copy_u8(*out_span, '-', out_span);
+    if (rc != AZ_OK) {
+      char err_buf[256];
+      (void)err_buf;
+      LOG_DEBUG("Error %d: %s\n", rc,
+                C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+      return rc;
+    }
     source = -source;
   }
 
@@ -963,7 +997,14 @@ AZ_NODISCARD enum az_result_core az_span_dtoa(az_span destination,
 
   if (source < 0) {
     _az_RETURN_IF_NOT_ENOUGH_SIZE(*out_span, 1);
-    az_span_copy_u8(*out_span, '-', out_span);
+    rc = az_span_copy_u8(*out_span, '-', out_span);
+    if (rc != AZ_OK) {
+      char err_buf[256];
+      (void)err_buf;
+      LOG_DEBUG("Error %d: %s\n", rc,
+                C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+      return rc;
+    }
     source = -source;
   }
 
@@ -1056,11 +1097,15 @@ AZ_NODISCARD enum az_result_core az_span_dtoa(az_span destination,
           }
 
           _az_RETURN_IF_NOT_ENOUGH_SIZE(*out_span, 1 + leading_zeros);
-          az_span_copy_u8(*out_span, '.', out_span);
+          rc = az_span_copy_u8(*out_span, '.', out_span);
+          if (rc != AZ_OK)
+            return rc;
           {
             int32_t z;
             for (z = 0; z < leading_zeros; z++) {
-              az_span_copy_u8(*out_span, '0', out_span);
+              rc = az_span_copy_u8(*out_span, '0', out_span);
+              if (rc != AZ_OK)
+                return rc;
             }
           }
 
@@ -1204,9 +1249,11 @@ AZ_NODISCARD AZ_INLINE bool _az_span_url_should_encode(uint8_t c) {
   }
 }
 
-AZ_NODISCARD size_t _az_span_url_encode_calc_length(az_span source) {
+AZ_NODISCARD enum az_result_core
+_az_span_url_encode_calc_length(az_span source, size_t *out_length) {
   size_t const source_size = az_span_size(source);
   _az_PRECONDITION_VALID_SPAN(source, 0, true);
+  _az_PRECONDITION_NOT_NULL(out_length);
   /* Trying to calculate the number of bytes to encode more than INT32_MAX / 3
    * might overflow an */
   /* int32 and return an erroneous number back. */
@@ -1226,7 +1273,8 @@ AZ_NODISCARD size_t _az_span_url_encode_calc_length(az_span source) {
     }
 
     /* If source_size is 0, this will return 0. */
-    return encoded_length;
+    *out_length = encoded_length;
+    return AZ_OK;
   }
 }
 
@@ -1296,22 +1344,28 @@ AZ_NODISCARD enum az_result_core _az_span_url_encode(az_span destination,
   return 0;
 }
 
-az_span _az_span_token(az_span source, az_span delimiter,
-                       az_span *out_remainder, size_t *out_index) {
+enum az_result_core _az_span_token(az_span source, az_span delimiter,
+                                   az_span *out_remainder, size_t *out_index,
+                                   az_span *out_token) {
+  enum az_result_core rc;
   _az_PRECONDITION_VALID_SPAN(source, 0, true);
   _az_PRECONDITION_VALID_SPAN(delimiter, 1, false);
   _az_PRECONDITION_NOT_NULL(out_remainder);
+  _az_PRECONDITION_NOT_NULL(out_token);
 
-  *out_index = az_span_find(source, delimiter);
+  rc = az_span_find(source, delimiter, out_index);
 
-  if (*out_index != (size_t)-1) {
+  if (rc == AZ_OK) {
     *out_remainder = az_span_slice(source, *out_index + az_span_size(delimiter),
                                    az_span_size(source));
 
-    return az_span_slice(source, 0, *out_index);
+    *out_token = az_span_slice(source, 0, *out_index);
+    return AZ_OK;
   }
 
   out_remainder->_internal.size = 0;
   out_remainder->_internal.ptr = NULL;
-  return source;
+  *out_index = (size_t)-1;
+  *out_token = source;
+  return AZ_OK;
 }

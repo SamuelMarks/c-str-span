@@ -41,7 +41,7 @@ repos:
         pass_filenames: false
       - id: test-msvc-wine
         name: Test (MSVC Wine)
-        entry: bash -c "curl -fsSL https://raw.githubusercontent.com/SamuelMarks/c-ci/master/build_msvc_wine.sh | bash"
+        entry: bash -c "~/repos/c-ci/build_msvc_wine.sh"
         language: system
         pass_filenames: false
       - id: build-msvc

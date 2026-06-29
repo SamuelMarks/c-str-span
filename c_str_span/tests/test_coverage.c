@@ -103,7 +103,8 @@ TEST test_az_span_copy_small_destination(void) {
   az_precondition_failed_set_callback(original);
 #else
   az_span result;
-  az_span_copy(dest, src, &result);
+  enum az_result_core rc = az_span_copy(dest, src, &result);
+  ASSERT_EQ(AZ_OK, rc);
   /* az_span_copy truncates if destination is too small */
   ASSERT_EQ(0, az_span_size(result));
   ASSERT_MEM_EQ("he", dest_buf, 2);
@@ -126,11 +127,13 @@ TEST test_az_span_to_str_small_buffer(void) {
 
   az_precondition_failed_set_callback(original);
 #else
-  az_span_to_str(buf, 3, src);
+  enum az_result_core rc = az_span_to_str(buf, 3, src);
+  ASSERT_EQ(AZ_OK, rc);
   ASSERT_STR_EQ("he", buf);
 
   /* Test size 0 buffer */
-  az_span_to_str(buf, 0, src);
+  rc = az_span_to_str(buf, 0, src);
+  ASSERT_EQ(AZ_OK, rc);
 #endif
   PASS();
 }
@@ -197,7 +200,8 @@ TEST test_az_span_copy_u8_empty(void) {
   az_span dest = az_span_empty();
 #ifndef __CYGWIN__
   az_span result;
-  az_span_copy_u8(dest, 'a', &result);
+  enum az_result_core rc = az_span_copy_u8(dest, 'a', &result);
+  ASSERT_EQ(AZ_OK, rc);
   ASSERT_EQ(0, az_span_size(result));
 #endif
   PASS();

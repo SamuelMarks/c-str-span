@@ -38,7 +38,7 @@ This generates `c_str_span_amalgamation.h`. To consume it, simply define `C_STR_
 #include "c_str_span_amalgamation.h"
 
 int main(void) {
-    az_span span = az_span_from_str("Hello");
+    az_span span = AZ_SPAN_FROM_STR("Hello");
     return (int)az_span_size(span);
 }
 ```
@@ -59,38 +59,85 @@ Since your SDK functions require `az_span` parameters, customers must know how t
 Create an empty `az_span`:
 
 ```c
-az_span empty_span = az_span_empty(); // size = 0
+az_span empty_span = az_span_empty(); /* size = 0 */
 ```
 
 Create an `az_span` expression from a byte buffer:
 
 ```c
 uint8_t buffer[1024];
-some_function(AZ_SPAN_FROM_BUFFER(buffer));  // size = 1024
+some_function(AZ_SPAN_FROM_BUFFER(buffer));  /* size = 1024 */
 ```
 
 Create an `az_span` expression from a string (the span does NOT include the 0-terminating byte):
 
 ```c
-some_function(AZ_SPAN_FROM_STR("Hello"));  // size = 5
+some_function(AZ_SPAN_FROM_STR("Hello"));  /* size = 5 */
 ```
 
 As shown above, an `az_span` over a string does not include the 0-terminator. If you need to 0-terminate the string, you can call this function to append a 0 byte (if the span's size is large enough to hold the extra byte):
 
 ```c
-int az_span_copy_u8(az_span destination, uint8_t byte, az_span* out_span);
+enum az_result_core az_span_copy_u8(az_span destination, uint8_t byte, az_span* out_span);
 ```
 
-and then call this function to get the address of the 0-terminated string:
+For example, checking the return value to ensure it didn't fail:
 
 ```c
-char* str = (char*) az_span_ptr(span); // str points to a 0-terminated string
+#include <assert.h>
+#include <stdio.h>
+
+void append_null_example(void) {
+    uint8_t buffer[6];
+    az_span destination = AZ_SPAN_FROM_BUFFER(buffer);
+    az_span out_span;
+    enum az_result_core rc;
+
+    /* Copy "Hello" into the buffer */
+    rc = az_span_copy(destination, AZ_SPAN_FROM_STR("Hello"), &out_span);
+    if (rc != AZ_OK) {
+        printf("Failed to copy span, error code: %d\n", rc);
+        assert(rc == AZ_OK);
+    }
+
+    /* We use out_span to append the null terminator since out_span represents the remainder */
+    rc = az_span_copy_u8(out_span, '\0', &out_span);
+    if (rc != AZ_OK) {
+        printf("Failed to append null terminator, error code: %d\n", rc);
+        assert(rc == AZ_OK);
+    }
+
+    /* str points to a 0-terminated string */
+    {
+        char* str = (char*) az_span_ptr(destination);
+        printf("%s\n", str);
+    }
+}
 ```
 
 Or, you can call this function to copy the string in the `az_span` to your own `char*` buffer; this function will 0-terminate the string in the `char*` buffer:
 
 ```c
-int az_span_to_str(char* destination, size_t destination_max_size, az_span source);
+enum az_result_core az_span_to_str(char* destination, size_t destination_max_size, az_span source);
+```
+
+Example handling the return code:
+
+```c
+#include <assert.h>
+#include <stdio.h>
+
+void to_str_example(void) {
+    char destination[16];
+    az_span source = AZ_SPAN_FROM_STR("Hello");
+    enum az_result_core rc;
+
+    rc = az_span_to_str(destination, sizeof(destination), source);
+    if (rc != AZ_OK) {
+        printf("Failed to convert span to string, error code: %d\n", rc);
+        assert(rc == AZ_OK);
+    }
+}
 ```
 
 There are many functions to manipulate `az_span` instances. You can slice (subset an `az_span`), parse an `az_span` containing a string into a number, format a number as a string into an `az_span`, check if two `az_span` instances are equal or the contents of two `az_span` instances are equal, and more.

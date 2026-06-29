@@ -17,13 +17,13 @@
 
 #if defined(_MSC_VER)
 #define FPRINTF_N(OUT, ap) (void)va_arg(ap, int *)
+#define FPRINTF fprintf_s
 #else
 /** @brief Internal doc. */
 #define FPRINTF_N(OUT, ap) fprintf(OUT, "%n", va_arg(ap, int *))
-#endif
-
 /** @brief Internal doc. */
 #define FPRINTF fprintf
+#endif
 
 /** @brief Internal doc. */
 #define AZ_SPAN_FPRINTF(func_name, OUT)                                        \
