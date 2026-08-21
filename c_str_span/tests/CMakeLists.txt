@@ -8,12 +8,20 @@ set(EXEC_NAME "${PROJECT_NAME}_${EXEC_NAME}")
 include(FetchContent)
 file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/patch_greatest.cmake" "file(READ CMakeLists.txt content)\nstring(REPLACE \"CMAKE_SOURCE_DIR\" \"CMAKE_CURRENT_SOURCE_DIR\" content \"\${content}\")\nstring(REPLACE \"include(InstallRequiredSystemLibraries)\" \"\" content \"\${content}\")\nfile(WRITE CMakeLists.txt \"\${content}\")")
 
-FetchContent_Declare(
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../../../greatest")
+    message(STATUS "Fetching greatest from local directory")
+    FetchContent_Declare(
+        greatest
+        SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../../greatest"
+    )
+else()
+    FetchContent_Declare(
         greatest
         URL https://github.com/SamuelMarks/greatest/archive/refs/heads/master.tar.gz
         DOWNLOAD_EXTRACT_TIMESTAMP true
         PATCH_COMMAND "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/patch_greatest.cmake"
-)
+    )
+endif()
 set(OLD_BUILD_TESTING ${BUILD_TESTING})
 set(BUILD_TESTING OFF)
 if (NOT DEFINED CPACK_PACKAGE_DESCRIPTION_SUMMARY)
