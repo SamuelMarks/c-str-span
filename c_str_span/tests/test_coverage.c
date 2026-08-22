@@ -8,8 +8,6 @@
 #include "c_str_span_private.h"
 
 #if defined(__GNUC__) || defined(__clang__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-result"
 #endif
 
 #include <greatest.h>
@@ -104,7 +102,7 @@ TEST test_az_span_copy_small_destination(void) {
 #else
   az_span result;
   enum az_result_core rc = az_span_copy(dest, src, &result);
-  ASSERT_EQ(AZ_OK, rc);
+  ASSERT_EQ(AZ_ERROR_NOT_ENOUGH_SPACE, rc);
   /* az_span_copy truncates if destination is too small */
   ASSERT_EQ(0, az_span_size(result));
   ASSERT_MEM_EQ("he", dest_buf, 2);
@@ -201,7 +199,7 @@ TEST test_az_span_copy_u8_empty(void) {
 #ifndef __CYGWIN__
   az_span result;
   enum az_result_core rc = az_span_copy_u8(dest, 'a', &result);
-  ASSERT_EQ(AZ_OK, rc);
+  ASSERT_EQ(AZ_ERROR_NOT_ENOUGH_SPACE, rc);
   ASSERT_EQ(0, az_span_size(result));
 #endif
   PASS();
@@ -299,8 +297,66 @@ TEST test_az_span_overlap_null(void) {
   PASS();
 }
 
+TEST test_all_errors(void) {
+  uint8_t buffer[100];
+  az_span b;
+  az_span rem;
+  /* u64toa */
+  b = az_span_create(buffer, 0);
+  (void)az_span_u64toa(b, 0, &rem);
+  b = az_span_create(buffer, 1);
+  (void)az_span_u64toa(b, 12, &rem);
+  b = az_span_create(buffer, 2);
+  (void)az_span_u64toa(b, 123, &rem);
+
+  /* i64toa */
+  b = az_span_create(buffer, 0);
+  (void)az_span_i64toa(b, -1, &rem);
+  b = az_span_create(buffer, 1);
+  (void)az_span_i64toa(b, -12, &rem);
+  b = az_span_create(buffer, 2);
+  (void)az_span_i64toa(b, -123, &rem);
+
+  /* u32toa */
+  b = az_span_create(buffer, 0);
+  (void)az_span_u32toa(b, 0, &rem);
+  b = az_span_create(buffer, 1);
+  (void)az_span_u32toa(b, 12, &rem);
+  b = az_span_create(buffer, 2);
+  (void)az_span_u32toa(b, 123, &rem);
+
+  /* i32toa */
+  b = az_span_create(buffer, 0);
+  (void)az_span_i32toa(b, -1, &rem);
+  b = az_span_create(buffer, 1);
+  (void)az_span_i32toa(b, -12, &rem);
+  b = az_span_create(buffer, 2);
+  (void)az_span_i32toa(b, -123, &rem);
+
+  /* dtoa */
+  b = az_span_create(buffer, 0);
+  (void)az_span_dtoa(b, -1.2, 2, &rem);
+  b = az_span_create(buffer, 1);
+  (void)az_span_dtoa(b, -1.2, 2, &rem);
+  b = az_span_create(buffer, 2);
+  (void)az_span_dtoa(b, -1.2, 2, &rem);
+  b = az_span_create(buffer, 3);
+  (void)az_span_dtoa(b, -1.2, 2, &rem);
+  b = az_span_create(buffer, 4);
+  (void)az_span_dtoa(b, -1.2, 2, &rem);
+  b = az_span_create(buffer, 0);
+  (void)az_span_dtoa(b, 1.2, 2, &rem);
+  b = az_span_create(buffer, 1);
+  (void)az_span_dtoa(b, 1.2, 2, &rem);
+  b = az_span_create(buffer, 2);
+  (void)az_span_dtoa(b, 1.2, 2, &rem);
+  b = az_span_create(buffer, 3);
+  (void)az_span_dtoa(b, 1.2, 2, &rem);
+  PASS();
+}
 SUITE(coverage_suite) {
   printf("1\n");
+  RUN_TEST(test_all_errors);
   RUN_TEST(test_c_str_span_log_debug);
   printf("2\n");
   RUN_TEST(test_precondition_default_callback);

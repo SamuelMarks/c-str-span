@@ -15,7 +15,8 @@ extern "C" {
 #endif /* __cplusplus */
 
 /* clang-format off */
-#if (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L) ||              \
+#if defined(__cplusplus) ||                                                    \
+    (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L) ||              \
     (defined(_MSC_VER) && _MSC_VER >= 1800)
 #include <stdbool.h>
 #else
@@ -23,7 +24,8 @@ extern "C" {
 #endif
 /* clang-format on */
 
-#if (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L) ||              \
+#if defined(__cplusplus) ||                                                    \
+    (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L) ||              \
     (defined(_MSC_VER) && _MSC_VER >= 1800)
 #else
 

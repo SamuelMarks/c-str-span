@@ -3,11 +3,37 @@ cmake_minimum_required(VERSION 3.11.4)
 cmake_policy(SET CMP0091 NEW)
 project(c_str_span VERSION 0.0.1 LANGUAGES C)
 
-if(MSVC AND CMAKE_CROSSCOMPILING)
-    if(POLICY CMP0091)
-        cmake_policy(SET CMP0091 NEW)
+string(TOUPPER "${PROJECT_NAME}" PROJECT_PREFIX)
+string(REPLACE "-" "_" PROJECT_PREFIX "${PROJECT_PREFIX}")
+
+set(${PROJECT_PREFIX}_CRT_LINKAGE "Shared" CACHE STRING "MSVC CRT Linkage: Static or Shared")
+set(${PROJECT_PREFIX}_CHARSET "Unicode" CACHE STRING "Charset to use: Unicode or ANSI")
+set(${PROJECT_PREFIX}_THREADING "Multi-threaded" CACHE STRING "Threading: Multi-threaded or Single-threaded")
+set(${PROJECT_PREFIX}_MSVC_RTC "" CACHE STRING "MSVC Runtime Checks: RTC1, RTCs, RTCu, or empty")
+set(${PROJECT_PREFIX}_LTO OFF CACHE BOOL "Enable Link-Time Optimization (LTO)")
+
+if(MSVC)
+    if(${PROJECT_PREFIX}_CRT_LINKAGE STREQUAL "Static")
+        set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+    else()
+        set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
     endif()
-    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+
+    if (${PROJECT_PREFIX}_MSVC_RTC)
+        add_compile_options("/${${PROJECT_PREFIX}_MSVC_RTC}")
+    endif()
+endif()
+
+if (${PROJECT_PREFIX}_CHARSET STREQUAL "Unicode")
+    add_compile_definitions(UNICODE _UNICODE)
+endif()
+
+if (${PROJECT_PREFIX}_LTO)
+    include(CheckIPOSupported)
+    check_ipo_supported(RESULT ipo_supported)
+    if(ipo_supported)
+        set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
+    endif()
 endif()
 
 
@@ -80,28 +106,18 @@ include(GNUInstallDirs)
 
 add_subdirectory("${PROJECT_NAME}")
 
-if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
-    option(BUILD_TESTING_${PROJECT_NAME} "Build the tests for c_str_span" ON)
-else()
-    option(BUILD_TESTING_${PROJECT_NAME} "Build the tests for c_str_span" OFF)
-endif()
-
-if (BUILD_TESTING_${PROJECT_NAME})
+if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND BUILD_TESTING)
     include(CTest)
-    if (BUILD_TESTING)
-        message(STATUS "TESTS ENABLED")
-        add_subdirectory("${PROJECT_NAME}/tests")
-        file(WRITE "${CMAKE_BINARY_DIR}/CTestCustom.cmake"
-            "set(CTEST_CUSTOM_COVERAGE_EXCLUDE\n"
-            "    \".*tests/.*\"\n"
-            "    \".*test\\\\.c\"\n"
-            ")\n"
-        )
-    else()
-        message(STATUS "TESTS DISABLED: BUILD_TESTING is OFF")
-    endif()
-else()
-    message(STATUS "TESTS DISABLED: BUILD_TESTING_${PROJECT_NAME} is OFF")
+    message(STATUS "TESTS ENABLED")
+    add_subdirectory("${PROJECT_NAME}/tests")
+    file(WRITE "${CMAKE_BINARY_DIR}/CTestCustom.cmake"
+        "set(CTEST_CUSTOM_COVERAGE_EXCLUDE\n"
+        "    \".*tests/.*\"\n"
+        "    \".*test\\\\.c\"\n"
+        ")\n"
+    )
+elseif(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
+    message(STATUS "TESTS DISABLED: BUILD_TESTING is OFF")
 endif()
 
 install(

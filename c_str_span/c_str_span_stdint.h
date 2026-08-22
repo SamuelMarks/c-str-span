@@ -7,6 +7,9 @@
 #ifndef C_STR_SPAN_STDINT_H
 #define C_STR_SPAN_STDINT_H
 
+/* clang-format off */
+/* clang-format on */
+
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */

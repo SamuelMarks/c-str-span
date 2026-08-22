@@ -647,20 +647,20 @@ TEST az_span_atod_test(void) {
   ASSERT(value == 1e-300);
 
   ASSERT_EQ(AZ_OK, az_span_atod(AZ_SPAN_FROM_STR("9007199254740992"), &value));
-  ASSERT(value == 9007199254740992);
+  ASSERT(value == 9007199254740992.0);
   ASSERT_EQ(AZ_OK, az_span_atod(AZ_SPAN_FROM_STR("9007199254740993"), &value));
-  ASSERT(value == 9007199254740993);
+  ASSERT(value == 9007199254740993.0);
   ASSERT_EQ(AZ_OK, az_span_atod(AZ_SPAN_FROM_STR("45035996273704961"), &value));
-  ASSERT(value == 45035996273704961);
+  ASSERT(value == 45035996273704961.0);
   ASSERT_EQ(AZ_OK,
             az_span_atod(AZ_SPAN_FROM_STR("9223372036854775806"), &value));
-  ASSERT(value == 9223372036854775806);
+  ASSERT(value == 9223372036854775806.0);
   ASSERT_EQ(AZ_OK,
             az_span_atod(AZ_SPAN_FROM_STR("-9223372036854775806"), &value));
-  ASSERT(value == -9223372036854775806);
+  ASSERT(value == -9223372036854775806.0);
   ASSERT_EQ(AZ_OK,
             az_span_atod(AZ_SPAN_FROM_STR("1844674407370955100"), &value));
-  ASSERT(value == 1844674407370955100);
+  ASSERT(value == 1844674407370955100.0);
   ASSERT_EQ(AZ_OK,
             az_span_atod(AZ_SPAN_FROM_STR("1.844674407370955e+19"), &value));
   ASSERT(value == 1.844674407370955e+19);
@@ -672,7 +672,7 @@ TEST az_span_atod_test(void) {
   ASSERT(value == 1.8446744073709552e+19);
   ASSERT_EQ(AZ_OK,
             az_span_atod(AZ_SPAN_FROM_STR("18446744073709551615"), &value));
-  ASSERT(value == 18446744073709551615UL);
+  ASSERT(value == 18446744073709551615.0);
   ASSERT_EQ(AZ_OK,
             az_span_atod(
                 AZ_SPAN_FROM_STR("18446744073709551615.18446744073709551615"),
@@ -1748,22 +1748,22 @@ TEST test_az_span_is_valid(void) {
   ASSERT(!(_az_span_is_valid(empty_span, 0, false)));
   ASSERT(!(_az_span_is_valid(empty_span, 1, true)));
   ASSERT(!(_az_span_is_valid(empty_span, 1, false)));
-  ASSERT(!(_az_span_is_valid(empty_span, -1, true)));
-  ASSERT(!(_az_span_is_valid(empty_span, -1, false)));
+  ASSERT(!(_az_span_is_valid(empty_span, (size_t)-1, true)));
+  ASSERT(!(_az_span_is_valid(empty_span, (size_t)-1, false)));
 
   ASSERT(_az_span_is_valid(empty_span, 0, true));
   ASSERT(!(_az_span_is_valid(empty_span, 0, false)));
   ASSERT(!(_az_span_is_valid(empty_span, 1, true)));
   ASSERT(!(_az_span_is_valid(empty_span, 1, false)));
-  ASSERT(!(_az_span_is_valid(empty_span, -1, true)));
-  ASSERT(!(_az_span_is_valid(empty_span, -1, false)));
+  ASSERT(!(_az_span_is_valid(empty_span, (size_t)-1, true)));
+  ASSERT(!(_az_span_is_valid(empty_span, (size_t)-1, false)));
 
   ASSERT(_az_span_is_valid(AZ_SPAN_FROM_STR(""), 0, true));
   ASSERT(_az_span_is_valid(AZ_SPAN_FROM_STR(""), 0, false));
   ASSERT(!(_az_span_is_valid(AZ_SPAN_FROM_STR(""), 1, true)));
   ASSERT(!(_az_span_is_valid(AZ_SPAN_FROM_STR(""), 1, false)));
-  ASSERT(!(_az_span_is_valid(AZ_SPAN_FROM_STR(""), -1, true)));
-  ASSERT(!(_az_span_is_valid(AZ_SPAN_FROM_STR(""), -1, false)));
+  ASSERT(!(_az_span_is_valid(AZ_SPAN_FROM_STR(""), (size_t)-1, true)));
+  ASSERT(!(_az_span_is_valid(AZ_SPAN_FROM_STR(""), (size_t)-1, false)));
 
   ASSERT(_az_span_is_valid(AZ_SPAN_FROM_STR("Hello"), 0, true));
   ASSERT(_az_span_is_valid(AZ_SPAN_FROM_STR("Hello"), 0, false));
@@ -1773,8 +1773,8 @@ TEST test_az_span_is_valid(void) {
   ASSERT(_az_span_is_valid(AZ_SPAN_FROM_STR("Hello"), 5, false));
   ASSERT(!(_az_span_is_valid(AZ_SPAN_FROM_STR("Hello"), 6, true)));
   ASSERT(!(_az_span_is_valid(AZ_SPAN_FROM_STR("Hello"), 6, false)));
-  ASSERT(!(_az_span_is_valid(AZ_SPAN_FROM_STR("Hello"), -1, true)));
-  ASSERT(!(_az_span_is_valid(AZ_SPAN_FROM_STR("Hello"), -1, false)));
+  ASSERT(!(_az_span_is_valid(AZ_SPAN_FROM_STR("Hello"), (size_t)-1, true)));
+  ASSERT(!(_az_span_is_valid(AZ_SPAN_FROM_STR("Hello"), (size_t)-1, false)));
 
   {
     uint8_t *const max_ptr = (uint8_t *)~0;
@@ -2058,6 +2058,14 @@ TEST az_span_u64toa_test(void) {
   ASSERT_EQ(AZ_OK, az_span_u64toa(b_span, 0, &remainder));
   ASSERT_EQ(az_span_size(b_span) - 1, az_span_size(remainder));
   ASSERT(az_span_ptr(b_span)[0] == '0');
+
+  /* Test insufficient space */
+  b_span = az_span_create(buffer, 0);
+  ASSERT_EQ(AZ_ERROR_NOT_ENOUGH_SPACE, az_span_u64toa(b_span, 0, &remainder));
+  b_span = az_span_create(buffer, 1);
+  ASSERT_EQ(AZ_ERROR_NOT_ENOUGH_SPACE, az_span_u64toa(b_span, 12, &remainder));
+  b_span = az_span_create(buffer, 2);
+  ASSERT_EQ(AZ_ERROR_NOT_ENOUGH_SPACE, az_span_u64toa(b_span, 123, &remainder));
 
   PASS();
 }

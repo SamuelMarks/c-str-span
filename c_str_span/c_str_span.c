@@ -693,6 +693,7 @@ AZ_NODISCARD enum az_result_core az_span_find(az_span source, az_span target,
 
 enum az_result_core az_span_copy(az_span destination, az_span source,
                                  az_span *out_span) {
+  enum az_result_core rc = AZ_OK;
   size_t src_size = az_span_size(source);
 
   _az_PRECONDITION_VALID_SPAN(destination, 0, true);
@@ -700,7 +701,7 @@ enum az_result_core az_span_copy(az_span destination, az_span source,
 
   if (src_size == 0) {
     *out_span = destination;
-    return 0;
+    return AZ_OK;
   }
 
   { /* Even though the contract of this function is that the destination must be
@@ -709,6 +710,7 @@ enum az_result_core az_span_copy(az_span destination, az_span source,
     size_t const dest_size = az_span_size(destination);
     if (src_size > dest_size) {
       src_size = dest_size;
+      rc = AZ_ERROR_NOT_ENOUGH_SPACE;
     }
 
     {
@@ -724,7 +726,7 @@ enum az_result_core az_span_copy(az_span destination, az_span source,
     }
 
     *out_span = az_span_slice_to_end(destination, src_size);
-    return 0;
+    return rc;
   }
 }
 
@@ -739,14 +741,14 @@ enum az_result_core az_span_copy_u8(az_span destination, uint8_t byte,
     size_t const dest_size = az_span_size(destination);
     if (dest_size < 1) {
       *out_span = destination;
-      return 0;
+      return AZ_ERROR_NOT_ENOUGH_SPACE;
     }
 
     {
       uint8_t *dst_ptr = az_span_ptr(destination);
       dst_ptr[0] = byte;
       *out_span = az_span_create(dst_ptr + 1, dest_size - 1);
-      return 0;
+      return AZ_OK;
     }
   }
 }
@@ -799,8 +801,6 @@ static AZ_NODISCARD int _az_span_builder_append_uint64(az_span *ref_span,
                                                        uint64_t n) {
   enum az_result_core rc = AZ_OK;
 
-  _az_RETURN_IF_NOT_ENOUGH_SIZE(*ref_span, 1);
-
   if (n == 0) {
     rc = az_span_copy_u8(*ref_span, '0', ref_span);
     if (rc != AZ_OK)
@@ -811,13 +811,10 @@ static AZ_NODISCARD int _az_span_builder_append_uint64(az_span *ref_span,
   {
     uint64_t div = _az_SMALLEST_20_DIGIT_NUMBER;
     uint64_t nn = n;
-    int32_t digit_count = _az_MAX_SIZE_FOR_UINT64;
+
     while (nn / div == 0) {
       div /= _az_NUMBER_OF_DECIMAL_VALUES;
-      digit_count--;
     }
-
-    _az_RETURN_IF_NOT_ENOUGH_SIZE(*ref_span, digit_count);
 
     while (div > 1) {
       uint8_t value_to_append = _az_decimal_to_ascii((uint8_t)(nn / div));
@@ -863,7 +860,6 @@ az_span_i64toa(az_span destination, int64_t source, az_span *out_span) {
   _az_PRECONDITION_NOT_NULL(out_span);
 
   if (source < 0) {
-    _az_RETURN_IF_NOT_ENOUGH_SIZE(destination, 1);
     rc = az_span_copy_u8(destination, '-', out_span);
     if (rc != AZ_OK) {
       char err_buf[256];
@@ -893,8 +889,6 @@ static AZ_NODISCARD int _az_span_builder_append_u32toa(az_span destination,
                                                        az_span *out_span) {
   enum az_result_core rc = AZ_OK;
 
-  _az_RETURN_IF_NOT_ENOUGH_SIZE(destination, 1);
-
   if (n == 0) {
     rc = az_span_copy_u8(destination, '0', out_span);
     if (rc != AZ_OK)
@@ -905,13 +899,10 @@ static AZ_NODISCARD int _az_span_builder_append_u32toa(az_span destination,
   {
     uint32_t div = _az_SMALLEST_10_DIGIT_NUMBER;
     uint32_t nn = n;
-    int32_t digit_count = _az_MAX_SIZE_FOR_UINT32;
+
     while (nn / div == 0) {
       div /= _az_NUMBER_OF_DECIMAL_VALUES;
-      digit_count--;
     }
-
-    _az_RETURN_IF_NOT_ENOUGH_SIZE(destination, digit_count);
 
     *out_span = destination;
 
@@ -952,7 +943,6 @@ az_span_i32toa(az_span destination, int32_t source, az_span *out_span) {
   *out_span = destination;
 
   if (source < 0) {
-    _az_RETURN_IF_NOT_ENOUGH_SIZE(*out_span, 1);
     rc = az_span_copy_u8(*out_span, '-', out_span);
     if (rc != AZ_OK) {
       char err_buf[256];
@@ -996,7 +986,6 @@ AZ_NODISCARD enum az_result_core az_span_dtoa(az_span destination,
   }
 
   if (source < 0) {
-    _az_RETURN_IF_NOT_ENOUGH_SIZE(*out_span, 1);
     rc = az_span_copy_u8(*out_span, '-', out_span);
     if (rc != AZ_OK) {
       char err_buf[256];
@@ -1096,7 +1085,6 @@ AZ_NODISCARD enum az_result_core az_span_dtoa(az_span destination,
             fractional_part /= _az_NUMBER_OF_DECIMAL_VALUES;
           }
 
-          _az_RETURN_IF_NOT_ENOUGH_SIZE(*out_span, 1 + leading_zeros);
           rc = az_span_copy_u8(*out_span, '.', out_span);
           if (rc != AZ_OK)
             return rc;
