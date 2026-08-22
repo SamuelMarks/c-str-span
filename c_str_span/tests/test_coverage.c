@@ -140,7 +140,7 @@ TEST test_az_span_dtoa_special_cases(void) {
   uint8_t buf[64];
   az_span dest = az_span_create(buf, 64);
   az_span out;
-  uint64_t const inf_bits = 0x7FF0000000000000ULL;
+  uint64_t const inf_bits = (((uint64_t)0x7FF00000) << 32);
   double d_inf;
 #if defined(_MSC_VER) && !defined(__clang__)
   memcpy_s(&d_inf, sizeof(d_inf), &inf_bits, sizeof(inf_bits));
@@ -248,7 +248,7 @@ TEST test_az_span_is_content_equal_all_paths(void) {
 }
 
 TEST test_az_isfinite_false(void) {
-  uint64_t inf = 0x7FF0000000000000ULL;
+  uint64_t inf = (((uint64_t)0x7FF00000) << 32);
   double d_inf;
 #if defined(_MSC_VER) && !defined(__clang__)
   memcpy_s(&d_inf, sizeof(d_inf), &inf, sizeof(inf));

@@ -35,7 +35,7 @@ extern "C" {
  * exponent, and 0s */
 /* for the fraction bits. */
 /** @brief Internal doc. */
-#define _az_BINARY_VALUE_OF_POSITIVE_INFINITY 0x7FF0000000000000ULL
+#define _az_BINARY_VALUE_OF_POSITIVE_INFINITY (((uint64_t)0x7FF00000) << 32)
 
 enum {
   _az_ASCII_LOWER_DIF = 'a' - 'A',

@@ -34,7 +34,8 @@ extern "C" {
 /* The smallest number that has the same number of digits as
  * _az_MAX_SIZE_FOR_UINT64 (i.e. 10^19). */
 /** @brief Internal doc. */
-#define _az_SMALLEST_20_DIGIT_NUMBER 10000000000000000000ULL
+#define _az_SMALLEST_20_DIGIT_NUMBER                                           \
+  ((((uint64_t)0x8AC72304) << 32) | 0x89E80000)
 
 enum {
   /* For example: 2,147,483,648 */

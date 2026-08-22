@@ -74,7 +74,6 @@ target_link_libraries(
 )
 
 if (MSVC)
-    target_compile_definitions("${EXEC_NAME}" PRIVATE _CRT_SECURE_NO_WARNINGS)
 endif (MSVC)
 
 #=======#

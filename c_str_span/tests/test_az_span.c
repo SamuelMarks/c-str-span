@@ -456,15 +456,6 @@ TEST test_az_isfinite(void) {
 /* Disable warning for float comparisons, for this particular test */
 /* error : comparing floating point with == or != is unsafe[-Werror = float -
  * equal] */
-#ifdef __GNUC__
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wfloat-equal"
-#endif /* __GNUC__ */
-
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wfloat-equal"
-#endif /* __clang__ */
 
 TEST az_span_atod_test(void) {
   double value = 0;
@@ -714,14 +705,6 @@ TEST az_span_atod_test(void) {
   ASSERT(value == 0);
   PASS();
 }
-
-#ifdef __GNUC__
-#pragma GCC diagnostic pop
-#endif /* __GNUC__ */
-
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif /* __clang__ */
 
 TEST az_span_atod_non_finite_not_allowed(void) {
   double value = 0;
@@ -2036,7 +2019,7 @@ TEST az_span_u64toa_test(void) {
   az_span b_span = AZ_SPAN_FROM_BUFFER(buffer);
   az_span remainder;
   size_t size_before_write = az_span_size(b_span);
-  uint64_t number = 12345678901234567890ULL;
+  uint64_t number = ((((uint64_t)0xAB54A98C) << 32) | 0xEB1F0AD2);
   az_span number_str = AZ_SPAN_FROM_STR("12345678901234567890");
   uint64_t reverse;
 

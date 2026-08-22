@@ -208,8 +208,8 @@ AZ_NODISCARD enum az_result_core az_span_atou64(az_span source,
 
             /* Check whether the next digit will cause an integer overflow.
              * Before actually doing the math below, this is checking whether
-             * value * 10 + d > UINT64_MAX. */
-            if ((UINT64_MAX - d) / _az_NUMBER_OF_DECIMAL_VALUES < value) {
+             * value * 10 + d > (~((uint64_t)0)). */
+            if (((~((uint64_t)0)) - d) / _az_NUMBER_OF_DECIMAL_VALUES < value) {
               rc = AZ_ERROR_UNEXPECTED_CHAR;
               {
                 char err_buf[256];
@@ -379,7 +379,7 @@ AZ_NODISCARD enum az_result_core az_span_atoi64(az_span source,
          * else, (-1 * sign + 1) / 2 = 0
          * This is necessary to correctly account for the fact that the absolute
          * value of INT64_MIN is 1 more than than the absolute value of
-         * INT64_MAX. */
+         * ((int64_t)(~((uint64_t)0) >> 1)). */
         uint64_t sign_factor = (uint64_t)(-1 * sign + 1) / 2;
 
         {
@@ -404,9 +404,11 @@ AZ_NODISCARD enum az_result_core az_span_atoi64(az_span source,
 
               /* Check whether the next digit will cause an integer overflow.
                * Before actually doing the math below, this is checking whether
-               * value * 10 + d > INT64_MAX, or in the case of negative numbers,
-               * checking whether value * 10 + d > INT64_MAX + 1. */
-              if ((uint64_t)(INT64_MAX - d + sign_factor) /
+               * value * 10 + d > ((int64_t)(~((uint64_t)0) >> 1)), or in the
+               * case of negative numbers, checking whether value * 10 + d >
+               * ((int64_t)(~((uint64_t)0) >> 1)) + 1. */
+              if ((uint64_t)(((int64_t)(~((uint64_t)0) >> 1)) - d +
+                             sign_factor) /
                       _az_NUMBER_OF_DECIMAL_VALUES <
                   value) {
                 rc = AZ_ERROR_UNEXPECTED_CHAR;
@@ -549,11 +551,6 @@ static bool _is_valid_start_of_double(uint8_t first_byte) {
   return result;
 }
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4710)
-#endif
-
 AZ_NODISCARD enum az_result_core az_span_atod(az_span source,
                                               double *out_number) {
   enum az_result_core rc = AZ_OK;
@@ -590,19 +587,10 @@ AZ_NODISCARD enum az_result_core az_span_atod(az_span source,
     format[1] = (char)((size / 10) + '0');
     format[2] = (char)((size % 10) + '0');
 
-#if defined(__GNUC__) || defined(__clang__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wformat-nonliteral"
-#endif
-
 #if defined(_MSC_VER)
     n = sscanf_s((char *)source_ptr, format, out_number, &chars_consumed);
 #else
     n = sscanf((char *)source_ptr, format, out_number, &chars_consumed);
-#endif
-
-#if defined(__GNUC__) || defined(__clang__)
-#pragma GCC diagnostic pop
 #endif
 
     /* Success if the entire source was consumed by sscanf  and it set the
@@ -613,10 +601,6 @@ AZ_NODISCARD enum az_result_core az_span_atod(az_span source,
                : AZ_ERROR_UNEXPECTED_CHAR;
   }
 }
-
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
 
 AZ_NODISCARD enum az_result_core az_span_find(az_span source, az_span target,
                                               size_t *out_index) {
