@@ -35,8 +35,13 @@ C_STR_SPAN_EXPORT void c_str_span_log_debug(const char *fmt, ...) {
 #ifdef DEBUG
   va_list args;
   va_start(args, fmt);
+#if defined(_MSC_VER)
+  fprintf_s(stderr, "[DEBUG] ");
+  vfprintf_s(stderr, fmt, args);
+#else
   fprintf(stderr, "[DEBUG] ");
   vfprintf(stderr, fmt, args);
+#endif
   va_end(args);
 #else
   (void)fmt;
