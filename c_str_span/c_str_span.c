@@ -561,9 +561,6 @@ AZ_NODISCARD enum az_result_core az_span_atod(az_span source,
   {
     size_t const size = az_span_size(source);
     uint8_t *source_ptr = az_span_ptr(source);
-    /* 8 is enough for "%<size>lf%n" where size is at most  99.
-       "%99lf%n" is 7 chars + null. */
-    char format[8] = "%00lf%n";
     int n = 0;
     int32_t chars_consumed = 0;
 
@@ -583,15 +580,24 @@ AZ_NODISCARD enum az_result_core az_span_atod(az_span source,
       return rc;
     }
 
-    /* Starting at 1 to skip the '%' character */
-    format[1] = (char)((size / 10) + '0');
-    format[2] = (char)((size % 10) + '0');
+    {
+      char buf[100];
+      if (size > 99) {
+        return AZ_ERROR_UNEXPECTED_CHAR;
+      }
+#if defined(_MSC_VER)
+      memcpy_s(buf, 100, source_ptr, size);
+#else
+      memcpy(buf, source_ptr, size);
+#endif
+      buf[size] = '\0';
 
 #if defined(_MSC_VER)
-    n = sscanf_s((char *)source_ptr, format, out_number, &chars_consumed);
+      n = sscanf_s(buf, "%lf%n", out_number, &chars_consumed);
 #else
-    n = sscanf((char *)source_ptr, format, out_number, &chars_consumed);
+      n = sscanf(buf, "%lf%n", out_number, &chars_consumed);
 #endif
+    }
 
     /* Success if the entire source was consumed by sscanf  and it set the
      * out_number argument. */
@@ -1028,7 +1034,7 @@ AZ_NODISCARD enum az_result_core az_span_dtoa(az_span destination,
       int32_t d;
 
       for (d = 0; d < fractional_digits; d++) {
-        shifted_fractional *= _az_NUMBER_OF_DECIMAL_VALUES;
+        shifted_fractional *= (double)_az_NUMBER_OF_DECIMAL_VALUES;
 
         /* Any decimal component that is less than 0.1, when multiplied by 10,
          * will be less than 1, which indicate a leading zero is present after

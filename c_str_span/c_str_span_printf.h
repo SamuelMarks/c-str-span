@@ -17,6 +17,15 @@ extern "C" {
 #include "c_str_span_export.h"
 /* clang-format on */
 
+/** @brief Internal doc. */
+#if defined(_MSC_VER)
+/** @brief Format for printing 64-bit numbers on MSVC. */
+#define NUM_FORMAT "%I64d"
+#else
+/** @brief Format for printing 64-bit numbers on non-MSVC. */
+#define NUM_FORMAT "%lld"
+#endif
+
 /*extern C_STR_SPAN_EXPORT void az_span_fprintf(FILE * __restrict OUT, const
  * uint8_t *format, ...);*/
 

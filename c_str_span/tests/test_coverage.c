@@ -82,6 +82,15 @@ TEST test_az_span_atox_empty(void) {
   ASSERT_EQ(AZ_ERROR_UNEXPECTED_CHAR, az_span_atoi32(empty, &val_i32));
   ASSERT_EQ(AZ_ERROR_UNEXPECTED_CHAR, az_span_atoi64(empty, &val_i64));
   ASSERT_EQ(AZ_ERROR_UNEXPECTED_CHAR, az_span_atod(empty, &val_d));
+
+  /* Test az_span_atod size limit > 99 */
+  {
+    double val_d_long;
+    az_span long_span = AZ_SPAN_FROM_STR(
+        "1234567890123456789012345678901234567890123456789012345678901234567890"
+        "1234567890123456789012345678901234567890");
+    ASSERT_EQ(AZ_ERROR_UNEXPECTED_CHAR, az_span_atod(long_span, &val_d_long));
+  }
 #endif
   PASS();
 }
