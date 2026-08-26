@@ -80,18 +80,20 @@ if (NOT DEFINED MSVC_VERSION
         OR NOT (CMAKE_C_COMPILER_ID STREQUAL "OpenWatcom"))
     target_compile_features("${PROJECT_NAME}_compiler_flags" INTERFACE "c_std_${CMAKE_C_STANDARD}")
     if (CMAKE_VERSION VERSION_GREATER_EQUAL "3.15")
-        set(gcc_like "$<COMPILE_LANG_AND_ID:C,CXX,ARMClang,AppleClang,Clang,GNU,LCC>")
+        set(gcc_like "$<COMPILE_LANG_AND_ID:C,CXX,GNU,LCC>")
+        set(clang_like "$<COMPILE_LANG_AND_ID:C,CXX,ARMClang,AppleClang,Clang>")
         set(msvc "$<COMPILE_LANG_AND_ID:C,CXX,MSVC>")
         target_compile_options(
                 "${PROJECT_NAME}_compiler_flags"
                 INTERFACE
-                "$<$<AND:${gcc_like},$<CONFIG:Debug>>:$<BUILD_INTERFACE:-Wshadow;-Wformat=2;-Wall;-Werror;-Wconversion;-Wcast-align;-Wstrict-prototypes;-Wmissing-prototypes;-Wsign-conversion;-Wshorten-64-to-32;-pedantic;-fprofile-arcs;-ftest-coverage>>"
+                "$<$<AND:${gcc_like},$<CONFIG:Debug>>:$<BUILD_INTERFACE:-Wshadow;-Wformat=2;-Wall;-Werror;-Wconversion;-Wcast-align;-Wstrict-prototypes;-Wmissing-prototypes;-Wsign-conversion;-pedantic;-fprofile-arcs;-ftest-coverage>>"
+                "$<$<AND:${clang_like},$<CONFIG:Debug>>:$<BUILD_INTERFACE:-Wshadow;-Wformat=2;-Wall;-Werror;-Wconversion;-Wcast-align;-Wstrict-prototypes;-Wmissing-prototypes;-Wsign-conversion;-Wshorten-64-to-32;-pedantic;-fprofile-arcs;-ftest-coverage>>"
                 "$<${msvc}:$<BUILD_INTERFACE:-W4;-WX;-Zi;-permissive->>"
         )
         target_link_options(
                 "${PROJECT_NAME}_compiler_flags"
                 INTERFACE
-                "$<$<AND:${gcc_like},$<CONFIG:Debug>>:$<BUILD_INTERFACE:--coverage>>"
+                "$<$<AND:$<OR:${gcc_like},${clang_like}>,$<CONFIG:Debug>>:$<BUILD_INTERFACE:--coverage>>"
         )
     endif (CMAKE_VERSION VERSION_GREATER_EQUAL "3.15")
 endif ()
