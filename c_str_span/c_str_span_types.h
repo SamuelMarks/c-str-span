@@ -15,6 +15,7 @@ extern "C" {
 #if defined(_MSC_VER) && _MSC_VER < 1600
 #include "c_str_span_stdint.h"
 #else
+#include <inttypes.h>
 #include <stdint.h>
 #endif /* defined(_MSC_VER) && _MSC_VER < 1600 */
 
@@ -65,14 +66,15 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
-#if defined(_MSC_VER) || defined(__MINGW32__)
+
+#if defined(_MSC_VER) && _MSC_VER < 1600
 #define C_STR_SPAN_PRId64 "I64d"
 #define C_STR_SPAN_PRIu64 "I64u"
 #define C_STR_SPAN_PRIx64 "I64x"
 #else
-#define C_STR_SPAN_PRId64 "lld"
-#define C_STR_SPAN_PRIu64 "llu"
-#define C_STR_SPAN_PRIx64 "llx"
+#define C_STR_SPAN_PRId64 PRId64
+#define C_STR_SPAN_PRIu64 PRIu64
+#define C_STR_SPAN_PRIx64 PRIx64
 #endif
 
 #endif /* C_STR_SPAN_TYPES_H */
