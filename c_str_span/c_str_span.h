@@ -74,18 +74,14 @@ typedef struct {
  * @param[in] span The #az_span whose starting memory address to return.
  * @return Starting memory address of \p span buffer.
  */
-AZ_NODISCARD AZ_INLINE uint8_t *az_span_ptr(az_span span) {
-  return span._internal.ptr;
-}
+#define az_span_ptr(span) ((span)._internal.ptr)
 
 /**
  * @brief Returns the number of bytes within the #az_span.
  * @param[in] span The #az_span whose size to return.
  * @return Size of \p span buffer.
  */
-AZ_NODISCARD AZ_INLINE size_t az_span_size(az_span span) {
-  return span._internal.size;
-}
+#define az_span_size(span) ((span)._internal.size)
 
 /********************************  CONSTRUCTORS */
 

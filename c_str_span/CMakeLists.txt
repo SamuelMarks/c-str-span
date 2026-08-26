@@ -73,6 +73,10 @@ include(GenerateExportHeader)
 set(_export_file "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_export.h")
 generate_export_header("${LIBRARY_NAME}" EXPORT_FILE_NAME "${_export_file}")
 
+# Wrap the generated export header in extern "C"
+file(READ "${_export_file}" EXPORT_CONTENT)
+file(WRITE "${_export_file}" "#ifdef __cplusplus\nextern \"C\" {\n#endif /* __cplusplus */\n${EXPORT_CONTENT}\n#ifdef __cplusplus\n}\n#endif /* __cplusplus */\n")
+
 target_include_directories(
         "${LIBRARY_NAME}"
         PUBLIC

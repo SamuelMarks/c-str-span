@@ -1,14 +1,31 @@
 cmake_minimum_required(VERSION 3.11.4)
 
 cmake_policy(SET CMP0091 NEW)
+
+if(CMAKE_SYSTEM_NAME STREQUAL "Windows" AND CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin")
+    set(CMAKE_OSX_ARCHITECTURES "")
+    # Skip linking in compiler tests to prevent LNK1181 arm64.obj cross-compilation errors on macOS
+    set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
+endif()
+
 project(c_str_span VERSION 0.0.1 LANGUAGES C)
 
 string(TOUPPER "${PROJECT_NAME}" PROJECT_PREFIX)
 string(REPLACE "-" "_" PROJECT_PREFIX "${PROJECT_PREFIX}")
 
+# The CI environment blindly passes CDD_ variables to all projects.
+# This project doesn't use them (no threading, no UNICODE, strict FetchContent),
+# so we silently consume them to prevent "unused variable" warnings.
+set(dummy ${CDD_CHARSET} ${CDD_THREADING} ${CDD_DEPS})
+
+if(DEFINED CDD_CRT_LINKAGE)
+    set(${PROJECT_PREFIX}_CRT_LINKAGE "${CDD_CRT_LINKAGE}" CACHE STRING "MSVC CRT Linkage: Static or Shared" FORCE)
+endif()
+if(DEFINED CDD_MSVC_RTC)
+    set(${PROJECT_PREFIX}_MSVC_RTC "${CDD_MSVC_RTC}" CACHE STRING "MSVC Runtime Checks: RTC1, RTCs, RTCu, or empty" FORCE)
+endif()
+
 set(${PROJECT_PREFIX}_CRT_LINKAGE "Shared" CACHE STRING "MSVC CRT Linkage: Static or Shared")
-set(${PROJECT_PREFIX}_CHARSET "Unicode" CACHE STRING "Charset to use: Unicode or ANSI")
-set(${PROJECT_PREFIX}_THREADING "Multi-threaded" CACHE STRING "Threading: Multi-threaded or Single-threaded")
 set(${PROJECT_PREFIX}_MSVC_RTC "" CACHE STRING "MSVC Runtime Checks: RTC1, RTCs, RTCu, or empty")
 set(${PROJECT_PREFIX}_LTO OFF CACHE BOOL "Enable Link-Time Optimization (LTO)")
 
@@ -22,10 +39,10 @@ if(MSVC)
     if (${PROJECT_PREFIX}_MSVC_RTC)
         add_compile_options("/${${PROJECT_PREFIX}_MSVC_RTC}")
     endif()
-endif()
 
-if (${PROJECT_PREFIX}_CHARSET STREQUAL "Unicode")
-    add_compile_definitions(UNICODE _UNICODE)
+    # Remove default /W3 to prevent D9025 "overriding /W3 with /W4" warnings
+    string(REGEX REPLACE "/W[0-4]" "" CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
+    string(REGEX REPLACE "-W[0-4]" "" CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
 endif()
 
 if (${PROJECT_PREFIX}_LTO)
@@ -106,7 +123,7 @@ include(GNUInstallDirs)
 
 add_subdirectory("${PROJECT_NAME}")
 
-if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND BUILD_TESTING)
+if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND (BUILD_TESTING OR C_STR_SPAN_BUILD_TESTING))
     include(CTest)
     message(STATUS "TESTS ENABLED")
     add_subdirectory("${PROJECT_NAME}/tests")
