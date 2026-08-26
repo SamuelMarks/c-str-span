@@ -16,7 +16,14 @@ string(REPLACE "-" "_" PROJECT_PREFIX "${PROJECT_PREFIX}")
 # The CI environment blindly passes CDD_ variables to all projects.
 # This project doesn't use them (no threading, no UNICODE, strict FetchContent),
 # so we silently consume them to prevent "unused variable" warnings.
-set(dummy ${CDD_CHARSET} ${CDD_THREADING} ${CDD_DEPS})
+set(dummy ${CDD_CHARSET} ${CDD_THREADING} ${CDD_DEPS}
+    ${FETCHCONTENT_SOURCE_DIR_C-ABSTRACT-HTTP}
+    ${FETCHCONTENT_SOURCE_DIR_C-ORM}
+    ${FETCHCONTENT_SOURCE_DIR_C-STR-SPAN}
+    ${FETCHCONTENT_SOURCE_DIR_C89STRINGUTILS}
+    ${FETCHCONTENT_SOURCE_DIR_CDD-C}
+    ${FETCHCONTENT_SOURCE_DIR_CFS}
+    ${FETCHCONTENT_SOURCE_DIR_PARSON})
 
 if(DEFINED CDD_CRT_LINKAGE)
     set(${PROJECT_PREFIX}_CRT_LINKAGE "${CDD_CRT_LINKAGE}" CACHE STRING "MSVC CRT Linkage: Static or Shared" FORCE)

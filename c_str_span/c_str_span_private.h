@@ -103,8 +103,8 @@ AZ_NODISCARD AZ_INLINE bool _az_isfinite(double value) {
          _az_BINARY_VALUE_OF_POSITIVE_INFINITY;
 }
 
-extern C_STR_SPAN_EXPORT AZ_NODISCARD int
 /** @brief Internal doc. */
+extern C_STR_SPAN_EXPORT AZ_NODISCARD enum az_result_core
 _az_is_expected_span(az_span *ref_span, az_span expected);
 
 /**

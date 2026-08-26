@@ -233,7 +233,7 @@ AZ_NODISCARD enum az_result_core az_span_atou64(az_span source,
       }
     }
   }
-  return 0;
+  return AZ_OK;
 }
 
 AZ_NODISCARD enum az_result_core az_span_atou32(az_span source,
@@ -320,7 +320,7 @@ AZ_NODISCARD enum az_result_core az_span_atou32(az_span source,
       }
     }
   }
-  return 0;
+  return AZ_OK;
 }
 
 AZ_NODISCARD enum az_result_core az_span_atoi64(az_span source,
@@ -435,7 +435,7 @@ AZ_NODISCARD enum az_result_core az_span_atoi64(az_span source,
       }
     }
   }
-  return 0;
+  return AZ_OK;
 }
 
 AZ_NODISCARD enum az_result_core az_span_atoi32(az_span source,
@@ -546,7 +546,7 @@ AZ_NODISCARD enum az_result_core az_span_atoi32(az_span source,
       }
     }
   }
-  return 0;
+  return AZ_OK;
 }
 
 static bool _is_valid_start_of_double(uint8_t first_byte) {
@@ -753,7 +753,7 @@ az_span_to_str(char *destination, size_t destination_max_size, az_span source) {
   _az_PRECONDITION_NOT_NULL(destination);
 
   if (destination_max_size == 0)
-    return 0;
+    return AZ_OK;
 
   /* Implementations of memmove generally do the right thing when number of
    * bytes to move is 0, even if the ptr is null, but given the behavior is
@@ -784,7 +784,7 @@ az_span_to_str(char *destination, size_t destination_max_size, az_span source) {
 #endif
     destination[size_to_write] = 0;
   }
-  return 0;
+  return AZ_OK;
 }
 
 /** @brief Internal doc. */
@@ -792,15 +792,15 @@ AZ_INLINE uint8_t _az_decimal_to_ascii(uint8_t d) {
   return (uint8_t)((uint32_t)('0' + d) & (uint8_t)UINT8_MAX);
 }
 
-static AZ_NODISCARD int _az_span_builder_append_uint64(az_span *ref_span,
-                                                       uint64_t n) {
+static AZ_NODISCARD enum az_result_core
+_az_span_builder_append_uint64(az_span *ref_span, uint64_t n) {
   enum az_result_core rc = AZ_OK;
 
   if (n == 0) {
     rc = az_span_copy_u8(*ref_span, '0', ref_span);
     if (rc != AZ_OK)
       return rc;
-    return 0;
+    return AZ_OK;
   }
 
   {
@@ -826,7 +826,7 @@ static AZ_NODISCARD int _az_span_builder_append_uint64(az_span *ref_span,
         return rc;
     }
   }
-  return 0;
+  return AZ_OK;
 }
 
 AZ_NODISCARD enum az_result_core
@@ -998,11 +998,11 @@ AZ_NODISCARD enum az_result_core az_span_dtoa(az_span destination,
     /* Only print decimal digits if the user asked for at least one to be
      * printed. Or if the decimal part is non-zero. */
     if (fractional_digits <= 0) {
-      return 0;
+      return AZ_OK;
     }
 
     if (after_decimal_part == 0) {
-      return 0;
+      return AZ_OK;
     }
 
     /* Clamp the fractional digits to the supported maximum value of 15. */
@@ -1028,7 +1028,7 @@ AZ_NODISCARD enum az_result_core az_span_dtoa(az_span destination,
       }
 
       if (shifted_fractional < 1) {
-        return 0;
+        return AZ_OK;
       }
 
       {
@@ -1078,7 +1078,8 @@ AZ_NODISCARD enum az_result_core az_span_dtoa(az_span destination,
 }
 
 /* TODO: pass az_span by value */
-AZ_NODISCARD int _az_is_expected_span(az_span *ref_span, az_span expected) {
+AZ_NODISCARD enum az_result_core _az_is_expected_span(az_span *ref_span,
+                                                      az_span expected) {
   enum az_result_core rc = AZ_OK;
 
   size_t const expected_size = az_span_size(expected);
@@ -1112,7 +1113,7 @@ AZ_NODISCARD int _az_is_expected_span(az_span *ref_span, az_span expected) {
   /* move reader after the expected span (means it was parsed as expected) */
   *ref_span = az_span_slice_to_end(*ref_span, expected_size);
 
-  return 0;
+  return AZ_OK;
 }
 
 /** @brief Internal doc. */
@@ -1301,7 +1302,7 @@ AZ_NODISCARD enum az_result_core _az_span_url_encode(az_span destination,
       *out_length = (ptrdiff_t)(dest_ptr - dest_begin);
     }
   }
-  return 0;
+  return AZ_OK;
 }
 
 enum az_result_core _az_span_token(az_span source, az_span delimiter,
