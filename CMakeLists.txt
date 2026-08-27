@@ -52,7 +52,10 @@ if(MSVC)
     string(REGEX REPLACE "-W[0-4]" "" CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
 endif()
 
-if (${PROJECT_PREFIX}_LTO)
+if (CMAKE_INTERPROCEDURAL_OPTIMIZATION OR ${PROJECT_PREFIX}_LTO)
+    if(CMAKE_C_COMPILER_ID MATCHES "Clang")
+        add_link_options("-fuse-ld=lld")
+    endif()
     include(CheckIPOSupported)
     check_ipo_supported(RESULT ipo_supported)
     if(ipo_supported)
@@ -86,8 +89,6 @@ if (NOT DEFINED MSVC_VERSION
         target_compile_options(
                 "${PROJECT_NAME}_compiler_flags"
                 INTERFACE
-                "$<$<AND:${gcc_like},$<CONFIG:Debug>>:$<BUILD_INTERFACE:-Wshadow;-Wformat=2;-Wall;-Werror;-Wconversion;-Wcast-align;-Wstrict-prototypes;-Wmissing-prototypes;-Wsign-conversion;-pedantic;-fprofile-arcs;-ftest-coverage>>"
-                "$<$<AND:${clang_like},$<CONFIG:Debug>>:$<BUILD_INTERFACE:-Wshadow;-Wformat=2;-Wall;-Werror;-Wconversion;-Wcast-align;-Wstrict-prototypes;-Wmissing-prototypes;-Wsign-conversion;-Wshorten-64-to-32;-pedantic;-fprofile-arcs;-ftest-coverage>>"
                 "$<${msvc}:$<BUILD_INTERFACE:-W4;-WX;-Zi;-permissive->>"
         )
         target_link_options(
