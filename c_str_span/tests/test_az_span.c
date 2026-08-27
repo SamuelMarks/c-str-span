@@ -1205,8 +1205,10 @@ TEST az_span_test_macro_only_allows_byte_buffers(void) {
 
   {
     uint32_t uint32_buffer[2];
-    ASSERT_EQ(1, _az_IS_ARRAY(uint32_buffer));
-    ASSERT_EQ(0, _az_IS_BYTE_ARRAY(uint32_buffer));
+    volatile int is_arr = _az_IS_ARRAY(uint32_buffer);
+    volatile int is_byte_arr = _az_IS_BYTE_ARRAY(uint32_buffer);
+    ASSERT_EQ(1, is_arr);
+    ASSERT_EQ(0, is_byte_arr);
   }
 
   {
@@ -2145,14 +2147,16 @@ static void test_precondition_failed_callback(void) {
 
 #ifndef AZ_NO_PRECONDITION_CHECKING
 TEST az_precondition_callback_test(void) {
+  volatile int zero = 0;
+  volatile int one = 1;
   az_precondition_failed_fn original = az_precondition_failed_get_callback();
   az_precondition_failed_set_callback(test_precondition_failed_callback);
 
   g_precondition_failed_called = 0;
-  _az_PRECONDITION(1 == 0);
+  _az_PRECONDITION(one == zero);
   ASSERT_EQ(1, g_precondition_failed_called);
 
-  _az_PRECONDITION(1 == 1);
+  _az_PRECONDITION(one == one);
   ASSERT_EQ(1, g_precondition_failed_called);
 
   {

@@ -86,15 +86,15 @@ if (NOT DEFINED MSVC_VERSION
         OR NOT (CMAKE_C_COMPILER_ID STREQUAL "OpenWatcom"))
     target_compile_features("${PROJECT_NAME}_compiler_flags" INTERFACE "c_std_${CMAKE_C_STANDARD}")
     if (CMAKE_VERSION VERSION_GREATER_EQUAL "3.15")
-        set(gcc_like "$<COMPILE_LANG_AND_ID:C,CXX,GNU,LCC>")
-        set(clang_like "$<COMPILE_LANG_AND_ID:C,CXX,ARMClang,AppleClang,Clang>")
-        set(msvc "$<COMPILE_LANG_AND_ID:C,CXX,MSVC>")
+        set(gcc_like "$<AND:$<COMPILE_LANG_AND_ID:C,CXX,GNU,LCC>,$<NOT:$<BOOL:${MSVC}>>>")
+        set(clang_like "$<AND:$<COMPILE_LANG_AND_ID:C,CXX,ARMClang,AppleClang,Clang>,$<NOT:$<BOOL:${MSVC}>>>")
+        set(msvc "$<OR:$<COMPILE_LANG_AND_ID:C,CXX,MSVC>,$<AND:$<COMPILE_LANG_AND_ID:C,CXX,Clang>,$<BOOL:${MSVC}>>>")
         target_compile_options(
                 "${PROJECT_NAME}_compiler_flags"
                 INTERFACE
-                "$<$<AND:${gcc_like},$<CONFIG:Debug>>:$<BUILD_INTERFACE:-Wshadow;-Wformat=2;-Wall;-Werror;-Wconversion;-Wcast-align;-Wstrict-prototypes;-Wmissing-prototypes;-Wsign-conversion;-Wno-long-long;-pedantic;-fprofile-arcs;-ftest-coverage>>"
-                "$<$<AND:${clang_like},$<CONFIG:Debug>>:$<BUILD_INTERFACE:-Wshadow;-Wformat=2;-Wall;-Werror;-Wconversion;-Wcast-align;-Wstrict-prototypes;-Wmissing-prototypes;-Wsign-conversion;-Wshorten-64-to-32;-Wno-long-long;-pedantic;-fprofile-arcs;-ftest-coverage>>"
-                "$<${msvc}:$<BUILD_INTERFACE:-W4;-WX;-Zi;-wd4127>>"
+                "$<$<AND:${gcc_like},$<CONFIG:Debug>>:$<BUILD_INTERFACE:-Wshadow;-Wformat=2;-Wall;-Werror;-Wconversion;-Wcast-align;-Wstrict-prototypes;-Wmissing-prototypes;-Wsign-conversion;-pedantic;-fprofile-arcs;-ftest-coverage>>"
+                "$<$<AND:${clang_like},$<CONFIG:Debug>>:$<BUILD_INTERFACE:-Wshadow;-Wformat=2;-Wall;-Werror;-Wconversion;-Wcast-align;-Wstrict-prototypes;-Wmissing-prototypes;-Wsign-conversion;-Wshorten-64-to-32;-pedantic;-fprofile-arcs;-ftest-coverage>>"
+                "$<${msvc}:$<BUILD_INTERFACE:-W4;-WX;-Zi>>"
                 "$<$<AND:${msvc},$<VERSION_GREATER_EQUAL:$<C_COMPILER_VERSION>,19.10>>:$<BUILD_INTERFACE:-permissive->>"
         )
         target_link_options(
