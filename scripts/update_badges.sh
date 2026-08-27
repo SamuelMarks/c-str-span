@@ -49,14 +49,14 @@ if [ -n "${BUILD_DIR}" ]; then
         (cd "${BUILD_DIR}" && ctest -C 'Debug' 2>/dev/null)
     fi
     COVERAGE_OUTPUT="$(cd "${BUILD_DIR}" && ctest -C 'Debug' -T 'Coverage' 2>/dev/null)"
-    PCT=$(echo "${COVERAGE_OUTPUT}" | grep -E "Percentage Coverage:|Total Coverage:" | grep -oE "[0-9]+(\.[0-9]+)?%" | head -n 1)
+    PCT=$(echo "${COVERAGE_OUTPUT}" | grep -E "Percentage Coverage:|Total Coverage:" | grep -oE "[0-9]+(\.[0-9]+)?%" | head -n 1 | tr -d '\r')
     if [ -n "${PCT}" ]; then
         TEST_COVERAGE="${PCT}"
     else
         PCT_VAL=$(echo "${COVERAGE_OUTPUT}" | awk '/Percentage Coverage:/ {print $NF} /Total Coverage:/ {print $NF}')
         if [[ "${PCT_VAL}" =~ [0-9] ]]; then
             if [[ ! "${PCT_VAL}" =~ %$ ]]; then PCT_VAL="${PCT_VAL}%"; fi
-            TEST_COVERAGE="${PCT_VAL}"
+            TEST_COVERAGE="$(echo "${PCT_VAL}" | xargs)"
         fi
     fi
 fi

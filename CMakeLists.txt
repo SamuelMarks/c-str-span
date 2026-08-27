@@ -76,6 +76,9 @@ endif ()
 set(CMAKE_C_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN YES)
 set(CMAKE_C_STANDARD 90 CACHE STRING "")
+if(MINGW)
+    add_compile_definitions(__USE_MINGW_ANSI_STDIO=1)
+endif()
 
 add_library("${PROJECT_NAME}_compiler_flags" INTERFACE)
 if (NOT DEFINED MSVC_VERSION
@@ -89,9 +92,10 @@ if (NOT DEFINED MSVC_VERSION
         target_compile_options(
                 "${PROJECT_NAME}_compiler_flags"
                 INTERFACE
-                "$<$<AND:${gcc_like},$<CONFIG:Debug>>:$<BUILD_INTERFACE:-Wshadow;-Wformat=2;-Wall;-Werror;-Wconversion;-Wcast-align;-Wstrict-prototypes;-Wmissing-prototypes;-Wsign-conversion;-pedantic;-fprofile-arcs;-ftest-coverage>>"
-                "$<$<AND:${clang_like},$<CONFIG:Debug>>:$<BUILD_INTERFACE:-Wshadow;-Wformat=2;-Wall;-Werror;-Wconversion;-Wcast-align;-Wstrict-prototypes;-Wmissing-prototypes;-Wsign-conversion;-Wshorten-64-to-32;-pedantic;-fprofile-arcs;-ftest-coverage>>"
-                "$<${msvc}:$<BUILD_INTERFACE:-W4;-WX;-Zi;-permissive->>"
+                "$<$<AND:${gcc_like},$<CONFIG:Debug>>:$<BUILD_INTERFACE:-Wshadow;-Wformat=2;-Wall;-Werror;-Wconversion;-Wcast-align;-Wstrict-prototypes;-Wmissing-prototypes;-Wsign-conversion;-Wno-long-long;-pedantic;-fprofile-arcs;-ftest-coverage>>"
+                "$<$<AND:${clang_like},$<CONFIG:Debug>>:$<BUILD_INTERFACE:-Wshadow;-Wformat=2;-Wall;-Werror;-Wconversion;-Wcast-align;-Wstrict-prototypes;-Wmissing-prototypes;-Wsign-conversion;-Wshorten-64-to-32;-Wno-long-long;-pedantic;-fprofile-arcs;-ftest-coverage>>"
+                "$<${msvc}:$<BUILD_INTERFACE:-W4;-WX;-Zi;-wd4127>>"
+                "$<$<AND:${msvc},$<VERSION_GREATER_EQUAL:$<C_COMPILER_VERSION>,19.10>>:$<BUILD_INTERFACE:-permissive->>"
         )
         target_link_options(
                 "${PROJECT_NAME}_compiler_flags"

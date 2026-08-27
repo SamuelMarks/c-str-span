@@ -67,14 +67,13 @@ TEST test_az_span_create_null_size_non_zero(void) {
 }
 
 TEST test_az_span_atox_empty(void) {
+#ifndef __CYGWIN__
   uint32_t val_u32;
   int32_t val_i32;
   uint64_t val_u64;
   int64_t val_i64;
   double val_d;
   az_span empty = az_span_empty();
-
-#ifndef __CYGWIN__
   ASSERT_EQ(AZ_ERROR_UNEXPECTED_CHAR, az_span_atou32(empty, &val_u32));
   ASSERT_EQ(AZ_ERROR_UNEXPECTED_CHAR,
             az_span_atou32(AZ_SPAN_FROM_STR("+"), &val_u32));
@@ -204,8 +203,8 @@ TEST test_az_span_printf_all_specifiers(void) {
 }
 
 TEST test_az_span_copy_u8_empty(void) {
-  az_span dest = az_span_empty();
 #ifndef __CYGWIN__
+  az_span dest = az_span_empty();
   az_span result;
   enum az_result_core rc = az_span_copy_u8(dest, 'a', &result);
   ASSERT_EQ(AZ_ERROR_NOT_ENOUGH_SPACE, rc);
