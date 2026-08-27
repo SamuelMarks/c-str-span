@@ -312,55 +312,55 @@ TEST test_all_errors(void) {
   az_span rem;
   /* u64toa */
   b = az_span_create(buffer, 0);
-  (void)az_span_u64toa(b, 0, &rem);
+  ASSERT_EQ(AZ_ERROR_NOT_ENOUGH_SPACE, az_span_u64toa(b, 0, &rem));
   b = az_span_create(buffer, 1);
-  (void)az_span_u64toa(b, 12, &rem);
+  ASSERT_EQ(AZ_ERROR_NOT_ENOUGH_SPACE, az_span_u64toa(b, 12, &rem));
   b = az_span_create(buffer, 2);
-  (void)az_span_u64toa(b, 123, &rem);
+  ASSERT_EQ(AZ_ERROR_NOT_ENOUGH_SPACE, az_span_u64toa(b, 123, &rem));
 
   /* i64toa */
   b = az_span_create(buffer, 0);
-  (void)az_span_i64toa(b, -1, &rem);
+  ASSERT_EQ(AZ_ERROR_NOT_ENOUGH_SPACE, az_span_i64toa(b, -1, &rem));
   b = az_span_create(buffer, 1);
-  (void)az_span_i64toa(b, -12, &rem);
+  ASSERT_EQ(AZ_ERROR_NOT_ENOUGH_SPACE, az_span_i64toa(b, -12, &rem));
   b = az_span_create(buffer, 2);
-  (void)az_span_i64toa(b, -123, &rem);
+  ASSERT_EQ(AZ_ERROR_NOT_ENOUGH_SPACE, az_span_i64toa(b, -123, &rem));
 
   /* u32toa */
   b = az_span_create(buffer, 0);
-  (void)az_span_u32toa(b, 0, &rem);
+  ASSERT_EQ(AZ_ERROR_NOT_ENOUGH_SPACE, az_span_u32toa(b, 0, &rem));
   b = az_span_create(buffer, 1);
-  (void)az_span_u32toa(b, 12, &rem);
+  ASSERT_EQ(AZ_ERROR_NOT_ENOUGH_SPACE, az_span_u32toa(b, 12, &rem));
   b = az_span_create(buffer, 2);
-  (void)az_span_u32toa(b, 123, &rem);
+  ASSERT_EQ(AZ_ERROR_NOT_ENOUGH_SPACE, az_span_u32toa(b, 123, &rem));
 
   /* i32toa */
   b = az_span_create(buffer, 0);
-  (void)az_span_i32toa(b, -1, &rem);
+  ASSERT_EQ(AZ_ERROR_NOT_ENOUGH_SPACE, az_span_i32toa(b, -1, &rem));
   b = az_span_create(buffer, 1);
-  (void)az_span_i32toa(b, -12, &rem);
+  ASSERT_EQ(AZ_ERROR_NOT_ENOUGH_SPACE, az_span_i32toa(b, -12, &rem));
   b = az_span_create(buffer, 2);
-  (void)az_span_i32toa(b, -123, &rem);
+  ASSERT_EQ(AZ_ERROR_NOT_ENOUGH_SPACE, az_span_i32toa(b, -123, &rem));
 
   /* dtoa */
   b = az_span_create(buffer, 0);
-  (void)az_span_dtoa(b, -1.2, 2, &rem);
+  ASSERT_EQ(AZ_ERROR_NOT_ENOUGH_SPACE, az_span_dtoa(b, -1.2, 2, &rem));
   b = az_span_create(buffer, 1);
-  (void)az_span_dtoa(b, -1.2, 2, &rem);
+  ASSERT_EQ(AZ_ERROR_NOT_ENOUGH_SPACE, az_span_dtoa(b, -1.2, 2, &rem));
   b = az_span_create(buffer, 2);
-  (void)az_span_dtoa(b, -1.2, 2, &rem);
+  ASSERT_EQ(AZ_ERROR_NOT_ENOUGH_SPACE, az_span_dtoa(b, -1.2, 2, &rem));
   b = az_span_create(buffer, 3);
-  (void)az_span_dtoa(b, -1.2, 2, &rem);
+  ASSERT_EQ(AZ_ERROR_NOT_ENOUGH_SPACE, az_span_dtoa(b, -1.2, 2, &rem));
   b = az_span_create(buffer, 4);
-  (void)az_span_dtoa(b, -1.2, 2, &rem);
+  ASSERT_EQ(AZ_ERROR_NOT_ENOUGH_SPACE, az_span_dtoa(b, -1.2, 2, &rem));
   b = az_span_create(buffer, 0);
-  (void)az_span_dtoa(b, 1.2, 2, &rem);
+  ASSERT_EQ(AZ_ERROR_NOT_ENOUGH_SPACE, az_span_dtoa(b, 1.2, 2, &rem));
   b = az_span_create(buffer, 1);
-  (void)az_span_dtoa(b, 1.2, 2, &rem);
+  ASSERT_EQ(AZ_ERROR_NOT_ENOUGH_SPACE, az_span_dtoa(b, 1.2, 2, &rem));
   b = az_span_create(buffer, 2);
-  (void)az_span_dtoa(b, 1.2, 2, &rem);
+  ASSERT_EQ(AZ_ERROR_NOT_ENOUGH_SPACE, az_span_dtoa(b, 1.2, 2, &rem));
   b = az_span_create(buffer, 3);
-  (void)az_span_dtoa(b, 1.2, 2, &rem);
+  ASSERT_EQ(AZ_ERROR_NOT_ENOUGH_SPACE, az_span_dtoa(b, 1.2, 2, &rem));
   PASS();
 }
 SUITE(coverage_suite) {

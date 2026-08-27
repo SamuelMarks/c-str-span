@@ -845,13 +845,10 @@ az_span_u64toa(az_span destination, uint64_t source, az_span *out_span) {
   n = sprintf(buf, "%" C_STR_SPAN_PRIu64, source);
 #endif
 
-  if (n > 0) {
-    src = az_span_create_from_str(buf);
-    rc = az_span_copy(destination, src, out_span);
-    return rc;
-  }
-
-  return AZ_ERROR_UNEXPECTED_CHAR;
+  (void)n;
+  src = az_span_create_from_str(buf);
+  rc = az_span_copy(destination, src, out_span);
+  return rc;
 }
 
 AZ_NODISCARD enum az_result_core
@@ -870,13 +867,10 @@ az_span_i64toa(az_span destination, int64_t source, az_span *out_span) {
   n = sprintf(buf, "%" C_STR_SPAN_PRId64, source);
 #endif
 
-  if (n > 0) {
-    src = az_span_create_from_str(buf);
-    rc = az_span_copy(destination, src, out_span);
-    return rc;
-  }
-
-  return AZ_ERROR_UNEXPECTED_CHAR;
+  (void)n;
+  src = az_span_create_from_str(buf);
+  rc = az_span_copy(destination, src, out_span);
+  return rc;
 }
 
 AZ_NODISCARD enum az_result_core
@@ -895,13 +889,10 @@ az_span_u32toa(az_span destination, uint32_t source, az_span *out_span) {
   n = sprintf(buf, "%u", source);
 #endif
 
-  if (n > 0) {
-    src = az_span_create_from_str(buf);
-    rc = az_span_copy(destination, src, out_span);
-    return rc;
-  }
-
-  return AZ_ERROR_UNEXPECTED_CHAR;
+  (void)n;
+  src = az_span_create_from_str(buf);
+  rc = az_span_copy(destination, src, out_span);
+  return rc;
 }
 
 AZ_NODISCARD enum az_result_core
@@ -920,13 +911,10 @@ az_span_i32toa(az_span destination, int32_t source, az_span *out_span) {
   n = sprintf(buf, "%d", source);
 #endif
 
-  if (n > 0) {
-    src = az_span_create_from_str(buf);
-    rc = az_span_copy(destination, src, out_span);
-    return rc;
-  }
-
-  return AZ_ERROR_UNEXPECTED_CHAR;
+  (void)n;
+  src = az_span_create_from_str(buf);
+  rc = az_span_copy(destination, src, out_span);
+  return rc;
 }
 
 AZ_NODISCARD enum az_result_core az_span_dtoa(az_span destination,
