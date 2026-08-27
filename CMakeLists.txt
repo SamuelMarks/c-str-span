@@ -44,7 +44,7 @@ if(MSVC)
     endif()
 
     if (${PROJECT_PREFIX}_MSVC_RTC)
-        add_compile_options("/${${PROJECT_PREFIX}_MSVC_RTC}")
+        add_compile_options("$<$<CONFIG:Debug>:/${${PROJECT_PREFIX}_MSVC_RTC}>")
     endif()
 
     # Remove default /W3 to prevent D9025 "overriding /W3 with /W4" warnings
@@ -53,7 +53,7 @@ if(MSVC)
 endif()
 
 if (CMAKE_INTERPROCEDURAL_OPTIMIZATION OR ${PROJECT_PREFIX}_LTO)
-    if(CMAKE_C_COMPILER_ID MATCHES "Clang")
+    if(CMAKE_C_COMPILER_ID MATCHES "Clang" AND NOT APPLE)
         add_link_options("-fuse-ld=lld")
     endif()
     include(CheckIPOSupported)
@@ -89,6 +89,8 @@ if (NOT DEFINED MSVC_VERSION
         target_compile_options(
                 "${PROJECT_NAME}_compiler_flags"
                 INTERFACE
+                "$<$<AND:${gcc_like},$<CONFIG:Debug>>:$<BUILD_INTERFACE:-Wshadow;-Wformat=2;-Wall;-Werror;-Wconversion;-Wcast-align;-Wstrict-prototypes;-Wmissing-prototypes;-Wsign-conversion;-pedantic;-fprofile-arcs;-ftest-coverage>>"
+                "$<$<AND:${clang_like},$<CONFIG:Debug>>:$<BUILD_INTERFACE:-Wshadow;-Wformat=2;-Wall;-Werror;-Wconversion;-Wcast-align;-Wstrict-prototypes;-Wmissing-prototypes;-Wsign-conversion;-Wshorten-64-to-32;-pedantic;-fprofile-arcs;-ftest-coverage>>"
                 "$<${msvc}:$<BUILD_INTERFACE:-W4;-WX;-Zi;-permissive->>"
         )
         target_link_options(
