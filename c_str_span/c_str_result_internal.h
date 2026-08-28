@@ -51,7 +51,7 @@ extern "C" {
                 C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));            \
       return rc;                                                               \
     }                                                                          \
-  } while (0, 0)
+  } while ((void)0, 0)
 
 /**
  * @brief Convenience macro to return if the provided span is not of the
@@ -69,7 +69,7 @@ extern "C" {
       }                                                                        \
       return rc;                                                               \
     }                                                                          \
-  } while (0, 0)
+  } while ((void)0, 0)
 
 /*#include <azure/core/_az_cfg_suffix.h>*/
 

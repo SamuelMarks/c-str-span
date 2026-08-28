@@ -177,7 +177,7 @@ TEST test_az_span_is_content_equal(void) {
     ASSERT(az_span_atoi32(source, &i32) == AZ_ERROR_UNEXPECTED_CHAR);          \
     ASSERT(az_span_atou64(source, &ui64) == AZ_ERROR_UNEXPECTED_CHAR);         \
     ASSERT(az_span_atoi64(source, &i64) == AZ_ERROR_UNEXPECTED_CHAR);          \
-  } while (0, 0)
+  } while ((void)0, 0)
 
 #define AZ_SPAN_ATOX_RETURN_ERRORS_HELPER(source)                              \
   do {                                                                         \
@@ -191,7 +191,7 @@ TEST test_az_span_is_content_equal(void) {
     ASSERT(az_span_atou64(source, &ui64) == AZ_ERROR_UNEXPECTED_CHAR);         \
     ASSERT(az_span_atoi64(source, &i64) == AZ_ERROR_UNEXPECTED_CHAR);          \
     ASSERT(az_span_atod(source, &decimal) == AZ_ERROR_UNEXPECTED_CHAR);        \
-  } while (0, 0)
+  } while ((void)0, 0)
 
 TEST az_span_atox_return_errors(void) {
 
@@ -329,13 +329,13 @@ TEST az_span_atou64_test(void) {
   ASSERT_EQ(4294967295U, value);
   ASSERT_EQ(AZ_OK,
             az_span_atou64(AZ_SPAN_FROM_STR("9223372036854775807"), &value));
-  ASSERT_EQ(9223372036854775807UL, value);
+  ASSERT_EQ((((uint64_t)0x7FFFFFFF << 32) | 0xFFFFFFFF), value);
   ASSERT_EQ(AZ_OK,
             az_span_atou64(AZ_SPAN_FROM_STR("18446744073709551615"), &value));
-  ASSERT_EQ(18446744073709551615UL, value);
+  ASSERT_EQ((((uint64_t)0xFFFFFFFF << 32) | 0xFFFFFFFF), value);
   ASSERT_EQ(AZ_OK, az_span_atou64(AZ_SPAN_FROM_STR("000018446744073709551615"),
                                   &value));
-  ASSERT_EQ(18446744073709551615UL, value);
+  ASSERT_EQ((((uint64_t)0xFFFFFFFF << 32) | 0xFFFFFFFF), value);
 
   ASSERT_EQ(AZ_ERROR_UNEXPECTED_CHAR,
             az_span_atou64(AZ_SPAN_FROM_STR("-123"), &value));
@@ -368,16 +368,16 @@ TEST az_span_atoi64_test(void) {
   ASSERT_EQ(AZ_OK, az_span_atoi64(AZ_SPAN_FROM_STR("4294967295"), &value));
   ASSERT_EQ(4294967295U, value);
   ASSERT_EQ(AZ_OK, az_span_atoi64(AZ_SPAN_FROM_STR("-4294967296"), &value));
-  ASSERT_EQ(-4294967296, value);
+  ASSERT_EQ(-((int64_t)1 << 32), value);
   ASSERT_EQ(AZ_OK,
             az_span_atoi64(AZ_SPAN_FROM_STR("9223372036854775807"), &value));
-  ASSERT_EQ(9223372036854775807L, value);
+  ASSERT_EQ((int64_t)(((uint64_t)0x7FFFFFFF << 32) | 0xFFFFFFFF), value);
   ASSERT_EQ(AZ_OK,
             az_span_atoi64(AZ_SPAN_FROM_STR("-9223372036854775808"), &value));
-  ASSERT_EQ(-9223372036854775807L - 1, value);
+  ASSERT_EQ(-(int64_t)(((uint64_t)0x7FFFFFFF << 32) | 0xFFFFFFFF) - 1, value);
   ASSERT_EQ(AZ_OK, az_span_atoi64(AZ_SPAN_FROM_STR("-00009223372036854775808"),
                                   &value));
-  ASSERT_EQ(-9223372036854775807L - 1, value);
+  ASSERT_EQ(-(int64_t)(((uint64_t)0x7FFFFFFF << 32) | 0xFFFFFFFF) - 1, value);
 
   ASSERT_EQ(AZ_ERROR_UNEXPECTED_CHAR,
             az_span_atoi64(AZ_SPAN_FROM_STR("92233720368547758070"), &value));
@@ -400,14 +400,14 @@ TEST az_span_atoi64_test(void) {
     double decimal = 0.0;                                                      \
     memcpy_s(&decimal, sizeof(decimal), &(source), sizeof(source));            \
     ASSERT_EQ(expected, _az_isfinite(decimal));                                \
-  } while (0, 0)
+  } while ((void)0, 0)
 #else
 #define TEST_AZ_ISFINITE_HELPER(source, expected)                              \
   do {                                                                         \
     double decimal = 0.0;                                                      \
     memcpy(&decimal, &(source), sizeof(decimal));                              \
     ASSERT_EQ(expected, _az_isfinite(decimal));                                \
-  } while (0, 0)
+  } while ((void)0, 0)
 #endif
 
 TEST test_az_isfinite(void) {
@@ -416,38 +416,38 @@ TEST test_az_isfinite(void) {
   TEST_AZ_ISFINITE_HELPER(source, true);
   source = 1;
   TEST_AZ_ISFINITE_HELPER(source, true);
-  source = 0x6FFFFFFFFFFFFFFF;
+  source = (((uint64_t)0x6FFFFFFF << 32) | 0xFFFFFFFF);
   TEST_AZ_ISFINITE_HELPER(source, true);
-  source = 0x7FEFFFFFFFFFFFFF;
-  TEST_AZ_ISFINITE_HELPER(source, true);
-
-  source = 0x7FF0000000000000; /* +inf */
-  TEST_AZ_ISFINITE_HELPER(source, false);
-  source = 0x7FF0000000000001; /* nan */
-  TEST_AZ_ISFINITE_HELPER(source, false);
-  source = 0x7FF7FFFFFFFFFFFF; /* nan */
-  TEST_AZ_ISFINITE_HELPER(source, false);
-  source = 0x7FF8000000000000; /* nan */
-  TEST_AZ_ISFINITE_HELPER(source, false);
-  source = 0x7FFFFFFFFFFFFFFF; /* nan */
-  TEST_AZ_ISFINITE_HELPER(source, false);
-
-  source = 0x8000000000000000;
-  TEST_AZ_ISFINITE_HELPER(source, true);
-  source = 0xFFEFFFFFFFFFFFFF;
+  source = (((uint64_t)0x7FEFFFFF << 32) | 0xFFFFFFFF);
   TEST_AZ_ISFINITE_HELPER(source, true);
 
-  source = 0xFFF0000000000000; /* -inf */
+  source = (((uint64_t)0x7FF00000 << 32) | 0x00000000); /* +inf */
   TEST_AZ_ISFINITE_HELPER(source, false);
-  source = 0xFFF7FFFFFFFFFFFF; /* nan */
+  source = (((uint64_t)0x7FF00000 << 32) | 0x00000001); /* nan */
   TEST_AZ_ISFINITE_HELPER(source, false);
-  source = 0xFFF8000000000000; /* nan */
+  source = (((uint64_t)0x7FF7FFFF << 32) | 0xFFFFFFFF); /* nan */
   TEST_AZ_ISFINITE_HELPER(source, false);
-  source = 0xFFFFFFFFFFFFFFFF; /* nan */
+  source = (((uint64_t)0x7FF80000 << 32) | 0x00000000); /* nan */
+  TEST_AZ_ISFINITE_HELPER(source, false);
+  source = (((uint64_t)0x7FFFFFFF << 32) | 0xFFFFFFFF); /* nan */
+  TEST_AZ_ISFINITE_HELPER(source, false);
+
+  source = (((uint64_t)0x80000000 << 32) | 0x00000000);
+  TEST_AZ_ISFINITE_HELPER(source, true);
+  source = (((uint64_t)0xFFEFFFFF << 32) | 0xFFFFFFFF);
+  TEST_AZ_ISFINITE_HELPER(source, true);
+
+  source = (((uint64_t)0xFFF00000 << 32) | 0x00000000); /* -inf */
+  TEST_AZ_ISFINITE_HELPER(source, false);
+  source = (((uint64_t)0xFFF7FFFF << 32) | 0xFFFFFFFF); /* nan */
+  TEST_AZ_ISFINITE_HELPER(source, false);
+  source = (((uint64_t)0xFFF80000 << 32) | 0x00000000); /* nan */
+  TEST_AZ_ISFINITE_HELPER(source, false);
+  source = (((uint64_t)0xFFFFFFFF << 32) | 0xFFFFFFFF); /* nan */
   TEST_AZ_ISFINITE_HELPER(source, false);
 
 #if !defined(_MSC_VER) || _MSC_VER >= 1600
-  source = 0xFFFFFFFFFFFFFFFF + 1;
+  source = (((uint64_t)0xFFFFFFFF << 32) | 0xFFFFFFFF) + 1;
   TEST_AZ_ISFINITE_HELPER(source, true);
 #endif /* !defined(_MSC_VER) || _MSC_VER >= 1600 */
   PASS();
@@ -477,7 +477,7 @@ TEST az_span_atod_test(void) {
   ASSERT_EQ(AZ_OK, az_span_atod(AZ_SPAN_FROM_STR("4294967295"), &value));
   ASSERT(value == 4294967295U);
   ASSERT_EQ(AZ_OK, az_span_atod(AZ_SPAN_FROM_STR("-4294967296"), &value));
-  ASSERT(value == -4294967296);
+  ASSERT(value == -((int64_t)1 << 32));
   ASSERT_EQ(AZ_OK,
             az_span_atod(AZ_SPAN_FROM_STR("9223372036854775807"), &value));
   ASSERT(value == 9223372036854775807.0);
@@ -590,9 +590,9 @@ TEST az_span_atod_test(void) {
   ASSERT_EQ(AZ_OK, az_span_atod(AZ_SPAN_FROM_STR("-2147483648"), &value));
   ASSERT(value == -2147483647 - 1);
   ASSERT_EQ(AZ_OK, az_span_atod(AZ_SPAN_FROM_STR("4503599627370496"), &value));
-  ASSERT(value == 4503599627370496);
+  ASSERT(value == 4503599627370496.0);
   ASSERT_EQ(AZ_OK, az_span_atod(AZ_SPAN_FROM_STR("9007199254740991"), &value));
-  ASSERT(value == 9007199254740991);
+  ASSERT(value == 9007199254740991.0);
   ASSERT_EQ(AZ_OK,
             az_span_atod(AZ_SPAN_FROM_STR("4503599627370496.2"), &value));
   ASSERT(value == 4503599627370496.2);
@@ -1389,7 +1389,7 @@ TEST az_span_u32toa_overflow_fails(void) {
     round_trip = 0;                                                            \
     ASSERT(az_result_succeeded(az_span_atod(output, &round_trip)));            \
     ASSERT(fabs((v) - round_trip) < 0.01);                                     \
-  } while (0, 0)
+  } while ((void)0, 0)
 
 TEST az_span_dtoa_succeeds(void) {
   /* We don't need more than 33 bytes to hold the supported doubles: */
@@ -1457,9 +1457,9 @@ TEST az_span_dtoa_succeeds(void) {
                                AZ_SPAN_FROM_STR("2147483648"));
   AZ_SPAN_DTOA_SUCCEEDS_HELPER(-2147483647 - 1, 15,
                                AZ_SPAN_FROM_STR("-2147483648"));
-  AZ_SPAN_DTOA_SUCCEEDS_HELPER(4503599627370496, 15,
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(4503599627370496.0, 15,
                                AZ_SPAN_FROM_STR("4503599627370496"));
-  AZ_SPAN_DTOA_SUCCEEDS_HELPER(9007199254740991, 15,
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(9007199254740991.0, 15,
                                AZ_SPAN_FROM_STR("9007199254740991"));
   AZ_SPAN_DTOA_SUCCEEDS_HELPER((double)4503599627370496.2, 15,
                                AZ_SPAN_FROM_STR("4503599627370496"));
@@ -1532,9 +1532,9 @@ TEST az_span_dtoa_succeeds(void) {
                                AZ_SPAN_FROM_STR("2147483648"));
   AZ_SPAN_DTOA_SUCCEEDS_HELPER(-2147483647 - 1, 2,
                                AZ_SPAN_FROM_STR("-2147483648"));
-  AZ_SPAN_DTOA_SUCCEEDS_HELPER(4503599627370496, 2,
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(4503599627370496.0, 2,
                                AZ_SPAN_FROM_STR("4503599627370496"));
-  AZ_SPAN_DTOA_SUCCEEDS_HELPER(9007199254740991, 2,
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(9007199254740991.0, 2,
                                AZ_SPAN_FROM_STR("9007199254740991"));
   AZ_SPAN_DTOA_SUCCEEDS_HELPER((double)4503599627370496.2, 2,
                                AZ_SPAN_FROM_STR("4503599627370496"));
@@ -1634,10 +1634,12 @@ TEST az_span_dtoa_overflow_fails(void) {
       az_span_dtoa(az_span_slice(buff, 0, 9), 2 * (double)1073741824, 15, &o));
   ASSERT_EQ(AZ_ERROR_NOT_ENOUGH_SPACE,
             az_span_dtoa(az_span_slice(buff, 0, 10), -2147483647 - 1, 15, &o));
-  ASSERT_EQ(AZ_ERROR_NOT_ENOUGH_SPACE,
-            az_span_dtoa(az_span_slice(buff, 0, 15), 4503599627370496, 15, &o));
-  ASSERT_EQ(AZ_ERROR_NOT_ENOUGH_SPACE,
-            az_span_dtoa(az_span_slice(buff, 0, 15), 9007199254740991, 15, &o));
+  ASSERT_EQ(
+      AZ_ERROR_NOT_ENOUGH_SPACE,
+      az_span_dtoa(az_span_slice(buff, 0, 15), 4503599627370496.0, 15, &o));
+  ASSERT_EQ(
+      AZ_ERROR_NOT_ENOUGH_SPACE,
+      az_span_dtoa(az_span_slice(buff, 0, 15), 9007199254740991.0, 15, &o));
   ASSERT_EQ(AZ_ERROR_NOT_ENOUGH_SPACE,
             az_span_dtoa(az_span_slice(buff, 0, 15), (double)4503599627370496.2,
                          15, &o));
@@ -1683,17 +1685,17 @@ TEST az_span_dtoa_too_large(void) {
   az_span o = az_span_empty();
 
   ASSERT_EQ(AZ_ERROR_NOT_SUPPORTED,
-            az_span_dtoa(buff, 9007199254740992, 15, &o));
+            az_span_dtoa(buff, 9007199254740992.0, 15, &o));
   ASSERT_EQ(AZ_ERROR_NOT_SUPPORTED,
-            az_span_dtoa(buff, (double)9007199254740993, 15, &o));
+            az_span_dtoa(buff, (double)9007199254740993.0, 15, &o));
   ASSERT_EQ(AZ_ERROR_NOT_SUPPORTED,
-            az_span_dtoa(buff, (double)45035996273704961, 15, &o));
+            az_span_dtoa(buff, (double)45035996273704961.0, 15, &o));
   ASSERT_EQ(AZ_ERROR_NOT_SUPPORTED,
-            az_span_dtoa(buff, 2147483647 * (double)4294967298, 15, &o));
+            az_span_dtoa(buff, 2147483647 * (double)4294967298.0, 15, &o));
   ASSERT_EQ(AZ_ERROR_NOT_SUPPORTED,
-            az_span_dtoa(buff, -2147483647 * (double)4294967298, 15, &o));
+            az_span_dtoa(buff, -2147483647 * (double)4294967298.0, 15, &o));
   ASSERT_EQ(AZ_ERROR_NOT_SUPPORTED,
-            az_span_dtoa(buff, (double)1844674407370955100, 15, &o));
+            az_span_dtoa(buff, (double)1844674407370955100.0, 15, &o));
   ASSERT_EQ(AZ_ERROR_NOT_SUPPORTED,
             az_span_dtoa(buff, (double)1.844674407370955e+19, 15, &o));
   ASSERT_EQ(AZ_ERROR_NOT_SUPPORTED,
@@ -1701,7 +1703,9 @@ TEST az_span_dtoa_too_large(void) {
   ASSERT_EQ(AZ_ERROR_NOT_SUPPORTED,
             az_span_dtoa(buff, (double)1.8446744073709552e+19, 15, &o));
   ASSERT_EQ(AZ_ERROR_NOT_SUPPORTED,
-            az_span_dtoa(buff, (double)18446744073709551615UL, 15, &o));
+            az_span_dtoa(buff,
+                         (double)(((uint64_t)0xFFFFFFFF << 32) | 0xFFFFFFFF),
+                         15, &o));
   ASSERT_EQ(
       AZ_ERROR_NOT_SUPPORTED,
       az_span_dtoa(buff, 18446744073709551615.18446744073709551615, 15, &o));

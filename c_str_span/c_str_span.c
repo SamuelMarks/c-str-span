@@ -54,7 +54,7 @@ C_STR_SPAN_EXPORT void c_str_span_log_debug(const char *fmt, ...) {
  * @brief The maximum integer value that can be stored in a double without
  * losing precision (2^53 - 1) An IEEE 64-bit double has 52 bits of mantissa
  */
-#define _az_MAX_SAFE_INTEGER 9007199254740991
+#define _az_MAX_SAFE_INTEGER ((uint64_t)90071992 * 100000000 + 54740991)
 
 #ifndef AZ_NO_PRECONDITION_CHECKING
 /* Note: If you are modifying this function, make sure to modify the inline
@@ -840,9 +840,15 @@ az_span_u64toa(az_span destination, uint64_t source, az_span *out_span) {
   _az_PRECONDITION_NOT_NULL(out_span);
 
 #if defined(_MSC_VER)
-  n = sprintf_s(buf, sizeof(buf), "%" C_STR_SPAN_PRIu64, source);
+  {
+    char const *fmt = "%" C_STR_SPAN_PRIu64;
+    n = sprintf_s(buf, sizeof(buf), fmt, source);
+  }
 #else
-  n = sprintf(buf, "%" C_STR_SPAN_PRIu64, source);
+  {
+    char const *fmt = "%" C_STR_SPAN_PRIu64;
+    n = sprintf(buf, fmt, source);
+  }
 #endif
 
   (void)n;
@@ -862,9 +868,15 @@ az_span_i64toa(az_span destination, int64_t source, az_span *out_span) {
   _az_PRECONDITION_NOT_NULL(out_span);
 
 #if defined(_MSC_VER)
-  n = sprintf_s(buf, sizeof(buf), "%" C_STR_SPAN_PRId64, source);
+  {
+    char const *fmt = "%" C_STR_SPAN_PRId64;
+    n = sprintf_s(buf, sizeof(buf), fmt, source);
+  }
 #else
-  n = sprintf(buf, "%" C_STR_SPAN_PRId64, source);
+  {
+    char const *fmt = "%" C_STR_SPAN_PRId64;
+    n = sprintf(buf, fmt, source);
+  }
 #endif
 
   (void)n;
