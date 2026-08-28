@@ -840,15 +840,9 @@ az_span_u64toa(az_span destination, uint64_t source, az_span *out_span) {
   _az_PRECONDITION_NOT_NULL(out_span);
 
 #if defined(_MSC_VER)
-  {
-    char const *fmt = "%" C_STR_SPAN_PRIu64;
-    n = sprintf_s(buf, sizeof(buf), fmt, source);
-  }
+  n = sprintf_s(buf, sizeof(buf), "%" C_STR_SPAN_PRIu64, source);
 #else
-  {
-    char const *fmt = "%" C_STR_SPAN_PRIu64;
-    n = sprintf(buf, fmt, source);
-  }
+  n = sprintf(buf, "%" C_STR_SPAN_PRIu64, source);
 #endif
 
   (void)n;
@@ -869,13 +863,11 @@ az_span_i64toa(az_span destination, int64_t source, az_span *out_span) {
 
 #if defined(_MSC_VER)
   {
-    char const *fmt = "%" C_STR_SPAN_PRId64;
-    n = sprintf_s(buf, sizeof(buf), fmt, source);
+    n = sprintf_s(buf, sizeof(buf), "%" C_STR_SPAN_PRId64, source);
   }
 #else
   {
-    char const *fmt = "%" C_STR_SPAN_PRId64;
-    n = sprintf(buf, fmt, source);
+    n = sprintf(buf, "%" C_STR_SPAN_PRId64, source);
   }
 #endif
 
