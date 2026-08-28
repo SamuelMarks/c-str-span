@@ -177,7 +177,7 @@ TEST test_az_span_is_content_equal(void) {
     ASSERT(az_span_atoi32(source, &i32) == AZ_ERROR_UNEXPECTED_CHAR);          \
     ASSERT(az_span_atou64(source, &ui64) == AZ_ERROR_UNEXPECTED_CHAR);         \
     ASSERT(az_span_atoi64(source, &i64) == AZ_ERROR_UNEXPECTED_CHAR);          \
-  } while (0)
+  } while (0, 0)
 
 #define AZ_SPAN_ATOX_RETURN_ERRORS_HELPER(source)                              \
   do {                                                                         \
@@ -191,7 +191,7 @@ TEST test_az_span_is_content_equal(void) {
     ASSERT(az_span_atou64(source, &ui64) == AZ_ERROR_UNEXPECTED_CHAR);         \
     ASSERT(az_span_atoi64(source, &i64) == AZ_ERROR_UNEXPECTED_CHAR);          \
     ASSERT(az_span_atod(source, &decimal) == AZ_ERROR_UNEXPECTED_CHAR);        \
-  } while (0)
+  } while (0, 0)
 
 TEST az_span_atox_return_errors(void) {
 
@@ -400,14 +400,14 @@ TEST az_span_atoi64_test(void) {
     double decimal = 0.0;                                                      \
     memcpy_s(&decimal, sizeof(decimal), &(source), sizeof(source));            \
     ASSERT_EQ(expected, _az_isfinite(decimal));                                \
-  } while (0)
+  } while (0, 0)
 #else
 #define TEST_AZ_ISFINITE_HELPER(source, expected)                              \
   do {                                                                         \
     double decimal = 0.0;                                                      \
     memcpy(&decimal, &(source), sizeof(decimal));                              \
     ASSERT_EQ(expected, _az_isfinite(decimal));                                \
-  } while (0)
+  } while (0, 0)
 #endif
 
 TEST test_az_isfinite(void) {
@@ -1389,7 +1389,7 @@ TEST az_span_u32toa_overflow_fails(void) {
     round_trip = 0;                                                            \
     ASSERT(az_result_succeeded(az_span_atod(output, &round_trip)));            \
     ASSERT(fabs((v) - round_trip) < 0.01);                                     \
-  } while (0)
+  } while (0, 0)
 
 TEST az_span_dtoa_succeeds(void) {
   /* We don't need more than 33 bytes to hold the supported doubles: */

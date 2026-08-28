@@ -36,7 +36,7 @@ static void test_precondition_failed_callback(void) {
       FAIL();                                                                  \
     }                                                                          \
     g_precondition_expected = false;                                           \
-  } while (0)
+  } while (0, 0)
 #endif
 
 TEST test_az_span_create_from_str_null(void) {

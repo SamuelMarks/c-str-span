@@ -93,7 +93,7 @@ az_precondition_failed_get_callback(void);
       az_precondition_failed_get_callback()();                                 \
     }                                                                          \
     _az_ANALYSIS_ASSUME(condition);                                            \
-  } while (0)
+  } while (0, 0)
 #endif /* AZ_NO_PRECONDITION_CHECKING */
 
 /** @brief Internal doc. */

@@ -1,3 +1,4 @@
+__pycache__
 *.gcov
 *.log
 out.txt

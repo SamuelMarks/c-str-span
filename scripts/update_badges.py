@@ -4,11 +4,17 @@ import re
 import subprocess
 from pathlib import Path
 
+
 def get_root_dir():
     return Path(__file__).resolve().parent.parent
 
+
 def find_best_build_dir(root):
-    build_dirs = list(root.glob("build*")) + list(root.glob("cmake-build-*"))
+    build_dirs = (
+        list(root.glob("build*"))
+        + list(root.glob("cmake-build-*"))
+        + list(root.glob("out/build/*"))
+    )
     best_dir = None
     max_gcno = -1
 
@@ -26,25 +32,85 @@ def find_best_build_dir(root):
                 break
     return best_dir
 
+
+def get_existing_test_coverage(root):
+    svg_path = root / "reports" / "test_coverage.svg"
+    if svg_path.exists():
+        svg_content = svg_path.read_text(encoding="utf-8")
+        match = re.search(
+            r"<title>test coverage: ([0-9]+(?:\.[0-9]+)?)%</title>", svg_content
+        )
+        if match:
+            return match.group(1)
+
+    readme_path = root / "README.md"
+    if readme_path.exists():
+        readme_content = readme_path.read_text(encoding="utf-8")
+        match = re.search(
+            r"https://img\.shields\.io/badge/coverage-([0-9]+(?:\.[0-9]+)?)%25-[a-z]+\.svg",
+            readme_content,
+        )
+        if match:
+            return match.group(1)
+    return "0"
+
+
 def get_test_coverage(root, build_dir):
     if not build_dir:
-        return "0"
+        return get_existing_test_coverage(root)
 
     gcda_files = list(build_dir.rglob("*.gcda"))
     if not gcda_files:
-        subprocess.run(["ctest", "-C", "Debug"], cwd=build_dir, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        try:
+            subprocess.run(
+                ["ctest", "-C", "Debug"],
+                cwd=build_dir,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+            )
+        except (FileNotFoundError, OSError):
+            pass
 
-    result = subprocess.run(["ctest", "-C", "Debug", "-T", "Coverage"], cwd=build_dir, capture_output=True, text=True)
+    # Try gcovr first for better Windows (MinGW) support
+    try:
+        result = subprocess.run(
+            ["gcovr", "--print-summary"], cwd=build_dir, capture_output=True, text=True
+        )
+        match = re.search(r"lines:\s*([0-9]+(?:\.[0-9]+)?)(?:%)?", result.stdout)
+        if match and "(0 out of 0)" not in result.stdout:
+            return match.group(1)
+    except (FileNotFoundError, OSError):
+        pass
 
-    match = re.search(r"(?:Percentage|Total) Coverage:\s*([0-9]+(?:\.[0-9]+)?)(?:%)?", result.stdout)
+    try:
+        result = subprocess.run(
+            ["ctest", "-C", "Debug", "-T", "Coverage"],
+            cwd=build_dir,
+            capture_output=True,
+            text=True,
+        )
+    except (FileNotFoundError, OSError):
+        return get_existing_test_coverage(root)
+
+    match = re.search(
+        r"(?:Percentage|Total) Coverage:\s*([0-9]+(?:\.[0-9]+)?)(?:%)?", result.stdout
+    )
     if match:
         return match.group(1)
-    return "0"
+
+    return get_existing_test_coverage(root)
+
 
 def get_doc_coverage(root):
     headers = []
     c_str_span_dir = root / "c_str_span"
-    exclude_patterns = ["_internal.h", "_private.h", "c_str_span_export.h", "c_str_span_stdint.h", "c_str_span_stdbool.h"]
+    exclude_patterns = [
+        "_internal.h",
+        "_private.h",
+        "c_str_span_export.h",
+        "c_str_span_stdint.h",
+        "c_str_span_stdbool.h",
+    ]
 
     for f in c_str_span_dir.glob("*.h"):
         if not any(excl in f.name for excl in exclude_patterns):
@@ -60,7 +126,11 @@ def get_doc_coverage(root):
 
         symbols = 0
         for line in content.splitlines():
-            if symbol_re.match(line) and "_az_" not in line and 'extern "C"' not in line:
+            if (
+                symbol_re.match(line)
+                and "_az_" not in line
+                and 'extern "C"' not in line
+            ):
                 symbols += 1
         total_symbols += symbols
 
@@ -74,6 +144,7 @@ def get_doc_coverage(root):
             return "100"
         return str(int(doc_symbols * 100 / total_symbols))
     return "100"
+
 
 def generate_badge(root, label, value, filename):
     val_num = float(value) if value else 0
@@ -96,15 +167,15 @@ def generate_badge(root, label, value, filename):
             readme_content = re.sub(
                 r"https://img\.shields\.io/badge/coverage-[0-9]+(?:\.[0-9]+)?%25-[a-z]+\.svg",
                 f"https://img.shields.io/badge/coverage-{value}%25-{shield_color}.svg",
-                readme_content
+                readme_content,
             )
         elif label == "doc coverage":
             readme_content = re.sub(
                 r"https://img\.shields\.io/badge/docs-[0-9]+(?:\.[0-9]+)?%25-[a-z]+\.svg",
                 f"https://img.shields.io/badge/docs-{value}%25-{shield_color}.svg",
-                readme_content
+                readme_content,
             )
-        readme_path.write_text(readme_content, encoding="utf-8")
+        readme_path.write_text(readme_content, encoding="utf-8", newline="\n")
 
     reports_dir = root / "reports"
     reports_dir.mkdir(exist_ok=True)
@@ -140,7 +211,8 @@ def generate_badge(root, label, value, filename):
 </svg>
 """
 
-    (reports_dir / filename).write_text(svg_template, encoding="utf-8")
+    (reports_dir / filename).write_text(svg_template, encoding="utf-8", newline="\n")
+
 
 def main():
     root = get_root_dir()
@@ -151,6 +223,7 @@ def main():
 
     generate_badge(root, "test coverage", test_cov, "test_coverage.svg")
     generate_badge(root, "doc coverage", doc_cov, "doc_coverage.svg")
+
 
 if __name__ == "__main__":
     main()

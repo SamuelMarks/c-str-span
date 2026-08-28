@@ -15,6 +15,7 @@ SUITE_EXTERN(coverage_suite);
 GREATEST_MAIN_DEFS();
 
 int main(int argc, char **argv) {
+  int passed = 0;
   GREATEST_MAIN_BEGIN();
   RUN_SUITE(lib_suite);
   RUN_SUITE(az_core_span_suite);
@@ -23,5 +24,6 @@ int main(int argc, char **argv) {
   RUN_SUITE(az_core_internal_suite);
   RUN_SUITE(coverage_suite);
   GREATEST_PRINT_REPORT();
-  return greatest_all_passed() ? EXIT_SUCCESS : EXIT_FAILURE;
+  greatest_all_passed(&passed);
+  return passed ? EXIT_SUCCESS : EXIT_FAILURE;
 }
