@@ -2,7 +2,7 @@
 #include <greatest.h>
 
 #include "test_az_span.h"
-#include "test_lib.h"
+
 #include "c_str_precondition.h"
 #include "c_str_precondition_internal.h"
 
@@ -17,12 +17,8 @@ GREATEST_MAIN_DEFS();
 int main(int argc, char **argv) {
   int passed = 0;
   GREATEST_MAIN_BEGIN();
-  RUN_SUITE(lib_suite);
-  RUN_SUITE(az_core_span_suite);
-  RUN_SUITE(az_core_result_suite);
-  RUN_SUITE(az_core_precondition_suite);
-  RUN_SUITE(az_core_internal_suite);
 
+  RUN_SUITE(coverage_suite);
   GREATEST_PRINT_REPORT();
   greatest_all_passed(&passed);
   return passed ? EXIT_SUCCESS : EXIT_FAILURE;

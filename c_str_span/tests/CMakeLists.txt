@@ -49,19 +49,19 @@ configure_file("configure.h.in" "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_con
 # Test target #
 #=============#
 
-set(Header_Files "test_lib.h" "test_az_span.h")
+set(Header_Files "test_lib.h" "test_az_span.h" "c_str_span_crt_mock.h")
 source_group("${EXEC_NAME} Header Files" FILES "${Header_Files}")
 
-set(Source_Files "test.c" "test_az_span.c" "test_coverage.c")
+set(Source_Files "test.c" "test_az_span.c")
 source_group("${EXEC_NAME} Source Files" FILES "${Source_Files}")
 
 add_executable("${EXEC_NAME}" "${Header_Files}" "${Source_Files}")
 
 target_include_directories(
         "${EXEC_NAME}"
-        PRIVATE
+        BEFORE PRIVATE
         "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>"
-        "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>"
+        "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..>" "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>"
         "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
 )
 
@@ -83,3 +83,9 @@ endif (MSVC)
 add_test(NAME "${EXEC_NAME}"
          COMMAND "${EXEC_NAME}"
          WORKING_DIRECTORY "${PROJECT_BINARY_DIR}")
+
+add_executable("${EXEC_NAME}_coverage" "test_coverage_main.c" "test_coverage.c" "c_str_span_crt_mock.h")
+target_include_directories("${EXEC_NAME}_coverage" BEFORE PRIVATE "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>" "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/..>" "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..>" "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>" "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>")
+# Notice we DO NOT link ${PROJECT_NAME} because test_coverage.c #includes the C files directly
+target_link_libraries("${EXEC_NAME}_coverage" PRIVATE greatest)
+add_test(NAME "${EXEC_NAME}_coverage" COMMAND "${EXEC_NAME}_coverage" WORKING_DIRECTORY "${PROJECT_BINARY_DIR}")

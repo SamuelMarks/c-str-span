@@ -7,9 +7,9 @@
  * @param size The size of the buffer.
  */
 #if defined(_MSC_VER)
-#define C_STR_SPAN_STRERROR(rc, buf, size) "Error"
+#define C_STR_SPAN_STRERROR(rc, buf, size) ((void)(buf), (void)(size), "Error")
 #else
-#define C_STR_SPAN_STRERROR(rc, buf, size) "Error"
+#define C_STR_SPAN_STRERROR(rc, buf, size) ((void)(buf), (void)(size), "Error")
 #endif
 
 /* Copyright (c) Microsoft Corporation. All rights reserved.

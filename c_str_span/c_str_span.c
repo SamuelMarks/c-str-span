@@ -31,21 +31,41 @@
 /* clang-format on */
 
 /** @brief Internal doc. */
-C_STR_SPAN_EXPORT void c_str_span_log_debug(const char *fmt, ...) {
+C_STR_SPAN_EXPORT enum az_result_core c_str_span_log_debug(const char *fmt,
+                                                           ...) {
+  enum az_result_core rc = AZ_OK;
 #ifdef DEBUG
   va_list args;
+  int frc = 0;
   va_start(args, fmt);
 #if defined(_MSC_VER)
-  fprintf_s(stderr, "[DEBUG] ");
-  vfprintf_s(stderr, fmt, args);
+  frc = fprintf_s(stderr, "[DEBUG] ");
+  if (frc < 0) {
+    rc = AZ_ERROR_ARG;
+  } else {
+    frc = vfprintf_s(stderr, fmt, args);
+    if (frc < 0) {
+      rc = AZ_ERROR_ARG;
+    }
+  }
 #else
-  fprintf(stderr, "[DEBUG] ");
-  vfprintf(stderr, fmt, args);
+  frc = fprintf(stderr, "[DEBUG] ");
+  if (frc < 0) {
+    rc = AZ_ERROR_ARG;
+  } else {
+    frc = vfprintf(stderr, fmt, args);
+    if (frc < 0) {
+      rc = AZ_ERROR_ARG;
+    }
+  }
 #endif
   va_end(args);
 #else
-  (void)fmt;
+  if (fmt == NULL) {
+    rc = AZ_ERROR_ARG;
+  }
 #endif
+  return rc;
 }
 
 /*#include <azure/core/_az_cfg.h>*/
@@ -163,9 +183,13 @@ AZ_NODISCARD enum az_result_core az_span_atou64(az_span source,
       rc = AZ_ERROR_UNEXPECTED_CHAR;
       {
         char err_buf[256];
-        (void)err_buf;
-        LOG_DEBUG("Error %d: %s\n", rc,
-                  C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+        enum az_result_core log_rc;
+        err_buf[0] = '\0';
+        log_rc = LOG_DEBUG("Error %d: %s\n", rc,
+                           C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+        if (log_rc != AZ_OK) {
+          rc = log_rc;
+        }
       }
       return rc;
     }
@@ -184,9 +208,14 @@ AZ_NODISCARD enum az_result_core az_span_atou64(az_span source,
           rc = AZ_ERROR_UNEXPECTED_CHAR;
           {
             char err_buf[256];
-            (void)err_buf;
-            LOG_DEBUG("Error %d: %s\n", rc,
-                      C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+            enum az_result_core log_rc;
+            err_buf[0] = '\0';
+            log_rc =
+                LOG_DEBUG("Error %d: %s\n", rc,
+                          C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+            if (log_rc != AZ_OK) {
+              rc = log_rc;
+            }
           }
           return rc;
         }
@@ -202,9 +231,14 @@ AZ_NODISCARD enum az_result_core az_span_atou64(az_span source,
             rc = AZ_ERROR_UNEXPECTED_CHAR;
             {
               char err_buf[256];
-              (void)err_buf;
-              LOG_DEBUG("Error %d: %s\n", rc,
-                        C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+              enum az_result_core log_rc;
+              err_buf[0] = '\0';
+              log_rc =
+                  LOG_DEBUG("Error %d: %s\n", rc,
+                            C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+              if (log_rc != AZ_OK) {
+                rc = log_rc;
+              }
             }
             return rc;
           }
@@ -218,9 +252,14 @@ AZ_NODISCARD enum az_result_core az_span_atou64(az_span source,
               rc = AZ_ERROR_UNEXPECTED_CHAR;
               {
                 char err_buf[256];
-                (void)err_buf;
-                LOG_DEBUG("Error %d: %s\n", rc,
-                          C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+                enum az_result_core log_rc;
+                err_buf[0] = '\0';
+                log_rc = LOG_DEBUG(
+                    "Error %d: %s\n", rc,
+                    C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+                if (log_rc != AZ_OK) {
+                  rc = log_rc;
+                }
               }
               return rc;
             }
@@ -250,9 +289,13 @@ AZ_NODISCARD enum az_result_core az_span_atou32(az_span source,
       rc = AZ_ERROR_UNEXPECTED_CHAR;
       {
         char err_buf[256];
-        (void)err_buf;
-        LOG_DEBUG("Error %d: %s\n", rc,
-                  C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+        enum az_result_core log_rc;
+        err_buf[0] = '\0';
+        log_rc = LOG_DEBUG("Error %d: %s\n", rc,
+                           C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+        if (log_rc != AZ_OK) {
+          rc = log_rc;
+        }
       }
       return rc;
     }
@@ -271,9 +314,14 @@ AZ_NODISCARD enum az_result_core az_span_atou32(az_span source,
           rc = AZ_ERROR_UNEXPECTED_CHAR;
           {
             char err_buf[256];
-            (void)err_buf;
-            LOG_DEBUG("Error %d: %s\n", rc,
-                      C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+            enum az_result_core log_rc;
+            err_buf[0] = '\0';
+            log_rc =
+                LOG_DEBUG("Error %d: %s\n", rc,
+                          C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+            if (log_rc != AZ_OK) {
+              rc = log_rc;
+            }
           }
           return rc;
         }
@@ -289,9 +337,14 @@ AZ_NODISCARD enum az_result_core az_span_atou32(az_span source,
             rc = AZ_ERROR_UNEXPECTED_CHAR;
             {
               char err_buf[256];
-              (void)err_buf;
-              LOG_DEBUG("Error %d: %s\n", rc,
-                        C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+              enum az_result_core log_rc;
+              err_buf[0] = '\0';
+              log_rc =
+                  LOG_DEBUG("Error %d: %s\n", rc,
+                            C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+              if (log_rc != AZ_OK) {
+                rc = log_rc;
+              }
             }
             return rc;
           }
@@ -305,9 +358,14 @@ AZ_NODISCARD enum az_result_core az_span_atou32(az_span source,
               rc = AZ_ERROR_UNEXPECTED_CHAR;
               {
                 char err_buf[256];
-                (void)err_buf;
-                LOG_DEBUG("Error %d: %s\n", rc,
-                          C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+                enum az_result_core log_rc;
+                err_buf[0] = '\0';
+                log_rc = LOG_DEBUG(
+                    "Error %d: %s\n", rc,
+                    C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+                if (log_rc != AZ_OK) {
+                  rc = log_rc;
+                }
               }
               return rc;
             }
@@ -337,9 +395,13 @@ AZ_NODISCARD enum az_result_core az_span_atoi64(az_span source,
       rc = AZ_ERROR_UNEXPECTED_CHAR;
       {
         char err_buf[256];
-        (void)err_buf;
-        LOG_DEBUG("Error %d: %s\n", rc,
-                  C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+        enum az_result_core log_rc;
+        err_buf[0] = '\0';
+        log_rc = LOG_DEBUG("Error %d: %s\n", rc,
+                           C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+        if (log_rc != AZ_OK) {
+          rc = log_rc;
+        }
       }
       return rc;
     }
@@ -359,9 +421,14 @@ AZ_NODISCARD enum az_result_core az_span_atoi64(az_span source,
             rc = AZ_ERROR_UNEXPECTED_CHAR;
             {
               char err_buf[256];
-              (void)err_buf;
-              LOG_DEBUG("Error %d: %s\n", rc,
-                        C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+              enum az_result_core log_rc;
+              err_buf[0] = '\0';
+              log_rc =
+                  LOG_DEBUG("Error %d: %s\n", rc,
+                            C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+              if (log_rc != AZ_OK) {
+                rc = log_rc;
+              }
             }
             return rc;
           }
@@ -371,9 +438,14 @@ AZ_NODISCARD enum az_result_core az_span_atoi64(az_span source,
           rc = AZ_ERROR_UNEXPECTED_CHAR;
           {
             char err_buf[256];
-            (void)err_buf;
-            LOG_DEBUG("Error %d: %s\n", rc,
-                      C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+            enum az_result_core log_rc;
+            err_buf[0] = '\0';
+            log_rc =
+                LOG_DEBUG("Error %d: %s\n", rc,
+                          C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+            if (log_rc != AZ_OK) {
+              rc = log_rc;
+            }
           }
           return rc;
         }
@@ -398,9 +470,14 @@ AZ_NODISCARD enum az_result_core az_span_atoi64(az_span source,
               rc = AZ_ERROR_UNEXPECTED_CHAR;
               {
                 char err_buf[256];
-                (void)err_buf;
-                LOG_DEBUG("Error %d: %s\n", rc,
-                          C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+                enum az_result_core log_rc;
+                err_buf[0] = '\0';
+                log_rc = LOG_DEBUG(
+                    "Error %d: %s\n", rc,
+                    C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+                if (log_rc != AZ_OK) {
+                  rc = log_rc;
+                }
               }
               return rc;
             }
@@ -419,9 +496,14 @@ AZ_NODISCARD enum az_result_core az_span_atoi64(az_span source,
                 rc = AZ_ERROR_UNEXPECTED_CHAR;
                 {
                   char err_buf[256];
-                  (void)err_buf;
-                  LOG_DEBUG("Error %d: %s\n", rc,
-                            C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+                  enum az_result_core log_rc;
+                  err_buf[0] = '\0';
+                  log_rc = LOG_DEBUG(
+                      "Error %d: %s\n", rc,
+                      C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+                  if (log_rc != AZ_OK) {
+                    rc = log_rc;
+                  }
                 }
                 return rc;
               }
@@ -452,9 +534,13 @@ AZ_NODISCARD enum az_result_core az_span_atoi32(az_span source,
       rc = AZ_ERROR_UNEXPECTED_CHAR;
       {
         char err_buf[256];
-        (void)err_buf;
-        LOG_DEBUG("Error %d: %s\n", rc,
-                  C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+        enum az_result_core log_rc;
+        err_buf[0] = '\0';
+        log_rc = LOG_DEBUG("Error %d: %s\n", rc,
+                           C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+        if (log_rc != AZ_OK) {
+          rc = log_rc;
+        }
       }
       return rc;
     }
@@ -474,9 +560,14 @@ AZ_NODISCARD enum az_result_core az_span_atoi32(az_span source,
             rc = AZ_ERROR_UNEXPECTED_CHAR;
             {
               char err_buf[256];
-              (void)err_buf;
-              LOG_DEBUG("Error %d: %s\n", rc,
-                        C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+              enum az_result_core log_rc;
+              err_buf[0] = '\0';
+              log_rc =
+                  LOG_DEBUG("Error %d: %s\n", rc,
+                            C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+              if (log_rc != AZ_OK) {
+                rc = log_rc;
+              }
             }
             return rc;
           }
@@ -486,9 +577,14 @@ AZ_NODISCARD enum az_result_core az_span_atoi32(az_span source,
           rc = AZ_ERROR_UNEXPECTED_CHAR;
           {
             char err_buf[256];
-            (void)err_buf;
-            LOG_DEBUG("Error %d: %s\n", rc,
-                      C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+            enum az_result_core log_rc;
+            err_buf[0] = '\0';
+            log_rc =
+                LOG_DEBUG("Error %d: %s\n", rc,
+                          C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+            if (log_rc != AZ_OK) {
+              rc = log_rc;
+            }
           }
           return rc;
         }
@@ -512,9 +608,14 @@ AZ_NODISCARD enum az_result_core az_span_atoi32(az_span source,
             rc = AZ_ERROR_UNEXPECTED_CHAR;
             {
               char err_buf[256];
-              (void)err_buf;
-              LOG_DEBUG("Error %d: %s\n", rc,
-                        C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+              enum az_result_core log_rc;
+              err_buf[0] = '\0';
+              log_rc =
+                  LOG_DEBUG("Error %d: %s\n", rc,
+                            C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+              if (log_rc != AZ_OK) {
+                rc = log_rc;
+              }
             }
             return rc;
           }
@@ -531,9 +632,14 @@ AZ_NODISCARD enum az_result_core az_span_atoi32(az_span source,
               rc = AZ_ERROR_UNEXPECTED_CHAR;
               {
                 char err_buf[256];
-                (void)err_buf;
-                LOG_DEBUG("Error %d: %s\n", rc,
-                          C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+                enum az_result_core log_rc;
+                err_buf[0] = '\0';
+                log_rc = LOG_DEBUG(
+                    "Error %d: %s\n", rc,
+                    C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+                if (log_rc != AZ_OK) {
+                  rc = log_rc;
+                }
               }
               return rc;
             }
@@ -578,9 +684,13 @@ AZ_NODISCARD enum az_result_core az_span_atod(az_span source,
       rc = AZ_ERROR_UNEXPECTED_CHAR;
       {
         char err_buf[256];
-        (void)err_buf;
-        LOG_DEBUG("Error %d: %s\n", rc,
-                  C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+        enum az_result_core log_rc;
+        err_buf[0] = '\0';
+        log_rc = LOG_DEBUG("Error %d: %s\n", rc,
+                           C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+        if (log_rc != AZ_OK) {
+          rc = log_rc;
+        }
       }
       return rc;
     }
@@ -591,9 +701,13 @@ AZ_NODISCARD enum az_result_core az_span_atod(az_span source,
         return AZ_ERROR_UNEXPECTED_CHAR;
       }
 #if defined(_MSC_VER)
-      memcpy_s(buf, 100, source_ptr, size);
+      if (memcpy_s(buf, 100, source_ptr, size) != 0) {
+        return AZ_ERROR_ARG;
+      }
 #else
-      memcpy(buf, source_ptr, size);
+      if (memcpy(buf, source_ptr, size) == NULL) {
+        return AZ_ERROR_ARG;
+      }
 #endif
       buf[size] = '\0';
 
@@ -713,10 +827,15 @@ enum az_result_core az_span_copy(az_span destination, az_span source,
       /* NOLINTNEXTLINE(clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling)
        */
 #if defined(_MSC_VER)
-      memmove_s((void *)ptr, dest_size, (void const *)az_span_ptr(source),
-                src_size);
+      if (memmove_s((void *)ptr, dest_size, (void const *)az_span_ptr(source),
+                    src_size) != 0) {
+        return AZ_ERROR_ARG;
+      }
 #else
-      memmove((void *)ptr, (void const *)az_span_ptr(source), src_size);
+      if (memmove((void *)ptr, (void const *)az_span_ptr(source), src_size) ==
+          NULL) {
+        return AZ_ERROR_ARG;
+      }
 #endif
     }
 
@@ -776,8 +895,10 @@ az_span_to_str(char *destination, size_t destination_max_size, az_span source) {
     /* NOLINTNEXTLINE(clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling)
      */
 #if defined(_MSC_VER)
-    memmove_s((void *)destination, destination_max_size,
-              (void const *)az_span_ptr(source), size_to_write);
+    if (memmove_s((void *)destination, destination_max_size,
+                  (void const *)az_span_ptr(source), size_to_write) != 0) {
+      return AZ_ERROR_ARG;
+    }
 #else
     memmove((void *)destination, (void const *)az_span_ptr(source),
             size_to_write);
@@ -845,7 +966,9 @@ az_span_u64toa(az_span destination, uint64_t source, az_span *out_span) {
   n = sprintf(buf, "%" C_STR_SPAN_PRIu64, source);
 #endif
 
-  (void)n;
+  if (n < 0) {
+    return AZ_ERROR_ARG;
+  }
   src = az_span_create_from_str(buf);
   rc = az_span_copy(destination, src, out_span);
   return rc;
@@ -862,16 +985,16 @@ az_span_i64toa(az_span destination, int64_t source, az_span *out_span) {
   _az_PRECONDITION_NOT_NULL(out_span);
 
 #if defined(_MSC_VER)
-  {
-    n = sprintf_s(buf, sizeof(buf), "%" C_STR_SPAN_PRId64, source);
-  }
+  { n = sprintf_s(buf, sizeof(buf), "%" C_STR_SPAN_PRId64, source); }
 #else
   {
     n = sprintf(buf, "%" C_STR_SPAN_PRId64, source);
   }
 #endif
 
-  (void)n;
+  if (n < 0) {
+    return AZ_ERROR_ARG;
+  }
   src = az_span_create_from_str(buf);
   rc = az_span_copy(destination, src, out_span);
   return rc;
@@ -893,7 +1016,9 @@ az_span_u32toa(az_span destination, uint32_t source, az_span *out_span) {
   n = sprintf(buf, "%u", source);
 #endif
 
-  (void)n;
+  if (n < 0) {
+    return AZ_ERROR_ARG;
+  }
   src = az_span_create_from_str(buf);
   rc = az_span_copy(destination, src, out_span);
   return rc;
@@ -915,7 +1040,9 @@ az_span_i32toa(az_span destination, int32_t source, az_span *out_span) {
   n = sprintf(buf, "%d", source);
 #endif
 
-  (void)n;
+  if (n < 0) {
+    return AZ_ERROR_ARG;
+  }
   src = az_span_create_from_str(buf);
   rc = az_span_copy(destination, src, out_span);
   return rc;
@@ -942,9 +1069,13 @@ AZ_NODISCARD enum az_result_core az_span_dtoa(az_span destination,
     rc = AZ_ERROR_NOT_SUPPORTED;
     {
       char err_buf[256];
-      (void)err_buf;
-      LOG_DEBUG("Error %d: %s\n", rc,
-                C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+      enum az_result_core log_rc;
+      err_buf[0] = '\0';
+      log_rc = LOG_DEBUG("Error %d: %s\n", rc,
+                         C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+      if (log_rc != AZ_OK) {
+        rc = log_rc;
+      }
     }
     return rc;
   }
@@ -953,9 +1084,13 @@ AZ_NODISCARD enum az_result_core az_span_dtoa(az_span destination,
     rc = az_span_copy_u8(*out_span, '-', out_span);
     if (rc != AZ_OK) {
       char err_buf[256];
-      (void)err_buf;
-      LOG_DEBUG("Error %d: %s\n", rc,
-                C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+      enum az_result_core log_rc;
+      err_buf[0] = '\0';
+      log_rc = LOG_DEBUG("Error %d: %s\n", rc,
+                         C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+      if (log_rc != AZ_OK) {
+        rc = log_rc;
+      }
       return rc;
     }
     source = -source;
@@ -969,9 +1104,13 @@ AZ_NODISCARD enum az_result_core az_span_dtoa(az_span destination,
       rc = AZ_ERROR_NOT_SUPPORTED;
       {
         char err_buf[256];
-        (void)err_buf;
-        LOG_DEBUG("Error %d: %s\n", rc,
-                  C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+        enum az_result_core log_rc;
+        err_buf[0] = '\0';
+        log_rc = LOG_DEBUG("Error %d: %s\n", rc,
+                           C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+        if (log_rc != AZ_OK) {
+          rc = log_rc;
+        }
       }
       return rc;
     }
@@ -981,9 +1120,13 @@ AZ_NODISCARD enum az_result_core az_span_dtoa(az_span destination,
     rc = _az_span_builder_append_uint64(out_span, (uint64_t)integer_part);
     if (rc != AZ_OK) {
       char err_buf[256];
-      (void)err_buf;
-      LOG_DEBUG("Error %d: %s\n", rc,
-                C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+      enum az_result_core log_rc;
+      err_buf[0] = '\0';
+      log_rc = LOG_DEBUG("Error %d: %s\n", rc,
+                         C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+      if (log_rc != AZ_OK) {
+        rc = log_rc;
+      }
       return rc;
     }
 
@@ -1025,9 +1168,9 @@ AZ_NODISCARD enum az_result_core az_span_dtoa(az_span destination,
 
       {
         double shifted_fractional_integer_part = 0;
-        double unused =
-            modf(shifted_fractional, &shifted_fractional_integer_part);
-        (void)unused;
+        if (modf(shifted_fractional, &shifted_fractional_integer_part) < 0) {
+          return AZ_ERROR_ARG;
+        }
 
         /* Since the maximum allowed fractional_digits is 15, this is guaranteed
          * to be true. */
@@ -1081,9 +1224,13 @@ AZ_NODISCARD enum az_result_core _az_is_expected_span(az_span *ref_span,
     rc = AZ_ERROR_UNEXPECTED_END;
     {
       char err_buf[256];
-      (void)err_buf;
-      LOG_DEBUG("Error %d: %s\n", rc,
-                C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+      enum az_result_core log_rc;
+      err_buf[0] = '\0';
+      log_rc = LOG_DEBUG("Error %d: %s\n", rc,
+                         C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+      if (log_rc != AZ_OK) {
+        rc = log_rc;
+      }
     }
     return rc;
   }
@@ -1095,9 +1242,13 @@ AZ_NODISCARD enum az_result_core _az_is_expected_span(az_span *ref_span,
       rc = AZ_ERROR_UNEXPECTED_CHAR;
       {
         char err_buf[256];
-        (void)err_buf;
-        LOG_DEBUG("Error %d: %s\n", rc,
-                  C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+        enum az_result_core log_rc;
+        err_buf[0] = '\0';
+        log_rc = LOG_DEBUG("Error %d: %s\n", rc,
+                           C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+        if (log_rc != AZ_OK) {
+          rc = log_rc;
+        }
       }
       return rc;
     }
@@ -1261,9 +1412,14 @@ AZ_NODISCARD enum az_result_core _az_span_url_encode(az_span destination,
             rc = AZ_ERROR_NOT_ENOUGH_SPACE;
             {
               char err_buf[256];
-              (void)err_buf;
-              LOG_DEBUG("Error %d: %s\n", rc,
-                        C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+              enum az_result_core log_rc;
+              err_buf[0] = '\0';
+              log_rc =
+                  LOG_DEBUG("Error %d: %s\n", rc,
+                            C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+              if (log_rc != AZ_OK) {
+                rc = log_rc;
+              }
             }
             return rc;
           }
@@ -1276,9 +1432,14 @@ AZ_NODISCARD enum az_result_core _az_span_url_encode(az_span destination,
             rc = AZ_ERROR_NOT_ENOUGH_SPACE;
             {
               char err_buf[256];
-              (void)err_buf;
-              LOG_DEBUG("Error %d: %s\n", rc,
-                        C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+              enum az_result_core log_rc;
+              err_buf[0] = '\0';
+              log_rc =
+                  LOG_DEBUG("Error %d: %s\n", rc,
+                            C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));
+              if (log_rc != AZ_OK) {
+                rc = log_rc;
+              }
             }
             return rc;
           }

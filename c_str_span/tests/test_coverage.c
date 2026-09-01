@@ -1,5 +1,11 @@
 /* clang-format off */
 #define AZ_NO_PRECONDITION_CHECKING
+#define C_STR_SPAN_EXPORTS
+#define DEBUG 1
+#pragma warning(disable: 4273)
+#pragma warning(disable: 4286)
+#undef C_STR_SPAN_EXPORT
+#define C_STR_SPAN_EXPORT
 #include "c_str_precondition_internal.h"
 #include "c_str_span.h"
 #include "c_str_span_internal.h"
@@ -177,27 +183,30 @@ TEST test_az_span_printf_all_specifiers(void) {
    * coverage. */
   int n;
   az_span span = AZ_SPAN_FROM_STR("test");
-  az_span_printf((const uint8_t *)"%c %d %i %o %u %x %X %e %E %f %F %g %G %a "
-                                  "%A %p %s %S %Z %% %Q %n\n",
-                 'A', 123, -456, 0777, 456u, 0xabc, 0xABC, 1.23e4, 1.23E4, 1.23,
-                 1.23, 1.23, 1.23, 1.23, 1.23, (void *)(size_t)0xdeadbeef,
-                 "str", "STR", "ZTR", span, &n);
+  ASSERT_EQ(AZ_OK,
+            az_span_printf(
+                (const uint8_t *)"%c %d %i %o %u %x %X %e %E %f %F %g %G %a "
+                                 "%A %p %s %S %Z %% %Q %n\n",
+                'A', 123, -456, 0777, 456u, 0xabc, 0xABC, 1.23e4, 1.23E4, 1.23,
+                1.23, 1.23, 1.23, 1.23, 1.23, (void *)(size_t)0xdeadbeef, "str",
+                "STR", "ZTR", span, &n));
 
   /* Test %Q with special characters */
-  az_span_printf((const uint8_t *)"%Q\n", AZ_SPAN_FROM_STR("\"\t\n\\\'"));
+  ASSERT_EQ(AZ_OK, az_span_printf((const uint8_t *)"%Q\n",
+                                  AZ_SPAN_FROM_STR("\"\t\n\\\'")));
 
   /* Test %Q with control characters */
   {
     uint8_t ctrl_buf[] = {1, 2, 3, 127};
     az_span ctrl_span = az_span_create(ctrl_buf, sizeof(ctrl_buf));
-    az_span_printf((const uint8_t *)"%Q\n", ctrl_span);
+    ASSERT_EQ(AZ_OK, az_span_printf((const uint8_t *)"%Q\n", ctrl_span));
   }
 
   /* Test % with no character after */
-  az_span_printf((const uint8_t *)"%\n");
+  ASSERT_EQ(AZ_OK, az_span_printf((const uint8_t *)"%\n"));
 
   /* Test default case in switch */
-  az_span_printf((const uint8_t *)"%y\n");
+  ASSERT_EQ(AZ_OK, az_span_printf((const uint8_t *)"%y\n"));
 
   PASS();
 }
@@ -362,7 +371,287 @@ TEST test_all_errors(void) {
   ASSERT_EQ(AZ_ERROR_NOT_ENOUGH_SPACE, az_span_dtoa(b, 1.2, 2, &rem));
   PASS();
 }
+
+#include "c_str_span_crt_mock.h"
+
+#if defined(_MSC_VER)
+int g_mock_memcpy_s_fail = 0;
+int g_mock_memmove_s_fail = 0;
+int g_mock_sprintf_s_fail = 0;
+int g_mock_fprintf_s_fail = 0;
+int g_mock_vfprintf_s_fail = 0;
+
+int mock_memcpy_s(void *dest, size_t destsz, const void *src, size_t count) {
+  if (g_mock_memcpy_s_fail)
+    return -1;
+  return (memcpy_s)(dest, destsz, src, count);
+}
+int mock_memmove_s(void *dest, size_t destsz, const void *src, size_t count) {
+  if (g_mock_memmove_s_fail)
+    return -1;
+  return (memmove_s)(dest, destsz, src, count);
+}
+int mock_sprintf_s(char *buffer, size_t sizeOfBuffer, const char *format, ...) {
+  if (g_mock_sprintf_s_fail)
+    return -1;
+  {
+    va_list args;
+    int res;
+    va_start(args, format);
+    res = vsprintf_s(buffer, sizeOfBuffer, format, args);
+    va_end(args);
+    return res;
+  }
+}
+int mock_fprintf_s(FILE *stream, const char *format, ...) {
+  if (g_mock_fprintf_s_fail)
+    return -1;
+  {
+    va_list args;
+    int res;
+    va_start(args, format);
+    res = vfprintf_s(stream, format, args);
+    va_end(args);
+    return res;
+  }
+}
+int mock_vfprintf_s(FILE *stream, const char *format, va_list argptr) {
+  if (g_mock_vfprintf_s_fail)
+    return -1;
+  return (vfprintf_s)(stream, format, argptr);
+}
+
+#define memcpy_s mock_memcpy_s
+#define memmove_s mock_memmove_s
+#define sprintf_s mock_sprintf_s
+#define fprintf_s mock_fprintf_s
+#define vfprintf_s mock_vfprintf_s
+
+#else
+int g_mock_memcpy_fail = 0;
+int g_mock_memmove_fail = 0;
+int g_mock_sprintf_fail = 0;
+int g_mock_fprintf_fail = 0;
+int g_mock_vfprintf_fail = 0;
+
+void *mock_memcpy(void *dest, const void *src, size_t n) {
+  if (g_mock_memcpy_fail)
+    return NULL;
+  return (memcpy)(dest, src, n);
+}
+void *mock_memmove(void *dest, const void *src, size_t n) {
+  if (g_mock_memmove_fail)
+    return NULL;
+  return (memmove)(dest, src, n);
+}
+int mock_sprintf(char *str, const char *format, ...) {
+  if (g_mock_sprintf_fail)
+    return -1;
+  {
+    va_list args;
+    int res;
+    va_start(args, format);
+    res = vsprintf(str, format, args);
+    va_end(args);
+    return res;
+  }
+}
+int mock_fprintf(FILE *stream, const char *format, ...) {
+  if (g_mock_fprintf_fail)
+    return -1;
+  {
+    va_list args;
+    int res;
+    va_start(args, format);
+    res = vfprintf(stream, format, args);
+    va_end(args);
+    return res;
+  }
+}
+int mock_vfprintf(FILE *stream, const char *format, va_list arg) {
+  if (g_mock_vfprintf_fail)
+    return -1;
+  return (vfprintf)(stream, format, arg);
+}
+
+#define memcpy mock_memcpy
+#define memmove mock_memmove
+#define sprintf mock_sprintf
+#define fprintf mock_fprintf
+#define vfprintf mock_vfprintf
+#endif
+
+int g_mock_fputc_fail = 0;
+int g_mock_fputs_fail = 0;
+int g_mock_modf_fail = 0;
+int g_mock_modf_call_count = 0;
+
+int mock_fputc(int character, FILE *stream) {
+  if (g_mock_fputc_fail)
+    return -1;
+  return (fputc)(character, stream);
+}
+int mock_fputs(const char *str, FILE *stream) {
+  if (g_mock_fputs_fail)
+    return -1;
+  return (fputs)(str, stream);
+}
+double mock_modf(double x, double *intpart) {
+  if (g_mock_modf_fail) {
+    if (g_mock_modf_call_count == 1) {
+      return -1.0;
+    }
+    g_mock_modf_call_count++;
+  }
+  return (modf)(x, intpart);
+}
+
+#define fputc mock_fputc
+#define fputs mock_fputs
+#define modf mock_modf
+
+static void mock_reset_cb(void *data) {
+  (void)data;
+#if defined(_MSC_VER)
+  g_mock_memcpy_s_fail = 0;
+  g_mock_memmove_s_fail = 0;
+  g_mock_sprintf_s_fail = 0;
+  g_mock_fprintf_s_fail = 0;
+  g_mock_vfprintf_s_fail = 0;
+#else
+  g_mock_memcpy_fail = 0;
+  g_mock_memmove_fail = 0;
+  g_mock_sprintf_fail = 0;
+  g_mock_fprintf_fail = 0;
+  g_mock_vfprintf_fail = 0;
+#endif
+  g_mock_fputc_fail = 0;
+  g_mock_fputs_fail = 0;
+  g_mock_modf_fail = 0;
+  g_mock_modf_call_count = 0;
+}
+
+#include "../c_str_span.c"
+#include "../c_str_span_precondition.c"
+#include "../c_str_span_printf.c"
+
+#undef memcpy_s
+#undef memmove_s
+#undef sprintf_s
+#undef fprintf_s
+#undef vfprintf_s
+#undef memcpy
+#undef memmove
+#undef sprintf
+#undef fprintf
+#undef vfprintf
+#undef fputc
+#undef fputs
+#undef modf
+
+TEST test_mock_failures(void) {
+  az_span b;
+  az_span rem;
+  uint8_t buffer[100];
+
+  /* 1. modf failure */
+  g_mock_modf_fail = 1;
+  b = az_span_create(buffer, 100);
+  ASSERT_EQ(AZ_ERROR_ARG, az_span_dtoa(b, 1.23, 2, &rem));
+  g_mock_modf_fail = 0;
+  g_mock_modf_call_count = 0;
+
+  /* 2. sprintf failure */
+#if defined(_MSC_VER)
+  g_mock_sprintf_s_fail = 1;
+#else
+  g_mock_sprintf_fail = 1;
+#endif
+  b = az_span_create(buffer, 100);
+  ASSERT_EQ(AZ_ERROR_ARG, az_span_i64toa(b, 123, &rem));
+  ASSERT_EQ(AZ_ERROR_ARG, az_span_u64toa(b, 123, &rem));
+  ASSERT_EQ(AZ_ERROR_ARG, az_span_i32toa(b, 123, &rem));
+  ASSERT_EQ(AZ_ERROR_ARG, az_span_u32toa(b, 123, &rem));
+#if defined(_MSC_VER)
+  g_mock_sprintf_s_fail = 0;
+#else
+  g_mock_sprintf_fail = 0;
+#endif
+
+  /* 3. memcpy failure */
+#if defined(_MSC_VER)
+  g_mock_memcpy_s_fail = 1;
+#else
+  g_mock_memcpy_fail = 1;
+#endif
+  b = az_span_create(buffer, 100);
+  {
+    double out_val;
+    ASSERT_EQ(AZ_ERROR_ARG, az_span_atod(AZ_SPAN_FROM_STR("1.23"), &out_val));
+  }
+#if defined(_MSC_VER)
+  g_mock_memcpy_s_fail = 0;
+#else
+  g_mock_memcpy_fail = 0;
+#endif
+
+  /* 4. memmove failure */
+#if defined(_MSC_VER)
+  g_mock_memmove_s_fail = 1;
+#else
+  g_mock_memmove_fail = 1;
+#endif
+  b = az_span_create(buffer, 100);
+  ASSERT_EQ(AZ_ERROR_ARG, az_span_copy(b, AZ_SPAN_FROM_STR("123"), &rem));
+#if defined(_MSC_VER)
+  g_mock_memmove_s_fail = 0;
+#else
+  g_mock_memmove_fail = 0;
+#endif
+
+  /* 5. fprintf failure */
+#if defined(_MSC_VER)
+  g_mock_fprintf_s_fail = 1;
+#else
+  g_mock_fprintf_fail = 1;
+#endif
+  ASSERT_EQ(AZ_ERROR_ARG, c_str_span_log_debug("Hello"));
+  ASSERT_EQ(AZ_ERROR_ARG, az_span_printf((const uint8_t *)"%d\n", 123));
+#if defined(_MSC_VER)
+  g_mock_fprintf_s_fail = 0;
+#else
+  g_mock_fprintf_fail = 0;
+#endif
+
+  /* 6. vfprintf failure */
+#if defined(_MSC_VER)
+  g_mock_vfprintf_s_fail = 1;
+#else
+  g_mock_vfprintf_fail = 1;
+#endif
+  ASSERT_EQ(AZ_ERROR_ARG, c_str_span_log_debug("Hello %d", 123));
+#if defined(_MSC_VER)
+  g_mock_vfprintf_s_fail = 0;
+#else
+  g_mock_vfprintf_fail = 0;
+#endif
+
+  /* 7. fputc failure */
+  g_mock_fputc_fail = 1;
+  ASSERT_EQ(AZ_ERROR_ARG, az_span_printf((const uint8_t *)"%c", 'c'));
+  ASSERT_EQ(AZ_ERROR_ARG, az_span_printf((const uint8_t *)"abc"));
+  g_mock_fputc_fail = 0;
+
+  /* 8. fputs failure */
+  g_mock_fputs_fail = 1;
+  ASSERT_EQ(AZ_ERROR_ARG, az_span_printf((const uint8_t *)"%s", "abc"));
+  g_mock_fputs_fail = 0;
+
+  PASS();
+}
+
 SUITE(coverage_suite) {
+  SET_SETUP(mock_reset_cb, NULL);
   printf("1\n");
   RUN_TEST(test_all_errors);
   RUN_TEST(test_c_str_span_log_debug);
@@ -392,4 +681,5 @@ SUITE(coverage_suite) {
   RUN_TEST(test_az_is_expected_span_fail);
   printf("13\n");
   RUN_TEST(test_az_span_printf_all_specifiers);
+  RUN_TEST(test_mock_failures);
 }

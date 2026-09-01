@@ -46,9 +46,13 @@ extern "C" {
     rc = (exp);                                                                \
     if (rc != 0) {                                                             \
       char err_buf[256];                                                       \
-      (void)err_buf;                                                           \
-      LOG_DEBUG("Error %d: %s\n", rc,                                          \
-                C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));            \
+      enum az_result_core log_rc;                                              \
+      err_buf[0] = '\0';                                                       \
+      log_rc = LOG_DEBUG("Error %d: %s\n", rc,                                 \
+                         C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));   \
+      if (log_rc != AZ_OK) {                                                   \
+        rc = log_rc;                                                           \
+      }                                                                        \
       return rc;                                                               \
     }                                                                          \
   } while ((void)0, 0)
@@ -60,12 +64,16 @@ extern "C" {
 #define _az_RETURN_IF_NOT_ENOUGH_SIZE(span, required_size)                     \
   do {                                                                         \
     if (az_span_size(span) < (size_t)(required_size)) {                        \
+      enum az_result_core log_rc;                                              \
       rc = AZ_ERROR_NOT_ENOUGH_SPACE;                                          \
       if (rc != 0) {                                                           \
         char err_buf[256];                                                     \
-        (void)err_buf;                                                         \
-        LOG_DEBUG("Error %d: %s\n", rc,                                        \
-                  C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf)));          \
+        err_buf[0] = '\0';                                                     \
+        log_rc = LOG_DEBUG("Error %d: %s\n", rc,                               \
+                           C_STR_SPAN_STRERROR(rc, err_buf, sizeof(err_buf))); \
+        if (log_rc != AZ_OK) {                                                 \
+          rc = log_rc;                                                         \
+        }                                                                      \
       }                                                                        \
       return rc;                                                               \
     }                                                                          \

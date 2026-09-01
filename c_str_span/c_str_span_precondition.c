@@ -18,7 +18,9 @@
 
 static void az_precondition_failed_default(void) {
   /* By default, when a precondition fails, we log it. */
-  c_str_span_log_debug("Precondition failed!\n");
+  if (c_str_span_log_debug("Precondition failed!\n") != AZ_OK) {
+    /* Logging failed, but we are already in a failure state */
+  }
 }
 
 /** @brief Internal doc. */
