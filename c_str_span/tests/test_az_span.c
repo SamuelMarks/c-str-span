@@ -1229,12 +1229,29 @@ TEST az_span_test_macro_only_allows_byte_buffers(void) {
 }
 
 TEST az_span_create_from_str_succeeds(void) {
-  char *str = "HelloWorld";
+  const char *str = "HelloWorld";
   az_span buffer = az_span_create_from_str(str);
 
   ASSERT_EQ(10, az_span_size(buffer));
   ASSERT(az_span_ptr(buffer) != NULL);
-  ASSERT((char *)az_span_ptr(buffer) == str);
+  ASSERT((const char *)az_span_ptr(buffer) == str);
+  PASS();
+}
+
+TEST az_span_create_from_literal_and_const_succeeds(void) {
+  az_span s1 = az_span_create_from_str("void foo()");
+  az_span s2 = az_span_create_from_str_of_size("void foo()", 10);
+  az_span s3 = AZ_SPAN_FROM_STR("void foo()");
+  const uint8_t raw[] = {1, 2, 3, 4};
+  az_span s4 = az_span_create_from_const_u8(raw, 4);
+
+  ASSERT_EQ(10, az_span_size(s1));
+  ASSERT_EQ(10, az_span_size(s2));
+  ASSERT_EQ(10, az_span_size(s3));
+  ASSERT(az_span_is_content_equal(s1, s2));
+  ASSERT(az_span_is_content_equal(s1, s3));
+  ASSERT_EQ(4, az_span_size(s4));
+  ASSERT(az_span_ptr(s4) == raw);
   PASS();
 }
 
@@ -2270,6 +2287,7 @@ SUITE(az_core_span_suite) {
   RUN_TEST(az_span_i64toa_test);
   RUN_TEST(az_span_test_macro_only_allows_byte_buffers);
   RUN_TEST(az_span_create_from_str_succeeds);
+  RUN_TEST(az_span_create_from_literal_and_const_succeeds);
   RUN_TEST(az_span_copy_uint8_succeeds);
   RUN_TEST(az_span_i32toa_succeeds);
   RUN_TEST(az_span_i32toa_negative_succeeds);

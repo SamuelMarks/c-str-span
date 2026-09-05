@@ -55,6 +55,10 @@ TEST test_az_span_create_from_str_null(void) {
     span = az_span_create_from_str_of_size(NULL, 10);
     ASSERT_EQ(0, az_span_size(span));
     ASSERT(az_span_ptr(span) == NULL);
+
+    span = az_span_create_from_const_u8(NULL, 10);
+    ASSERT_EQ(0, az_span_size(span));
+    ASSERT(az_span_ptr(span) == NULL);
   }
 #endif
   PASS();

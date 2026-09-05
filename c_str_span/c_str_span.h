@@ -174,6 +174,17 @@ extern C_STR_SPAN_EXPORT AZ_NODISCARD az_span az_span_create(uint8_t *ptr,
 extern C_STR_SPAN_EXPORT AZ_NODISCARD az_span az_span_empty(void);
 
 /**
+ * @brief Returns an #az_span from a length-provided const byte buffer.
+ *
+ * @param[in] ptr The pointer to the byte buffer.
+ * @param[in] size The total number of bytes in the byte buffer.
+ *
+ * @return An #az_span over the byte buffer.
+ */
+extern C_STR_SPAN_EXPORT AZ_NODISCARD az_span
+az_span_create_from_const_u8(const uint8_t *ptr, size_t size);
+
+/**
  * @brief Returns an #az_span from a 0-terminated array of bytes (chars).
  *
  * @param[in] str The pointer to the 0-terminated array of bytes (chars).
@@ -182,7 +193,7 @@ extern C_STR_SPAN_EXPORT AZ_NODISCARD az_span az_span_empty(void);
  * string's length not including the `\0` terminator.
  */
 extern C_STR_SPAN_EXPORT AZ_NODISCARD az_span
-az_span_create_from_str(char *str);
+az_span_create_from_str(const char *str);
 
 /**
  * @brief Returns an #az_span from a length-provided array of bytes (chars).
@@ -194,7 +205,7 @@ az_span_create_from_str(char *str);
  * provided size.
  */
 extern C_STR_SPAN_EXPORT AZ_NODISCARD az_span
-az_span_create_from_str_of_size(char *str, size_t size);
+az_span_create_from_str_of_size(const char *str, size_t size);
 
 /******************************  SPAN MANIPULATION */
 

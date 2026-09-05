@@ -100,24 +100,47 @@ AZ_NODISCARD az_span az_span_empty(void) {
   return span;
 }
 
-AZ_NODISCARD az_span az_span_create_from_str(char *str) {
-  /* Avoid passing in null pointer to strlen to avoid memory access violation.
-   */
-  if (str == NULL) {
+AZ_NODISCARD az_span az_span_create_from_const_u8(const uint8_t *ptr,
+                                                  size_t size) {
+  az_span span;
+  union {
+    const uint8_t *c;
+    uint8_t *u;
+  } conv;
+
+  if (ptr == NULL) {
     return az_span_empty();
   }
 
-  return az_span_create((uint8_t *)str, strlen(str));
+  conv.c = ptr;
+  span._internal.ptr = conv.u;
+  span._internal.size = size;
+  return span;
 }
 
-AZ_NODISCARD az_span az_span_create_from_str_of_size(char *str, size_t size) {
+AZ_NODISCARD az_span az_span_create_from_str(const char *str) {
   /* Avoid passing in null pointer to strlen to avoid memory access violation.
    */
   if (str == NULL) {
     return az_span_empty();
   }
 
-  return az_span_create((uint8_t *)str, size);
+  return az_span_create_from_str_of_size(str, strlen(str));
+}
+
+AZ_NODISCARD az_span az_span_create_from_str_of_size(const char *str,
+                                                     size_t size) {
+  union {
+    const char *c;
+    const uint8_t *u;
+  } conv;
+
+  if (str == NULL) {
+    return az_span_empty();
+  }
+
+  conv.c = str;
+  return az_span_create_from_const_u8(conv.u, size);
 }
 
 AZ_NODISCARD az_span az_span_slice(az_span span, size_t start_index,

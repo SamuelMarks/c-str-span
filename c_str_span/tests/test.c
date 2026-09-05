@@ -24,6 +24,6 @@ int main(int argc, char **argv) {
   RUN_SUITE(az_core_internal_suite);
 
   GREATEST_PRINT_REPORT();
-  greatest_all_passed(&passed);
+  passed = greatest_all_passed();
   return passed ? EXIT_SUCCESS : EXIT_FAILURE;
 }
