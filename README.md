@@ -3,7 +3,7 @@ c-str-span
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Doc Coverage](https://img.shields.io/badge/docs-100%25-brightgreen.svg)](#)
-[![Test Coverage](https://img.shields.io/badge/coverage-94.73%25-brightgreen.svg)](#)
+[![Test Coverage](https://img.shields.io/badge/coverage-90.28%25-brightgreen.svg)](#)
 ![doc coverage](reports/doc_coverage.svg)
 ![test coverage](reports/test_coverage.svg)
 [![CI](https://github.com/SamuelMarks/c-str-span/actions/workflows/ci.yml/badge.svg)](https://github.com/SamuelMarks/c-str-span/actions/workflows/ci.yml)

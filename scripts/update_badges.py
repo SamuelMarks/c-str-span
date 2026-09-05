@@ -175,7 +175,8 @@ def generate_badge(root, label, value, filename):
                 f"https://img.shields.io/badge/docs-{value}%25-{shield_color}.svg",
                 readme_content,
             )
-        readme_path.write_text(readme_content, encoding="utf-8", newline="\n")
+        with open(readme_path, "w", encoding="utf-8", newline="\n") as f:
+            f.write(readme_content)
 
     reports_dir = root / "reports"
     reports_dir.mkdir(exist_ok=True)
@@ -211,7 +212,8 @@ def generate_badge(root, label, value, filename):
 </svg>
 """
 
-    (reports_dir / filename).write_text(svg_template, encoding="utf-8", newline="\n")
+    with open(reports_dir / filename, "w", encoding="utf-8", newline="\n") as f:
+        f.write(svg_template)
 
 
 def main():
