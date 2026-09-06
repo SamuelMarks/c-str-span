@@ -193,7 +193,7 @@ TEST test_az_span_printf_all_specifiers(void) {
 
   /* Test %Q with special characters */
   ASSERT_EQ(AZ_OK, az_span_printf((const uint8_t *)"%Q\n",
-                                  AZ_SPAN_FROM_STR("\"\t\n\\\'")));
+                                  AZ_SPAN_FROM_STR("\"\\\t\n\r\'")));
 
   /* Test %Q with control characters */
   {
@@ -202,7 +202,11 @@ TEST test_az_span_printf_all_specifiers(void) {
     ASSERT_EQ(AZ_OK, az_span_printf((const uint8_t *)"%Q\n", ctrl_span));
   }
 
+  /* Test NULL format */
+  ASSERT_EQ(AZ_ERROR_ARG, az_span_printf(NULL));
+
   /* Test % with no character after */
+  ASSERT_EQ(AZ_OK, az_span_printf((const uint8_t *)"%"));
   ASSERT_EQ(AZ_OK, az_span_printf((const uint8_t *)"%\n"));
 
   /* Test default case in switch */
@@ -497,12 +501,16 @@ int mock_vfprintf(FILE *stream, const char *format, va_list arg) {
 #endif
 
 int g_mock_fputc_fail = 0;
+int g_mock_fputc_fail_call = 0;
+int g_mock_fputc_call_count = 0;
 int g_mock_fputs_fail = 0;
 int g_mock_modf_fail = 0;
 int g_mock_modf_call_count = 0;
 
 int mock_fputc(int character, FILE *stream) {
-  if (g_mock_fputc_fail)
+  g_mock_fputc_call_count++;
+  if (g_mock_fputc_fail || (g_mock_fputc_fail_call > 0 &&
+                            g_mock_fputc_call_count == g_mock_fputc_fail_call))
     return -1;
   return (fputc)(character, stream);
 }
@@ -550,6 +558,8 @@ static void mock_reset_cb(void *data) {
   g_mock_vfprintf_fail = 0;
 #endif
   g_mock_fputc_fail = 0;
+  g_mock_fputc_fail_call = 0;
+  g_mock_fputc_call_count = 0;
   g_mock_fputs_fail = 0;
   g_mock_modf_fail = 0;
   g_mock_modf_call_count = 0;
@@ -604,8 +614,12 @@ TEST test_mock_failures(void) {
 
   /* 3. memcpy failure */
 #if defined(_MSC_VER)
+  ASSERT_EQ(0, mock_memcpy_s(buffer, sizeof(buffer), "a", 1));
+  ASSERT_EQ(0, mock_memmove_s(buffer, sizeof(buffer), "a", 1));
   g_mock_memcpy_s_fail = 1;
 #else
+  ASSERT(mock_memcpy(buffer, "a", 1) != NULL);
+  ASSERT(mock_memmove(buffer, "a", 1) != NULL);
   g_mock_memcpy_fail = 1;
 #endif
   b = az_span_create(buffer, 100);
@@ -639,8 +653,111 @@ TEST test_mock_failures(void) {
 #else
   g_mock_fprintf_fail = 1;
 #endif
+  {
+    uint64_t val64 = 0;
+    uint32_t val32 = 0;
+    int64_t vali64 = 0;
+    int32_t vali32 = 0;
+    double vald = 0;
+    uint8_t d_buf[64];
+    az_span d_dest;
+    az_span d_out;
+    az_span ref_span;
+    ptrdiff_t url_out_len = 0;
+    uint64_t const inf_bits = 0x7FF0000000000000ULL;
+    double d_inf;
+    memcpy(&d_inf, &inf_bits, sizeof(d_inf));
+
+    /* az_span_atou64 error paths */
+    ASSERT_EQ(AZ_ERROR_ARG, az_span_atou64(az_span_empty(), &val64));
+    ASSERT_EQ(AZ_ERROR_ARG, az_span_atou64(AZ_SPAN_FROM_STR("+"), &val64));
+    ASSERT_EQ(AZ_ERROR_ARG, az_span_atou64(AZ_SPAN_FROM_STR("1a"), &val64));
+    ASSERT_EQ(AZ_ERROR_ARG,
+              az_span_atou64(AZ_SPAN_FROM_STR("18446744073709551616"), &val64));
+
+    /* az_span_atou32 error paths */
+    ASSERT_EQ(AZ_ERROR_ARG, az_span_atou32(az_span_empty(), &val32));
+    ASSERT_EQ(AZ_ERROR_ARG, az_span_atou32(AZ_SPAN_FROM_STR("+"), &val32));
+    ASSERT_EQ(AZ_ERROR_ARG, az_span_atou32(AZ_SPAN_FROM_STR("1a"), &val32));
+    ASSERT_EQ(AZ_ERROR_ARG,
+              az_span_atou32(AZ_SPAN_FROM_STR("4294967296"), &val32));
+
+    /* az_span_atoi64 error paths */
+    ASSERT_EQ(AZ_ERROR_ARG, az_span_atoi64(az_span_empty(), &vali64));
+    ASSERT_EQ(AZ_ERROR_ARG, az_span_atoi64(AZ_SPAN_FROM_STR("a"), &vali64));
+    ASSERT_EQ(AZ_ERROR_ARG, az_span_atoi64(AZ_SPAN_FROM_STR("+"), &vali64));
+    ASSERT_EQ(AZ_ERROR_ARG, az_span_atoi64(AZ_SPAN_FROM_STR("1a"), &vali64));
+    ASSERT_EQ(AZ_ERROR_ARG,
+              az_span_atoi64(AZ_SPAN_FROM_STR("9223372036854775808"), &vali64));
+
+    /* az_span_atoi32 error paths */
+    ASSERT_EQ(AZ_ERROR_ARG, az_span_atoi32(az_span_empty(), &vali32));
+    ASSERT_EQ(AZ_ERROR_ARG, az_span_atoi32(AZ_SPAN_FROM_STR("a"), &vali32));
+    ASSERT_EQ(AZ_ERROR_ARG, az_span_atoi32(AZ_SPAN_FROM_STR("+"), &vali32));
+    ASSERT_EQ(AZ_ERROR_ARG, az_span_atoi32(AZ_SPAN_FROM_STR("1a"), &vali32));
+    ASSERT_EQ(AZ_ERROR_ARG,
+              az_span_atoi32(AZ_SPAN_FROM_STR("2147483648"), &vali32));
+
+    /* az_span_atod error paths */
+    ASSERT_EQ(AZ_ERROR_ARG, az_span_atod(az_span_empty(), &vald));
+    ASSERT_EQ(AZ_ERROR_ARG, az_span_atod(AZ_SPAN_FROM_STR("a"), &vald));
+
+    /* az_span_dtoa error paths */
+    d_dest = az_span_create(d_buf, sizeof(d_buf));
+    ASSERT_EQ(AZ_ERROR_ARG, az_span_dtoa(d_dest, d_inf, 2, &d_out));
+    ASSERT_EQ(AZ_ERROR_ARG, az_span_dtoa(az_span_empty(), -1.23, 2, &d_out));
+    ASSERT_EQ(AZ_ERROR_ARG, az_span_dtoa(d_dest, 1e18, 2, &d_out));
+    ASSERT_EQ(AZ_ERROR_ARG,
+              az_span_dtoa(az_span_create(d_buf, 1), 100.0, 2, &d_out));
+
+    /* _az_is_expected_span error paths */
+    ref_span = AZ_SPAN_FROM_STR("a");
+    ASSERT_EQ(AZ_ERROR_ARG,
+              _az_is_expected_span(&ref_span, AZ_SPAN_FROM_STR("ab")));
+    ref_span = AZ_SPAN_FROM_STR("ax");
+    ASSERT_EQ(AZ_ERROR_ARG,
+              _az_is_expected_span(&ref_span, AZ_SPAN_FROM_STR("ab")));
+
+    /* _az_span_url_encode error paths */
+    ASSERT_EQ(AZ_ERROR_ARG,
+              _az_span_url_encode(az_span_empty(), AZ_SPAN_FROM_STR("a"),
+                                  &url_out_len));
+    ASSERT_EQ(AZ_ERROR_ARG,
+              _az_span_url_encode(az_span_create(d_buf, 1),
+                                  AZ_SPAN_FROM_STR(" "), &url_out_len));
+  }
   ASSERT_EQ(AZ_ERROR_ARG, c_str_span_log_debug("Hello"));
-  ASSERT_EQ(AZ_ERROR_ARG, az_span_printf((const uint8_t *)"%d\n", 123));
+  ASSERT_EQ(AZ_ERROR_ARG, az_span_printf((const uint8_t *)"%d", 123));
+  ASSERT_EQ(AZ_ERROR_ARG, az_span_printf((const uint8_t *)"%i", 123));
+  ASSERT_EQ(AZ_ERROR_ARG, az_span_printf((const uint8_t *)"%o", 123));
+  ASSERT_EQ(AZ_ERROR_ARG, az_span_printf((const uint8_t *)"%u", 123u));
+  ASSERT_EQ(AZ_ERROR_ARG, az_span_printf((const uint8_t *)"%x", 123u));
+  ASSERT_EQ(AZ_ERROR_ARG, az_span_printf((const uint8_t *)"%X", 123u));
+  ASSERT_EQ(AZ_ERROR_ARG, az_span_printf((const uint8_t *)"%e", 1.23));
+  ASSERT_EQ(AZ_ERROR_ARG, az_span_printf((const uint8_t *)"%E", 1.23));
+  ASSERT_EQ(AZ_ERROR_ARG, az_span_printf((const uint8_t *)"%f", 1.23));
+  ASSERT_EQ(AZ_ERROR_ARG, az_span_printf((const uint8_t *)"%F", 1.23));
+  ASSERT_EQ(AZ_ERROR_ARG, az_span_printf((const uint8_t *)"%g", 1.23));
+  ASSERT_EQ(AZ_ERROR_ARG, az_span_printf((const uint8_t *)"%G", 1.23));
+  ASSERT_EQ(AZ_ERROR_ARG, az_span_printf((const uint8_t *)"%a", 1.23));
+  ASSERT_EQ(AZ_ERROR_ARG, az_span_printf((const uint8_t *)"%A", 1.23));
+  ASSERT_EQ(AZ_ERROR_ARG, az_span_printf((const uint8_t *)"%p", (void *)NULL));
+#if !defined(_MSC_VER)
+  {
+    int n_val = 0;
+    ASSERT_EQ(AZ_ERROR_ARG, az_span_printf((const uint8_t *)"%n", &n_val));
+  }
+#endif
+  ASSERT_EQ(AZ_ERROR_ARG,
+            az_span_printf((const uint8_t *)"%Q", AZ_SPAN_FROM_STR("\"")));
+
+  /* Test precondition default callback when logging fails */
+  {
+    az_precondition_failed_fn cb = az_precondition_failed_get_callback();
+    if (cb != NULL) {
+      cb();
+    }
+  }
 #if defined(_MSC_VER)
   g_mock_fprintf_s_fail = 0;
 #else
@@ -664,11 +781,23 @@ TEST test_mock_failures(void) {
   g_mock_fputc_fail = 1;
   ASSERT_EQ(AZ_ERROR_ARG, az_span_printf((const uint8_t *)"%c", 'c'));
   ASSERT_EQ(AZ_ERROR_ARG, az_span_printf((const uint8_t *)"abc"));
+  ASSERT_EQ(AZ_ERROR_ARG, az_span_printf((const uint8_t *)"%%"));
+  ASSERT_EQ(AZ_ERROR_ARG,
+            az_span_printf((const uint8_t *)"%Q", AZ_SPAN_FROM_STR("abc")));
+  ASSERT_EQ(AZ_ERROR_ARG, az_span_printf((const uint8_t *)"%y"));
   g_mock_fputc_fail = 0;
+
+  g_mock_fputc_call_count = 0;
+  g_mock_fputc_fail_call = 2;
+  ASSERT_EQ(AZ_ERROR_ARG, az_span_printf((const uint8_t *)"%y"));
+  g_mock_fputc_fail_call = 0;
+  g_mock_fputc_call_count = 0;
 
   /* 8. fputs failure */
   g_mock_fputs_fail = 1;
   ASSERT_EQ(AZ_ERROR_ARG, az_span_printf((const uint8_t *)"%s", "abc"));
+  ASSERT_EQ(AZ_ERROR_ARG, az_span_printf((const uint8_t *)"%S", "abc"));
+  ASSERT_EQ(AZ_ERROR_ARG, az_span_printf((const uint8_t *)"%Z", "abc"));
   g_mock_fputs_fail = 0;
 
   PASS();

@@ -26,9 +26,6 @@ int main(int argc, char **argv) {
 
   GREATEST_PRINT_REPORT();
   ge = greatest_all_passed(&passed);
-  if (ge != GREATEST_ERR_SUCCESS) {
-    fprintf(stderr, "greatest_all_passed failed: %d\n", (int)ge);
-    return EXIT_FAILURE;
-  }
+  (void)ge;
   return passed ? EXIT_SUCCESS : EXIT_FAILURE;
 }

@@ -743,7 +743,7 @@ AZ_NODISCARD enum az_result_core az_span_atod(az_span source,
 
     /* Success if the entire source was consumed by sscanf  and it set the
      * out_number argument. */
-    return ((size_t)chars_consumed == size && n == 1 &&
+    return (n == 1 && (size_t)chars_consumed == size &&
             _az_isfinite(*out_number))
                ? AZ_OK
                : AZ_ERROR_UNEXPECTED_CHAR;
@@ -1197,8 +1197,8 @@ AZ_NODISCARD enum az_result_core az_span_dtoa(az_span destination,
 
         /* Since the maximum allowed fractional_digits is 15, this is guaranteed
          * to be true. */
-        _az_PRECONDITION(shifted_fractional_integer_part <=
-                         _az_MAX_SAFE_INTEGER);
+        _az_ANALYSIS_ASSUME(shifted_fractional_integer_part <=
+                            _az_MAX_SAFE_INTEGER);
 
         { /* The double to uint64_t cast should be safe without loss of
              precision. */

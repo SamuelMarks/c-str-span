@@ -34,21 +34,21 @@ def find_best_build_dir(root):
 
 
 def get_existing_test_coverage(root):
+    readme_path = root / "README.md"
+    if readme_path.exists():
+        readme_content = readme_path.read_text(encoding="utf-8")
+        match = re.search(
+            r"https://img\.shields\.io/badge/coverage-([0-9]+(?:\.[0-9]+)?)(?:%25|%)-[a-z]+\.svg",
+            readme_content,
+        )
+        if match:
+            return match.group(1)
+
     svg_path = root / "reports" / "test_coverage.svg"
     if svg_path.exists():
         svg_content = svg_path.read_text(encoding="utf-8")
         match = re.search(
             r"<title>test coverage: ([0-9]+(?:\.[0-9]+)?)%</title>", svg_content
-        )
-        if match:
-            return match.group(1)
-
-    readme_path = root / "README.md"
-    if readme_path.exists():
-        readme_content = readme_path.read_text(encoding="utf-8")
-        match = re.search(
-            r"https://img\.shields\.io/badge/coverage-([0-9]+(?:\.[0-9]+)?)%25-[a-z]+\.svg",
-            readme_content,
         )
         if match:
             return match.group(1)
@@ -129,7 +129,7 @@ def get_doc_coverage(root):
             if (
                 symbol_re.match(line)
                 and "_az_" not in line
-                and 'extern "C"' not in line
+                and "extern \"C\"" not in line
             ):
                 symbols += 1
         total_symbols += symbols
@@ -146,37 +146,71 @@ def get_doc_coverage(root):
     return "100"
 
 
-def generate_badge(root, label, value, filename):
+def update_readme(root, test_cov, doc_cov):
+    readme_path = root / "README.md"
+    if not readme_path.exists():
+        return
+
+    readme = readme_path.read_text(encoding="utf-8")
+
+    # Remove any existing doc coverage and test coverage shields (including local reports/*.svg)
+    readme = re.sub(
+        r"\[?!\[doc[ _]?coverage\]\(.*?\)\]?(?:\(.*?\))?\n?",
+        "",
+        readme,
+        flags=re.IGNORECASE,
+    )
+    readme = re.sub(
+        r"\[?!\[test[ _]?coverage\]\(.*?\)\]?(?:\(.*?\))?\n?",
+        "",
+        readme,
+        flags=re.IGNORECASE,
+    )
+
+    doc_num = float(doc_cov) if doc_cov else 0
+    if doc_num < 50:
+        doc_color = "red"
+    elif doc_num < 80:
+        doc_color = "yellow"
+    else:
+        doc_color = "brightgreen"
+    doc_shield = f"[![Doc Coverage](https://img.shields.io/badge/docs-{doc_cov}%25-{doc_color}.svg)](#)"
+
+    test_shield = ""
+    if test_cov is not None:
+        test_num = float(test_cov) if test_cov else 0
+        if test_num < 50:
+            test_color = "red"
+        elif test_num < 80:
+            test_color = "yellow"
+        else:
+            test_color = "brightgreen"
+        test_shield = f"[![Test Coverage](https://img.shields.io/badge/coverage-{test_cov}%25-{test_color}.svg)](#)"
+
+    license_regex = r"(\[!\[License\].*?\]\(.*?\)\n?)"
+    insert_str = r"\1" + doc_shield + "\n"
+    if test_shield:
+        insert_str += test_shield + "\n"
+
+    if re.search(license_regex, readme):
+        readme = re.sub(license_regex, insert_str, readme, count=1)
+    else:
+        readme = doc_shield + "\n" + (test_shield + "\n" if test_shield else "") + readme
+
+    with open(readme_path, "w", encoding="utf-8", newline="\n") as f:
+        f.write(readme)
+
+
+def generate_svg_badge(root, label, value, filename):
     val_num = float(value) if value else 0
     val_int = int(val_num)
 
     if val_int < 50:
         color = "#e05d44"
-        shield_color = "red"
     elif val_int < 80:
         color = "#dfb317"
-        shield_color = "yellow"
     else:
         color = "#97ca00"
-        shield_color = "brightgreen"
-
-    readme_path = root / "README.md"
-    if readme_path.exists():
-        readme_content = readme_path.read_text(encoding="utf-8")
-        if label == "test coverage":
-            readme_content = re.sub(
-                r"https://img\.shields\.io/badge/coverage-[0-9]+(?:\.[0-9]+)?%25-[a-z]+\.svg",
-                f"https://img.shields.io/badge/coverage-{value}%25-{shield_color}.svg",
-                readme_content,
-            )
-        elif label == "doc coverage":
-            readme_content = re.sub(
-                r"https://img\.shields\.io/badge/docs-[0-9]+(?:\.[0-9]+)?%25-[a-z]+\.svg",
-                f"https://img.shields.io/badge/docs-{value}%25-{shield_color}.svg",
-                readme_content,
-            )
-        with open(readme_path, "w", encoding="utf-8", newline="\n") as f:
-            f.write(readme_content)
 
     reports_dir = root / "reports"
     reports_dir.mkdir(exist_ok=True)
@@ -223,8 +257,9 @@ def main():
     test_cov = get_test_coverage(root, best_build)
     doc_cov = get_doc_coverage(root)
 
-    generate_badge(root, "test coverage", test_cov, "test_coverage.svg")
-    generate_badge(root, "doc coverage", doc_cov, "doc_coverage.svg")
+    update_readme(root, test_cov, doc_cov)
+    generate_svg_badge(root, "test coverage", test_cov, "test_coverage.svg")
+    generate_svg_badge(root, "doc coverage", doc_cov, "doc_coverage.svg")
 
 
 if __name__ == "__main__":

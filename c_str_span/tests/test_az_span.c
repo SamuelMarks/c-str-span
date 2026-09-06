@@ -12,6 +12,7 @@
 #include "c_str_hex_private.h"
 
 #include "c_str_span_internal.h"
+#include "c_str_span_log.h"
 #include "c_str_span_printf.h"
 
 #if defined(_WIN32) || defined(__WIN32__) || defined(__WINDOWS__)
@@ -44,6 +45,7 @@
 #endif /* ! __cplusplus */
 
 #include <greatest.h>
+#include <setjmp.h>
 #include <stdio.h>
 
 #include "test_az_span.h"
@@ -727,6 +729,10 @@ TEST az_span_atod_non_finite_not_allowed(void) {
             az_span_atod(AZ_SPAN_FROM_STR("NAN"), &value));
   ASSERT_EQ(AZ_ERROR_UNEXPECTED_CHAR,
             az_span_atod(AZ_SPAN_FROM_STR("INF"), &value));
+  ASSERT_EQ(AZ_ERROR_UNEXPECTED_CHAR,
+            az_span_atod(AZ_SPAN_FROM_STR("1e500"), &value));
+  ASSERT_EQ(AZ_ERROR_UNEXPECTED_CHAR,
+            az_span_atod(AZ_SPAN_FROM_STR("-1e500"), &value));
   ASSERT_EQ(AZ_ERROR_UNEXPECTED_CHAR,
             az_span_atod(AZ_SPAN_FROM_STR("+INF"), &value));
   ASSERT_EQ(AZ_ERROR_UNEXPECTED_CHAR,
@@ -1807,8 +1813,16 @@ TEST test_az_span_is_valid(void) {
                              false));
     ASSERT(_az_span_is_valid(az_span_create(max_ptr - INT32_MAX, INT32_MAX), 0,
                              true));
-    PASS();
   }
+
+  {
+    az_span bad_null_span;
+    bad_null_span._internal.ptr = NULL;
+    bad_null_span._internal.size = 5;
+    ASSERT(!_az_span_is_valid(bad_null_span, 0, true));
+  }
+
+  PASS();
 }
 
 TEST test_az_span_overlap(void) {
@@ -2145,12 +2159,35 @@ TEST az_span_url_encode_test(void) {
 }
 
 TEST az_span_printf_test(void) {
-  /* We can't easily capture stdout without redirecting, so we just call it to
-   * ensure no crashes and coverage. In a real scenario we'd use a variant that
-   * writes to a buffer. */
+  int n = 0;
+  uint8_t ctrl_buf[2];
+  az_span ctrl_span;
+
+  /* Test NULL format */
+  ASSERT_EQ(AZ_ERROR_ARG, az_span_printf(NULL));
+
+  /* Test trailing percent */
+  ASSERT_EQ(AZ_OK, az_span_printf((const uint8_t *)"%"));
+
+  /* Test regular string with no percent */
+  ASSERT_EQ(AZ_OK, az_span_printf((const uint8_t *)"Testing az_span_printf: "));
+
+  /* Test all specifiers */
   ASSERT_EQ(AZ_OK, az_span_printf(
-                       (const uint8_t *)"Testing az_span_printf: %s %d %f %Q\n",
-                       "string", 42, 3.14, AZ_SPAN_FROM_STR("span")));
+                       (const uint8_t *)"%c %d %i %o %u %x %X %e %E %f %F %g "
+                                        "%G %a %A %p %s %S %Z %% %n %y\n",
+                       'A', 1, 2, 8, 10u, 0xa, 0xA, 1.0, 1.0, 1.0, 1.0, 1.0,
+                       1.0, 1.0, 1.0, (void *)NULL, "s", "S", "Z", &n));
+
+  /* Test %Q with quotes, backslash, single quote, and regular chars */
+  ASSERT_EQ(AZ_OK, az_span_printf((const uint8_t *)"%Q\n",
+                                  AZ_SPAN_FROM_STR("\"\\\t\n\r\'abc")));
+
+  ctrl_buf[0] = 1;
+  ctrl_buf[1] = 127;
+  ctrl_span = az_span_create(ctrl_buf, sizeof(ctrl_buf));
+  ASSERT_EQ(AZ_OK, az_span_printf((const uint8_t *)"%Q\n", ctrl_span));
+
   PASS();
 }
 
@@ -2186,10 +2223,7 @@ TEST az_precondition_callback_test(void) {
   {
     char buf[10];
     az_span src = AZ_SPAN_FROM_STR("test");
-    enum az_result_core rc = az_span_to_str(buf, 0, src);
-    if (rc != AZ_OK) {
-    }
-    ASSERT_EQ(AZ_OK, rc);
+    ASSERT_EQ(AZ_OK, az_span_to_str(buf, 0, src));
   }
 
   /* Trigger the overlap precondition to hit branches in _az_span_overlap */
@@ -2198,20 +2232,159 @@ TEST az_precondition_callback_test(void) {
     az_span dest = AZ_SPAN_FROM_BUFFER(buffer);
     az_span src = az_span_create(buffer + 2, 5);
     ptrdiff_t out_len;
-    int res1;
-    int res2;
-    res1 = _az_span_url_encode(dest, src, &out_len);
-    if (res1 != AZ_OK) {
-      res1 = AZ_OK;
-    }
+    (void)_az_span_url_encode(dest, src, &out_len);
     printf("called = %d\n", g_precondition_failed_called);
     ASSERT_EQ(2, g_precondition_failed_called);
-    res2 = _az_span_url_encode(src, dest, &out_len);
-    if (res2 != AZ_OK) {
-      res2 = AZ_OK;
-    }
+    (void)_az_span_url_encode(src, dest, &out_len);
     ASSERT_EQ(3, g_precondition_failed_called);
   }
+
+  az_precondition_failed_set_callback(original);
+  PASS();
+}
+
+static jmp_buf g_precondition_jmp;
+static volatile int g_precondition_expected = 0;
+
+static void test_precondition_failed_callback_jmp(void) {
+  if (g_precondition_expected) {
+    longjmp(g_precondition_jmp, 1);
+  }
+}
+
+#define ASSERT_PRECONDITION_FAIL(expr)                                         \
+  do {                                                                         \
+    g_precondition_expected = 1;                                               \
+    if (setjmp(g_precondition_jmp) == 0) {                                     \
+      (void)(expr);                                                            \
+      g_precondition_expected = 0;                                             \
+      FAIL();                                                                  \
+    }                                                                          \
+    g_precondition_expected = 0;                                               \
+  } while ((void)0, 0)
+
+TEST test_preconditions_coverage(void) {
+  az_precondition_failed_fn original;
+  az_span bad_span;
+  az_span valid_span;
+  az_span huge_span;
+  az_span out_span;
+  az_span rem;
+  az_span tok;
+  uint64_t u64 = 0;
+  uint32_t u32 = 0;
+  int64_t i64 = 0;
+  int32_t i32 = 0;
+  double d = 0;
+  size_t len = 0;
+  size_t idx = 0;
+  ptrdiff_t url_out_len = 0;
+  uint8_t buf[128];
+  char cbuf[128];
+
+  bad_span._internal.ptr = NULL;
+  bad_span._internal.size = 10;
+  valid_span = AZ_SPAN_FROM_STR("valid");
+  huge_span = az_span_create(buf, 101);
+  original = az_precondition_failed_get_callback();
+  az_precondition_failed_set_callback(test_precondition_failed_callback_jmp);
+
+  /* az_span_slice preconditions */
+  ASSERT_PRECONDITION_FAIL(az_span_slice(bad_span, 0, 0));
+  ASSERT_PRECONDITION_FAIL(az_span_slice(valid_span, 0, 100));
+  ASSERT_PRECONDITION_FAIL(az_span_slice(valid_span, 2, 1));
+
+  /* az_span_atou64 preconditions */
+  ASSERT_PRECONDITION_FAIL(az_span_atou64(bad_span, &u64));
+  ASSERT_PRECONDITION_FAIL(az_span_atou64(valid_span, NULL));
+
+  /* az_span_atou32 preconditions */
+  ASSERT_PRECONDITION_FAIL(az_span_atou32(bad_span, &u32));
+  ASSERT_PRECONDITION_FAIL(az_span_atou32(valid_span, NULL));
+
+  /* az_span_atoi64 preconditions */
+  ASSERT_PRECONDITION_FAIL(az_span_atoi64(bad_span, &i64));
+  ASSERT_PRECONDITION_FAIL(az_span_atoi64(valid_span, NULL));
+
+  /* az_span_atoi32 preconditions */
+  ASSERT_PRECONDITION_FAIL(az_span_atoi32(bad_span, &i32));
+  ASSERT_PRECONDITION_FAIL(az_span_atoi32(valid_span, NULL));
+
+  /* az_span_atod preconditions */
+  ASSERT_PRECONDITION_FAIL(az_span_atod(bad_span, &d));
+  ASSERT_PRECONDITION_FAIL(az_span_atod(valid_span, NULL));
+  ASSERT_PRECONDITION_FAIL(az_span_atod(huge_span, &d));
+
+  /* az_span_copy preconditions */
+  ASSERT_PRECONDITION_FAIL(az_span_copy(bad_span, valid_span, &out_span));
+  ASSERT_PRECONDITION_FAIL(az_span_copy(valid_span, valid_span, NULL));
+
+  /* az_span_copy_u8 preconditions */
+  ASSERT_PRECONDITION_FAIL(az_span_copy_u8(bad_span, 'a', &out_span));
+  ASSERT_PRECONDITION_FAIL(az_span_copy_u8(valid_span, 'a', NULL));
+
+  /* az_span_to_str preconditions */
+  ASSERT_PRECONDITION_FAIL(az_span_to_str(NULL, 10, valid_span));
+  ASSERT_PRECONDITION_FAIL(az_span_to_str(cbuf, 10, az_span_empty()));
+  ASSERT_EQ(AZ_OK, az_span_to_str(cbuf, sizeof(cbuf), valid_span));
+
+  /* az_span_u64toa preconditions */
+  ASSERT_PRECONDITION_FAIL(az_span_u64toa(bad_span, 123, &out_span));
+  ASSERT_PRECONDITION_FAIL(az_span_u64toa(valid_span, 123, NULL));
+
+  /* az_span_i64toa preconditions */
+  ASSERT_PRECONDITION_FAIL(az_span_i64toa(bad_span, 123, &out_span));
+  ASSERT_PRECONDITION_FAIL(az_span_i64toa(valid_span, 123, NULL));
+
+  /* az_span_u32toa preconditions */
+  ASSERT_PRECONDITION_FAIL(az_span_u32toa(bad_span, 123, &out_span));
+  ASSERT_PRECONDITION_FAIL(az_span_u32toa(valid_span, 123, NULL));
+
+  /* az_span_i32toa preconditions */
+  ASSERT_PRECONDITION_FAIL(az_span_i32toa(bad_span, 123, &out_span));
+  ASSERT_PRECONDITION_FAIL(az_span_i32toa(valid_span, 123, NULL));
+
+  /* az_span_dtoa preconditions */
+  ASSERT_PRECONDITION_FAIL(az_span_dtoa(bad_span, 1.23, 2, &out_span));
+  ASSERT_PRECONDITION_FAIL(az_span_dtoa(valid_span, 1.23, 2, NULL));
+
+  /* _az_span_url_encode_calc_length preconditions */
+  ASSERT_PRECONDITION_FAIL(_az_span_url_encode_calc_length(bad_span, &len));
+  ASSERT_PRECONDITION_FAIL(_az_span_url_encode_calc_length(valid_span, NULL));
+  ASSERT_PRECONDITION_FAIL(_az_span_url_encode_calc_length(
+      az_span_create(buf, (size_t)INT32_MAX), &len));
+  ASSERT_EQ(AZ_OK, _az_span_url_encode_calc_length(valid_span, &len));
+
+  /* _az_span_url_encode preconditions */
+  ASSERT_PRECONDITION_FAIL(_az_span_url_encode(valid_span, valid_span, NULL));
+  ASSERT_PRECONDITION_FAIL(
+      _az_span_url_encode(valid_span, bad_span, &url_out_len));
+  ASSERT_PRECONDITION_FAIL(
+      _az_span_url_encode(bad_span, valid_span, &url_out_len));
+  ASSERT_PRECONDITION_FAIL(_az_span_url_encode(
+      az_span_create(buf, 10), az_span_create(buf + 2, 5), &url_out_len));
+  ASSERT_PRECONDITION_FAIL(_az_span_url_encode(
+      az_span_create(buf + 2, 10), az_span_create(buf, 5), &url_out_len));
+  ASSERT_EQ(AZ_OK,
+            _az_span_url_encode(az_span_create(buf, 20),
+                                az_span_create(buf + 50, 5), &url_out_len));
+  ASSERT_EQ(AZ_OK, _az_span_url_encode(az_span_create(buf + 50, 20),
+                                       az_span_create(buf, 5), &url_out_len));
+  ASSERT_EQ(AZ_OK, _az_span_url_encode(az_span_create(buf, 20), az_span_empty(),
+                                       &url_out_len));
+  ASSERT_EQ(0, url_out_len);
+
+  /* _az_span_token preconditions */
+  ASSERT_PRECONDITION_FAIL(
+      _az_span_token(bad_span, valid_span, &rem, &idx, &tok));
+  ASSERT_PRECONDITION_FAIL(
+      _az_span_token(valid_span, az_span_empty(), &rem, &idx, &tok));
+  ASSERT_PRECONDITION_FAIL(
+      _az_span_token(valid_span, valid_span, NULL, &idx, &tok));
+  ASSERT_PRECONDITION_FAIL(
+      _az_span_token(valid_span, valid_span, &rem, &idx, NULL));
+
+  test_precondition_failed_callback_jmp();
 
   az_precondition_failed_set_callback(original);
   PASS();
@@ -2221,6 +2394,7 @@ TEST az_precondition_callback_test(void) {
 SUITE(az_core_precondition_suite) {
 #ifndef AZ_NO_PRECONDITION_CHECKING
   RUN_TEST(az_precondition_callback_test);
+  RUN_TEST(test_preconditions_coverage);
 #endif
 }
 
@@ -2236,6 +2410,21 @@ TEST az_span_internal_helpers_test(void) {
   az_span s1 = AZ_SPAN_FROM_STR("abc");
   az_span s2 = az_span_slice_to_end(s1, 1);
   ASSERT_EQ(1, _az_span_diff(s2, s1));
+
+  ASSERT_EQ(AZ_ERROR_ARG, c_str_span_log_debug(NULL));
+  ASSERT_EQ(AZ_OK, c_str_span_log_debug("test"));
+
+#ifndef AZ_NO_PRECONDITION_CHECKING
+  {
+    az_span s3 = AZ_SPAN_FROM_STR("xyz");
+    az_precondition_failed_fn original = az_precondition_failed_get_callback();
+    az_precondition_failed_set_callback(test_precondition_failed_callback);
+    g_precondition_failed_called = 0;
+    (void)_az_span_diff(s3, s1);
+    ASSERT_EQ(1, g_precondition_failed_called);
+    az_precondition_failed_set_callback(original);
+  }
+#endif
 
   ASSERT(
       az_result_succeeded(_az_is_expected_span(&s1, AZ_SPAN_FROM_STR("abc"))));

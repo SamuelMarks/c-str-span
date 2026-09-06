@@ -44,13 +44,10 @@ bool _az_span_is_valid(az_span span, size_t min_size, bool null_is_valid) {
 
   bool result = false;
 
-  const az_span empty = {{NULL, 0}};
-  uint8_t *const default_init_ptr = az_span_ptr(empty);
-
   if (null_is_valid) {
-    result = (ptr == NULL || ptr == default_init_ptr) ? span_size == 0 : true;
+    result = (ptr == NULL) ? span_size == 0 : true;
   } else {
-    result = (ptr != NULL && ptr != default_init_ptr);
+    result = (ptr != NULL);
   }
 
   if (result) {
