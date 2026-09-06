@@ -16,6 +16,7 @@ GREATEST_MAIN_DEFS();
 
 int main(int argc, char **argv) {
   int passed = 0;
+  enum greatest_err ge;
   GREATEST_MAIN_BEGIN();
   RUN_SUITE(lib_suite);
   RUN_SUITE(az_core_span_suite);
@@ -24,6 +25,10 @@ int main(int argc, char **argv) {
   RUN_SUITE(az_core_internal_suite);
 
   GREATEST_PRINT_REPORT();
-  passed = greatest_all_passed();
+  ge = greatest_all_passed(&passed);
+  if (ge != GREATEST_ERR_SUCCESS) {
+    fprintf(stderr, "greatest_all_passed failed: %d\n", (int)ge);
+    return EXIT_FAILURE;
+  }
   return passed ? EXIT_SUCCESS : EXIT_FAILURE;
 }

@@ -1,11 +1,7 @@
 /* clang-format off */
 #define AZ_NO_PRECONDITION_CHECKING
-#define C_STR_SPAN_EXPORTS
+#define C_STR_SPAN_STATIC_DEFINE
 #define DEBUG 1
-#pragma warning(disable: 4273)
-#pragma warning(disable: 4286)
-#undef C_STR_SPAN_EXPORT
-#define C_STR_SPAN_EXPORT
 #include "c_str_precondition_internal.h"
 #include "c_str_span.h"
 #include "c_str_span_internal.h"
@@ -478,10 +474,25 @@ int mock_vfprintf(FILE *stream, const char *format, va_list arg) {
   return (vfprintf)(stream, format, arg);
 }
 
+#ifdef memcpy
+#undef memcpy
+#endif
 #define memcpy mock_memcpy
+#ifdef memmove
+#undef memmove
+#endif
 #define memmove mock_memmove
+#ifdef sprintf
+#undef sprintf
+#endif
 #define sprintf mock_sprintf
+#ifdef fprintf
+#undef fprintf
+#endif
 #define fprintf mock_fprintf
+#ifdef vfprintf
+#undef vfprintf
+#endif
 #define vfprintf mock_vfprintf
 #endif
 
@@ -510,8 +521,17 @@ double mock_modf(double x, double *intpart) {
   return (modf)(x, intpart);
 }
 
+#ifdef fputc
+#undef fputc
+#endif
 #define fputc mock_fputc
+#ifdef fputs
+#undef fputs
+#endif
 #define fputs mock_fputs
+#ifdef modf
+#undef modf
+#endif
 #define modf mock_modf
 
 static void mock_reset_cb(void *data) {
