@@ -2232,10 +2232,13 @@ TEST az_precondition_callback_test(void) {
     az_span dest = AZ_SPAN_FROM_BUFFER(buffer);
     az_span src = az_span_create(buffer + 2, 5);
     ptrdiff_t out_len;
-    (void)_az_span_url_encode(dest, src, &out_len);
+    enum az_result_core rc;
+    rc = _az_span_url_encode(dest, src, &out_len);
+    ASSERT_EQ(AZ_OK, rc);
     printf("called = %d\n", g_precondition_failed_called);
     ASSERT_EQ(2, g_precondition_failed_called);
-    (void)_az_span_url_encode(src, dest, &out_len);
+    rc = _az_span_url_encode(src, dest, &out_len);
+    ASSERT_EQ(AZ_ERROR_NOT_ENOUGH_SPACE, rc);
     ASSERT_EQ(3, g_precondition_failed_called);
   }
 
@@ -2245,6 +2248,8 @@ TEST az_precondition_callback_test(void) {
 
 static jmp_buf g_precondition_jmp;
 static volatile int g_precondition_expected = 0;
+static volatile enum az_result_core g_precondition_rc = AZ_OK;
+static volatile az_span g_precondition_span;
 
 static void test_precondition_failed_callback_jmp(void) {
   if (g_precondition_expected) {
@@ -2256,7 +2261,18 @@ static void test_precondition_failed_callback_jmp(void) {
   do {                                                                         \
     g_precondition_expected = 1;                                               \
     if (setjmp(g_precondition_jmp) == 0) {                                     \
-      (void)(expr);                                                            \
+      g_precondition_rc = (expr);                                              \
+      g_precondition_expected = 0;                                             \
+      FAIL();                                                                  \
+    }                                                                          \
+    g_precondition_expected = 0;                                               \
+  } while ((void)0, 0)
+
+#define ASSERT_PRECONDITION_FAIL_SPAN(expr)                                    \
+  do {                                                                         \
+    g_precondition_expected = 1;                                               \
+    if (setjmp(g_precondition_jmp) == 0) {                                     \
+      g_precondition_span = (expr);                                            \
       g_precondition_expected = 0;                                             \
       FAIL();                                                                  \
     }                                                                          \
@@ -2290,9 +2306,9 @@ TEST test_preconditions_coverage(void) {
   az_precondition_failed_set_callback(test_precondition_failed_callback_jmp);
 
   /* az_span_slice preconditions */
-  ASSERT_PRECONDITION_FAIL(az_span_slice(bad_span, 0, 0));
-  ASSERT_PRECONDITION_FAIL(az_span_slice(valid_span, 0, 100));
-  ASSERT_PRECONDITION_FAIL(az_span_slice(valid_span, 2, 1));
+  ASSERT_PRECONDITION_FAIL_SPAN(az_span_slice(bad_span, 0, 0));
+  ASSERT_PRECONDITION_FAIL_SPAN(az_span_slice(valid_span, 0, 100));
+  ASSERT_PRECONDITION_FAIL_SPAN(az_span_slice(valid_span, 2, 1));
 
   /* az_span_atou64 preconditions */
   ASSERT_PRECONDITION_FAIL(az_span_atou64(bad_span, &u64));
@@ -2418,9 +2434,11 @@ TEST az_span_internal_helpers_test(void) {
   {
     az_span s3 = AZ_SPAN_FROM_STR("xyz");
     az_precondition_failed_fn original = az_precondition_failed_get_callback();
+    size_t diff;
     az_precondition_failed_set_callback(test_precondition_failed_callback);
     g_precondition_failed_called = 0;
-    (void)_az_span_diff(s3, s1);
+    diff = _az_span_diff(s3, s1);
+    ASSERT_EQ(0, diff);
     ASSERT_EQ(1, g_precondition_failed_called);
     az_precondition_failed_set_callback(original);
   }

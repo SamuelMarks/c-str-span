@@ -543,7 +543,9 @@ double mock_modf(double x, double *intpart) {
 #define modf mock_modf
 
 static void mock_reset_cb(void *data) {
-  (void)data;
+  if (data != NULL) {
+    *(int *)data = 0;
+  }
 #if defined(_MSC_VER)
   g_mock_memcpy_s_fail = 0;
   g_mock_memmove_s_fail = 0;
@@ -803,6 +805,38 @@ TEST test_mock_failures(void) {
   PASS();
 }
 
+static int mock_allocator_oom(az_span_allocator_context *allocator_context,
+                              az_span *out_next_destination) {
+  if (allocator_context != NULL && out_next_destination != NULL) {
+    if (allocator_context->minimum_required_size > 1024) {
+      *out_next_destination = az_span_empty();
+      return (int)AZ_ERROR_OUT_OF_MEMORY;
+    }
+  }
+  return (int)AZ_OK;
+}
+
+TEST test_az_span_allocator_oom(void) {
+  az_span_allocator_context ctx;
+  az_span dest;
+  int rc;
+
+  ctx.user_context = NULL;
+  ctx.bytes_used = 0;
+  ctx.minimum_required_size = 2048;
+
+  dest = az_span_empty();
+  rc = mock_allocator_oom(&ctx, &dest);
+  ASSERT_EQ((int)AZ_ERROR_OUT_OF_MEMORY, rc);
+  ASSERT_EQ(0, (int)az_span_size(dest));
+
+  ctx.minimum_required_size = 512;
+  rc = mock_allocator_oom(&ctx, &dest);
+  ASSERT_EQ((int)AZ_OK, rc);
+
+  PASS();
+}
+
 SUITE(coverage_suite) {
   SET_SETUP(mock_reset_cb, NULL);
   printf("1\n");
@@ -835,4 +869,5 @@ SUITE(coverage_suite) {
   printf("13\n");
   RUN_TEST(test_az_span_printf_all_specifiers);
   RUN_TEST(test_mock_failures);
+  RUN_TEST(test_az_span_allocator_oom);
 }

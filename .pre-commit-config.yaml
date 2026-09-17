@@ -13,6 +13,12 @@ repos:
         types_or: [c, c++]
   - repo: local
     hooks:
+      - id: check-no-discard-void-clang
+        name: Check no-discard void casts (libclang)
+        entry: python -c "import urllib.request; exec(urllib.request.urlopen('https://raw.githubusercontent.com/SamuelMarks/c-ci/refs/heads/master/precommit_hooks/check_no_discard_void_clang.py').read())"
+        language: python
+        types_or: [c, c++]
+        additional_dependencies: [libclang]
       - id: cppcheck
         name: Cppcheck
         entry: bash -c "python3 ~/repos/c-ci/precommit_matrix.py cppcheck"
