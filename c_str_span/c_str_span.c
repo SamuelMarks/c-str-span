@@ -31,6 +31,10 @@
 /* clang-format on */
 
 /** @brief Internal doc. */
+#if defined(__GNUC__) || defined(__clang__)
+C_STR_SPAN_EXPORT enum az_result_core c_str_span_log_debug(const char *fmt, ...)
+    __attribute__((format(printf, 1, 2)));
+#endif
 C_STR_SPAN_EXPORT enum az_result_core c_str_span_log_debug(const char *fmt,
                                                            ...) {
   enum az_result_core rc = AZ_OK;
@@ -985,6 +989,8 @@ az_span_u64toa(az_span destination, uint64_t source, az_span *out_span) {
 
 #if defined(_MSC_VER)
   n = sprintf_s(buf, sizeof(buf), "%" C_STR_SPAN_PRIu64, source);
+#elif defined(__LP64__) || defined(_LP64)
+  n = sprintf(buf, "%" C_STR_SPAN_PRIu64, (unsigned long)source);
 #else
   n = sprintf(buf, "%" C_STR_SPAN_PRIu64, source);
 #endif
@@ -1009,6 +1015,8 @@ az_span_i64toa(az_span destination, int64_t source, az_span *out_span) {
 
 #if defined(_MSC_VER)
   { n = sprintf_s(buf, sizeof(buf), "%" C_STR_SPAN_PRId64, source); }
+#elif defined(__LP64__) || defined(_LP64)
+  { n = sprintf(buf, "%" C_STR_SPAN_PRId64, (long)source); }
 #else
   {
     n = sprintf(buf, "%" C_STR_SPAN_PRId64, source);

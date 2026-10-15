@@ -9,37 +9,12 @@
 #include "c_str_span_printf.h"
 #include "c_str_span_private.h"
 
-#if defined(__GNUC__) || defined(__clang__)
-#endif
-
 #include <greatest.h>
 #include <math.h>
 #include <setjmp.h>
 #include <stdio.h>
 #include <string.h>
 /* clang-format on */
-
-#if 0
-static jmp_buf g_precondition_jmp;
-static volatile bool g_precondition_expected = false;
-
-static void test_precondition_failed_callback(void) {
-  if (g_precondition_expected) {
-    longjmp(g_precondition_jmp, 1);
-  }
-}
-
-#define ASSERT_PRECONDITION_FAIL(expr)                                         \
-  do {                                                                         \
-    g_precondition_expected = true;                                            \
-    if (setjmp(g_precondition_jmp) == 0) {                                     \
-      (void)(expr);                                                            \
-      g_precondition_expected = false;                                         \
-      FAIL();                                                                  \
-    }                                                                          \
-    g_precondition_expected = false;                                           \
-  } while ((void)0, 0)
-#endif
 
 TEST test_az_span_create_from_str_null(void) {
 #ifndef __CYGWIN__
@@ -104,41 +79,18 @@ TEST test_az_span_copy_small_destination(void) {
   uint8_t dest_buf[2];
   az_span dest = az_span_create(dest_buf, 2);
   az_span src = AZ_SPAN_FROM_STR("hello");
-
-#if 0
-  az_precondition_failed_fn original = az_precondition_failed_get_callback();
-  az_precondition_failed_set_callback(test_precondition_failed_callback);
-
-  az_span out_span;
-  ASSERT_PRECONDITION_FAIL(az_span_copy(dest, src, &out_span));
-
-  az_precondition_failed_set_callback(original);
-#else
   az_span result;
   enum az_result_core rc = az_span_copy(dest, src, &result);
   ASSERT_EQ(AZ_ERROR_NOT_ENOUGH_SPACE, rc);
   /* az_span_copy truncates if destination is too small */
   ASSERT_EQ(0, az_span_size(result));
   ASSERT_MEM_EQ("he", dest_buf, 2);
-#endif
   PASS();
 }
 
 TEST test_az_span_to_str_small_buffer(void) {
   char buf[3];
   az_span src = AZ_SPAN_FROM_STR("hello");
-
-#if 0
-  az_precondition_failed_fn original = az_precondition_failed_get_callback();
-  az_precondition_failed_set_callback(test_precondition_failed_callback);
-
-  /* az_span_to_str expects size_to_write < destination_max_size */
-  ASSERT_PRECONDITION_FAIL(az_span_to_str(buf, 3, src));
-  /* and destination_max_size > 0 */
-  ASSERT_PRECONDITION_FAIL(az_span_to_str(buf, 0, src));
-
-  az_precondition_failed_set_callback(original);
-#else
   enum az_result_core rc = az_span_to_str(buf, 3, src);
   ASSERT_EQ(AZ_OK, rc);
   ASSERT_STR_EQ("he", buf);
@@ -146,7 +98,6 @@ TEST test_az_span_to_str_small_buffer(void) {
   /* Test size 0 buffer */
   rc = az_span_to_str(buf, 0, src);
   ASSERT_EQ(AZ_OK, rc);
-#endif
   PASS();
 }
 
@@ -297,7 +248,7 @@ TEST test_az_is_expected_span_fail(void) {
 }
 
 TEST test_c_str_span_log_debug(void) {
-  c_str_span_log_debug("Test %d\n", 1);
+  ASSERT_EQ(AZ_OK, c_str_span_log_debug("Test %d\n", 1));
   PASS();
 }
 
@@ -666,9 +617,13 @@ TEST test_mock_failures(void) {
     az_span d_out;
     az_span ref_span;
     ptrdiff_t url_out_len = 0;
-    uint64_t const inf_bits = 0x7FF0000000000000ULL;
+    uint64_t const inf_bits = (((uint64_t)0x7FF00000) << 32);
     double d_inf;
-    memcpy(&d_inf, &inf_bits, sizeof(d_inf));
+#if defined(_MSC_VER) && !defined(__clang__)
+    (memcpy_s)(&d_inf, sizeof(d_inf), &inf_bits, sizeof(inf_bits));
+#else
+    (memcpy)(&d_inf, &inf_bits, sizeof(d_inf));
+#endif
 
     /* az_span_atou64 error paths */
     ASSERT_EQ(AZ_ERROR_ARG, az_span_atou64(az_span_empty(), &val64));
@@ -722,8 +677,8 @@ TEST test_mock_failures(void) {
 
     /* _az_span_url_encode error paths */
     ASSERT_EQ(AZ_ERROR_ARG,
-              _az_span_url_encode(az_span_empty(), AZ_SPAN_FROM_STR("a"),
-                                  &url_out_len));
+              _az_span_url_encode(az_span_create(d_buf, 0),
+                                  AZ_SPAN_FROM_STR("a"), &url_out_len));
     ASSERT_EQ(AZ_ERROR_ARG,
               _az_span_url_encode(az_span_create(d_buf, 1),
                                   AZ_SPAN_FROM_STR(" "), &url_out_len));
@@ -834,11 +789,18 @@ TEST test_az_span_allocator_oom(void) {
   rc = mock_allocator_oom(&ctx, &dest);
   ASSERT_EQ((int)AZ_OK, rc);
 
+  rc = mock_allocator_oom(NULL, &dest);
+  ASSERT_EQ((int)AZ_OK, rc);
+
+  rc = mock_allocator_oom(&ctx, NULL);
+  ASSERT_EQ((int)AZ_OK, rc);
+
   PASS();
 }
 
 SUITE(coverage_suite) {
   SET_SETUP(mock_reset_cb, NULL);
+  SET_TEARDOWN(mock_reset_cb, NULL);
   printf("1\n");
   RUN_TEST(test_all_errors);
   RUN_TEST(test_c_str_span_log_debug);

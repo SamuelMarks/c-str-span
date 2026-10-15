@@ -1,10 +1,16 @@
 #ifndef C_STR_SPAN_CRT_MOCK_H
 #define C_STR_SPAN_CRT_MOCK_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
+/* clang-format off */
 #include <math.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
+/* clang-format on */
 
 #if defined(_MSC_VER)
 extern int g_mock_memcpy_s_fail;
@@ -30,9 +36,18 @@ extern int g_mock_vfprintf_fail;
 
 extern void *mock_memcpy(void *dest, const void *src, size_t n);
 extern void *mock_memmove(void *dest, const void *src, size_t n);
+#if defined(__GNUC__) || defined(__clang__)
+extern int mock_sprintf(char *str, const char *format, ...)
+    __attribute__((format(printf, 2, 3)));
+extern int mock_fprintf(FILE *stream, const char *format, ...)
+    __attribute__((format(printf, 2, 3)));
+extern int mock_vfprintf(FILE *stream, const char *format, va_list arg)
+    __attribute__((format(printf, 2, 0)));
+#else
 extern int mock_sprintf(char *str, const char *format, ...);
 extern int mock_fprintf(FILE *stream, const char *format, ...);
 extern int mock_vfprintf(FILE *stream, const char *format, va_list arg);
+#endif
 #endif
 
 extern int g_mock_fputc_fail;
@@ -43,5 +58,9 @@ extern int g_mock_modf_call_count;
 extern int mock_fputc(int character, FILE *stream);
 extern int mock_fputs(const char *str, FILE *stream);
 extern double mock_modf(double x, double *intpart);
+
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 
 #endif /* !C_STR_SPAN_CRT_MOCK_H */

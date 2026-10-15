@@ -2155,6 +2155,13 @@ TEST az_span_url_encode_test(void) {
         result, AZ_SPAN_FROM_STR("Hello%20World%21%20%26%20%40")));
   }
 
+  /* Destination size 3 >= source size 2 (" a"), but " " takes 3 bytes so 'a'
+   * triggers dest_ptr >= dest_end */
+  ASSERT_EQ(AZ_ERROR_NOT_ENOUGH_SPACE,
+            _az_span_url_encode(az_span_create(buffer, 3),
+                                AZ_SPAN_FROM_STR(" a"), &out_len));
+  ASSERT_EQ(0, out_len);
+
   PASS();
 }
 

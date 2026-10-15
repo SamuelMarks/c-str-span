@@ -63,18 +63,31 @@ extern "C" {
 #define AZ_INLINE static __inline__
 #endif /* _MSC_VER */
 
+#if defined(_MSC_VER)
+/** @brief Format specifier for int64_t. */
+#define C_STR_SPAN_PRId64 "I64d"
+/** @brief Format specifier for uint64_t. */
+#define C_STR_SPAN_PRIu64 "I64u"
+/** @brief Format specifier for hex uint64_t. */
+#define C_STR_SPAN_PRIx64 "I64x"
+#elif defined(__LP64__) || defined(_LP64)
+/** @brief Format specifier for int64_t. */
+#define C_STR_SPAN_PRId64 "ld"
+/** @brief Format specifier for uint64_t. */
+#define C_STR_SPAN_PRIu64 "lu"
+/** @brief Format specifier for hex uint64_t. */
+#define C_STR_SPAN_PRIx64 "lx"
+#else
+/** @brief Format specifier for int64_t. */
+#define C_STR_SPAN_PRId64 PRId64
+/** @brief Format specifier for uint64_t. */
+#define C_STR_SPAN_PRIu64 PRIu64
+/** @brief Format specifier for hex uint64_t. */
+#define C_STR_SPAN_PRIx64 PRIx64
+#endif
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
-
-#if defined(_MSC_VER) && _MSC_VER < 1600
-#define C_STR_SPAN_PRId64 "I64d"
-#define C_STR_SPAN_PRIu64 "I64u"
-#define C_STR_SPAN_PRIx64 "I64x"
-#else
-#define C_STR_SPAN_PRId64 PRId64
-#define C_STR_SPAN_PRIu64 PRIu64
-#define C_STR_SPAN_PRIx64 PRIx64
-#endif
 
 #endif /* C_STR_SPAN_TYPES_H */

@@ -1,17 +1,4 @@
 
-/**
- * @brief Macro to get the string representation of an error code.
- *
- * @param rc The error code.
- * @param buf The buffer to store the error string.
- * @param size The size of the buffer.
- */
-#if defined(_MSC_VER)
-#define C_STR_SPAN_STRERROR(rc, buf, size) ((void)(buf), (void)(size), "Error")
-#else
-#define C_STR_SPAN_STRERROR(rc, buf, size) ((void)(buf), (void)(size), "Error")
-#endif
-
 /* Copyright (c) Microsoft Corporation. All rights reserved.
  * SPDX-License-Identifier: MIT */
 
@@ -47,6 +34,21 @@ extern "C" {
 #include <string.h>
 /* clang-format on */
 /*#include <azure/core/_az_cfg_prefix.h>*/
+
+/**
+ * @brief Macro to get the string representation of an error code.
+ *
+ * @param rc The error code.
+ * @param buf The buffer to store the error string.
+ * @param size The size of the buffer.
+ */
+#if defined(_MSC_VER)
+#define C_STR_SPAN_STRERROR(rc, buf, size)                                     \
+  ((buf) != NULL && (size) > 0 && (rc) != 0 ? "Error" : "Error")
+#else
+#define C_STR_SPAN_STRERROR(rc, buf, size)                                     \
+  ((buf) != NULL && (size) > 0 && (rc) != 0 ? "Error" : "Error")
+#endif
 
 enum {
   _az_FACILITY_CORE = 0x1,

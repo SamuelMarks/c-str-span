@@ -87,5 +87,8 @@ add_test(NAME "${EXEC_NAME}"
 add_executable("${EXEC_NAME}_coverage" "test_coverage_main.c" "test_coverage.c" "c_str_span_crt_mock.h")
 target_include_directories("${EXEC_NAME}_coverage" BEFORE PRIVATE "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>" "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/..>" "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..>" "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>" "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>")
 # Notice we DO NOT link ${PROJECT_NAME} because test_coverage.c #includes the C files directly
-target_link_libraries("${EXEC_NAME}_coverage" PRIVATE greatest)
+target_link_libraries("${EXEC_NAME}_coverage" PRIVATE "${PROJECT_NAME}_compiler_flags" greatest)
+if(MATH_LIBRARY)
+    target_link_libraries("${EXEC_NAME}_coverage" PRIVATE ${MATH_LIBRARY})
+endif()
 add_test(NAME "${EXEC_NAME}_coverage" COMMAND "${EXEC_NAME}_coverage" WORKING_DIRECTORY "${PROJECT_BINARY_DIR}")

@@ -1,3 +1,9 @@
+/**
+ * @file
+ *
+ * @brief Public API for formatted output of #az_span.
+ */
+
 #ifndef C_STR_SPAN_PRINTF_H
 #define C_STR_SPAN_PRINTF_H
 
@@ -21,9 +27,13 @@ extern "C" {
 /*extern C_STR_SPAN_EXPORT enum az_result_core az_span_fprintf(FILE * __restrict
  * OUT, const uint8_t *format, ...);*/
 
-/* `az_span`s supported with "%Q", with special characters escaped.
- * doesn't support "%03d" or other fancier syntax
- * */
+/**
+ * @brief Prints formatted output to stdout, supporting #az_span with `%Q`
+ * (special characters escaped).
+ *
+ * @param[in] format Null-terminated format string.
+ * @return #AZ_OK on success, or #AZ_ERROR_ARG on failure.
+ */
 extern C_STR_SPAN_EXPORT enum az_result_core
 az_span_printf(const uint8_t *format, ...);
 
