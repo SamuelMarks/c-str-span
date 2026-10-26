@@ -78,6 +78,9 @@ if (NOT PRECONDITIONS)
     add_compile_definitions(AZ_NO_PRECONDITION_CHECKING)
 endif ()
 
+option(${PROJECT_PREFIX}_COVERAGE "Enable code coverage" OFF)
+option(CODE_COVERAGE "Enable code coverage" OFF)
+
 #===============#
 # Compiler args #
 #===============#
@@ -101,16 +104,23 @@ if (NOT DEFINED MSVC_VERSION
         target_compile_options(
                 "${PROJECT_NAME}_compiler_flags"
                 INTERFACE
-                "$<$<AND:${gcc_like},$<CONFIG:Debug>>:$<BUILD_INTERFACE:-Wshadow;-Wformat=2;-Wall;-Wconversion;-Wcast-align;-Wstrict-prototypes;-Wmissing-prototypes;-Wsign-conversion;-pedantic;-fprofile-arcs;-ftest-coverage>>"
-                "$<$<AND:${clang_like},$<CONFIG:Debug>>:$<BUILD_INTERFACE:-Wshadow;-Wformat=2;-Wall;-Wconversion;-Wcast-align;-Wstrict-prototypes;-Wmissing-prototypes;-Wsign-conversion;-Wshorten-64-to-32;-pedantic;-fprofile-arcs;-ftest-coverage>>"
+                "$<$<AND:${gcc_like},$<CONFIG:Debug>>:$<BUILD_INTERFACE:-Wshadow;-Wformat=2;-Wall;-Wconversion;-Wcast-align;-Wstrict-prototypes;-Wmissing-prototypes;-Wsign-conversion;-pedantic>>"
+                "$<$<AND:${clang_like},$<CONFIG:Debug>>:$<BUILD_INTERFACE:-Wshadow;-Wformat=2;-Wall;-Wconversion;-Wcast-align;-Wstrict-prototypes;-Wmissing-prototypes;-Wsign-conversion;-Wshorten-64-to-32;-pedantic>>"
                 "$<${msvc}:$<BUILD_INTERFACE:-W4;-WX;-Zi>>"
                 "$<$<AND:${msvc},$<VERSION_GREATER_EQUAL:$<C_COMPILER_VERSION>,19.10>>:$<BUILD_INTERFACE:-permissive->>"
         )
-        target_link_options(
-                "${PROJECT_NAME}_compiler_flags"
-                INTERFACE
-                "$<$<AND:$<OR:${gcc_like},${clang_like}>,$<CONFIG:Debug>>:$<BUILD_INTERFACE:--coverage>>"
-        )
+        if (${PROJECT_PREFIX}_COVERAGE OR CODE_COVERAGE)
+            target_compile_options(
+                    "${PROJECT_NAME}_compiler_flags"
+                    INTERFACE
+                    "$<$<AND:$<OR:${gcc_like},${clang_like}>,$<CONFIG:Debug>>:$<BUILD_INTERFACE:-fprofile-arcs;-ftest-coverage>>"
+            )
+            target_link_options(
+                    "${PROJECT_NAME}_compiler_flags"
+                    INTERFACE
+                    "$<$<AND:$<OR:${gcc_like},${clang_like}>,$<CONFIG:Debug>>:$<BUILD_INTERFACE:--coverage>>"
+            )
+        endif ()
     endif (CMAKE_VERSION VERSION_GREATER_EQUAL "3.15")
 endif ()
 # Set the build directories
