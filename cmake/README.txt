@@ -1,7 +1,7 @@
 c_str_span
 
-Repo for [most] all my experiments in C, on GitHub to run in cross-platform workflows.
+UTF-8 replacement for C strings, supporting zero-copy use-cases (non-null-terminated).
 
 ------------------------------------------------------------------------
 
-Licensed under CC0
+MIT licensed
